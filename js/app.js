@@ -13,11 +13,10 @@ class Notification{
 
 //Main logic
 let appModel = new AppViewModel();
-
 ko.applyBindings(appModel);
 
 function AppViewModel() {
-    this.school = "Technology Services";
+    this.school = ko.observable("Technology Services");
     this.sections = ["login", "apps"]
     this.currentSection = ko.observable("login");
 
@@ -34,6 +33,7 @@ function AppViewModel() {
 }
 
 function login() {
+    //Boilerplate Config
     let username = appModel.username();
     let password = appModel.password();
     let config = {
@@ -43,6 +43,7 @@ function login() {
         password: password
     };
     let ad = new ActiveDirectory(config);
+    //Get User Info
     ad.findUser(username, function (err, user) {
         if (err) {
             let error = "Invalid Credentials"
@@ -51,7 +52,22 @@ function login() {
             return;
         }
         console.log(username + ': ');
-        console.log(JSON.stringify(user));
+        console.log(user);
+        //Parse DN
+        let DN = user.dn.split(",");
+        for(let piece of DN){
+            let subpieces = piece.split("=")
+            let type = subpieces[0];
+            let value = subpieces[1];
+            if(user[type] === undefined){
+                user[type] = [value];
+            }
+            else{
+                user[type].push(value);
+            }
+        }
+        appModel.school(user.OU[user.OU.length-1]);
+        console.log(user);
         appModel.user(user);
         appModel.currentSection('apps');
     });
