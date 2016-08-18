@@ -1,19 +1,96 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Hello World!</title>
-  </head>
-  <body>
-    <h1>Hello World!</h1>
-    <!-- All of the Node.js APIs are available in this renderer process. -->
-    We are using node <script>document.write(process.versions.node)</script>,
-    Chromium <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
-  </body>
+<html lang="en" class=" js">
 
-  <script>
-    // You can also require other files to run in this process
-    require('./renderer.js')
-  </script>
+<head>
+  <meta charset="UTF-8">
+  <title>CNGEN</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/bootstrap-select.min.css">
+  <link rel="stylesheet" href="css/vcubranding-main-2.0.css">
+  <link rel="stylesheet" href="css/custom.min.css">
+  <link rel="stylesheet" href="css/font-awesome.min.css">
+  <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+  <script src="js/jquery-2.2.4.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/bootstrap-select.min.js"></script>
+  <script src="js/knockout-3.4.0.js"></script>
+  <script>if (window.module) module = window.module;</script>
+</head>
+
+<body>
+  <header>
+    <div id="vcuIdentityWrapper">
+      <header id="vcuIdentity">
+        <h1><a title="Virginia Commonwealth University">Virginia Commonwealth University</a></h1>
+        <h2><a title="VCU Make it real.">Make it real.</a></h2>
+      </header>
+    </div>
+    <div class="ts-header">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="department-name">
+              <a><strong>VCU</strong> <span data-bind="text: school"></span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="notifications">
+      <div class="container">
+        <div class="row"></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container vertical-align" data-bind="visible: currentSection() == 'login'">
+      <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+          <h1>Login</h1>
+          <div class="input-group input-group-lg">
+            <input type="text" class="form-control" placeholder="Username" aria-describedby="sizing-addon1" data-bind="value: username">
+            <span class="input-group-addon" id="sizing-addon1">@vcu.edu</span>
+          </div>
+          <input type="password" class="form-control input-lg" placeholder="Password" aria-describedby="sizing-addon1" data-bind="value: password">
+          <button class="btn btn-ts-dark btn-lg pull-right" data-bind="click: login">Login</button>
+        </div>
+      </div>
+    </div>
+    <div class="container" data-bind="visible: currentSection() == 'apps'">
+      <h1 class="text-center">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Tempore eum quo, ex molestias iste necessitatibus soluta
+        in, qui, iusto ipsa eligendi dolorem quisquam quis aspernatur beatae mollitia fuga quidem ipsum.</h1>
+      <h1>Please name me</h1>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 ts-home-footer-info">
+            <ul class="list-unstyled">
+              <li><a>Virginia Commonwealth University</a></li>
+              <li><a>Technology Services</a></li>
+              <li>701 W. Broad St., P.O. Box 843059</li>
+              <li>Richmond, VA 23284</li>
+              <li>Phone: (804) 828-2227</li>
+              <li><a href="mailto:itsc@vcu.edu" title="Click here to open your mail client to email Technology Services">Contact Us</a></li>
+            </ul>
+          </div>
+        </div>
+        <!-- /.row -->
+      </div>
+    </div>
+    <div id="realLogo">
+      <h1><a href="http://www.makeitreal.vcu.edu" target="_blank" title="VCU Make it real.">Make it real.</a></h1>
+      <h2><a href="http://www.vcu.edu" target="_blank" title="Virginia Commonwealth University">Virginia Commonwealth University</a></h2>
+    </div>
+  </footer>
+</body>
+<script src="js/app.js"></script>
+<script>
+  require('./renderer.js');
+</script>
+
 </html>
