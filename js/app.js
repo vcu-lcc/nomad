@@ -1,8 +1,11 @@
 let ActiveDirectory = require('activedirectory');
 
 class Notification{
-    constructor(name, type, message, dismissable=true){
-
+    constructor(name, type = "success", message, dismissable=true){
+        this.name = name;
+        this.type = type;   //bootstrap alerts: success, info, warning, danger
+        this.message = message;
+        this.dismissable = dismissable;
     }
 }
 
