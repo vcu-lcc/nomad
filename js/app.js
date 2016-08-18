@@ -33,6 +33,7 @@ function AppViewModel() {
 }
 
 function login() {
+    appModel.notifications.removeAll();
     //Boilerplate config
     let username = appModel.username();
     let password = appModel.password();
@@ -47,7 +48,6 @@ function login() {
     ad.findUser(username, function (err, user) {
         if (err) {
             let error = "Invalid Credentials"
-            appModel.notifications.removeAll();
             appModel.notifications.push(new Notification("Login Error", "danger", error));
             return;
         }
