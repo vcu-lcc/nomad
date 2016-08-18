@@ -9,4 +9,5 @@ main{flex:1}
 .alert-header{
     margin: 0;
     border-radius: 0;
+    height: auto !important;
 }

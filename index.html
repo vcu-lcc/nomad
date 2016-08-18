@@ -37,7 +37,7 @@
       </div>
     </div>
     <div id="notifications">
-      <div data-bind="template: { name: 'notification-template', foreach: notifications }"></div>
+      <div data-bind="template: { name: 'notification-template', foreach: notifications, beforeRemove: hideNotification, afterAdd: showNotification}"></div>
     </div>
   </header>
 
@@ -46,19 +46,19 @@
       <div class="row">
         <div class="col-md-6 col-md-offset-3">
           <h1>Login</h1>
+          <form>
           <div class="input-group input-group-lg">
             <input type="text" class="form-control" placeholder="Username" aria-describedby="sizing-addon1" data-bind="value: username">
             <span class="input-group-addon" id="sizing-addon1">@vcu.edu</span>
           </div>
           <input type="password" class="form-control input-lg" placeholder="Password" aria-describedby="sizing-addon1" data-bind="value: password">
           <button class="btn btn-ts-dark btn-lg pull-right" data-bind="click: login">Login</button>
+          </form>
         </div>
       </div>
     </div>
     <div class="container" data-bind="visible: currentSection() == 'apps'">
-      <h1 class="text-center">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Tempore eum quo, ex molestias iste necessitatibus soluta
-        in, qui, iusto ipsa eligendi dolorem quisquam quis aspernatur beatae mollitia fuga quidem ipsum.</h1>
-      <h1>Please name me</h1>
+      <h1>Welcome <span data-bind="text: user().displayName"></span></h1>
     </div>
   </main>
 
@@ -88,9 +88,16 @@
 </body>
 
 <script type="text/html" id="notification-template">
-  <div class="alert alert-header" data-bind="css: alertModifier">
-    <span data-bind="text: message"></span>
+<div class="collapse">
+  <div class="alert alert-header text-center" data-bind="css: alertModifier">
+    <div class="container">
+      <b data-bind="text: message"></b>
+      <button type="button" class="close"<span aria-hidden="true" data-bind="click: $parent.removeNotification">&times;</span></button>
+    </div>
+    
+
   </div>
+</div>
 </script>
 
 <script src="js/app.js"></script>

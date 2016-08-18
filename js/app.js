@@ -23,14 +23,17 @@ function AppViewModel() {
 
     this.username = ko.observable();
     this.password = ko.observable();
+    this.user = ko.observable();
     this.loggedIn = false;
     
     this.notifications = ko.observableArray();
+    this.removeNotification = (notification)=>{
+        this.notifications.remove(notification);
+    }
 
 }
 
 function login() {
-    appModel.notifications.push(new Notification("test","success", "this is a notification"));
     let username = appModel.username();
     let password = appModel.password();
     let config = {
@@ -40,32 +43,25 @@ function login() {
         password: password
     };
     let ad = new ActiveDirectory(config);
-    ad.authenticate(username, password, function (err, auth) {
+    ad.findUser(username, function (err, user) {
         if (err) {
-            console.log('ERROR: ' + JSON.stringify(err));
+            let error = "Invalid Credentials"
+            appModel.notifications.removeAll();
+            appModel.notifications.push(new Notification("Login Error", "danger", error));
             return;
         }
-
-        if (auth) {
-            console.log('Authenticated!');
-        }
-        else {
-            console.log('Authentication failed!');
-        }
+        console.log(username + ': ');
+        console.log(JSON.stringify(user));
+        appModel.user(user);
+        appModel.currentSection('apps');
     });
-    // ad.findUser(username, function (err, user) {
-    //     if (err) {
-    //         console.log('ERROR: ' + JSON.stringify(err));
-    //         return;
-    //     }
-    //     console.log(username + ': ');
-    //     console.log(JSON.stringify(user));
-    // });
 }
 
-function createNotification(name, type, message){
 
+
+function showNotification(elem){
+    $(elem).collapse('show');
 }
-function dismissNotification(name){
-
+function hideNotification(elem){
+    $(elem).collapse('hide');
 }
