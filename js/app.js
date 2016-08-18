@@ -3,7 +3,7 @@ let ActiveDirectory = require('activedirectory');
 class Notification{
     constructor(name, type = "success", message, dismissable=true){
         this.name = name;
-        this.type = type;   //bootstrap alerts: success, info, warning, danger
+        this.type = type;   //Bootstrap alerts: success, info, warning, danger
         this.alertModifier = "alert-" + type;
         this.message = message;
         this.dismissable = dismissable;
@@ -33,7 +33,7 @@ function AppViewModel() {
 }
 
 function login() {
-    //Boilerplate Config
+    //Boilerplate config
     let username = appModel.username();
     let password = appModel.password();
     let config = {
@@ -43,7 +43,7 @@ function login() {
         password: password
     };
     let ad = new ActiveDirectory(config);
-    //Get User Info
+    //Get user info
     ad.findUser(username, function (err, user) {
         if (err) {
             let error = "Invalid Credentials"
@@ -51,8 +51,6 @@ function login() {
             appModel.notifications.push(new Notification("Login Error", "danger", error));
             return;
         }
-        console.log(username + ': ');
-        console.log(user);
         //Parse DN
         let DN = user.dn.split(",");
         for(let piece of DN){
@@ -66,8 +64,8 @@ function login() {
                 user[type].push(value);
             }
         }
+        //Update model
         appModel.school(user.OU[user.OU.length-1]);
-        console.log(user);
         appModel.user(user);
         appModel.currentSection('apps');
     });
