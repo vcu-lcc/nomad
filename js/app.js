@@ -4,9 +4,11 @@ class Notification{
     constructor(name, type = "success", message, dismissable=true){
         this.name = name;
         this.type = type;   //bootstrap alerts: success, info, warning, danger
+        this.alertModifier = "alert-" + type;
         this.message = message;
         this.dismissable = dismissable;
     }
+    
 }
 
 //Main logic
@@ -23,11 +25,12 @@ function AppViewModel() {
     this.password = ko.observable();
     this.loggedIn = false;
     
-    this.notifications = [];
+    this.notifications = ko.observableArray();
 
 }
 
 function login() {
+    appModel.notifications.push(new Notification("test","success", "this is a notification"));
     let username = appModel.username();
     let password = appModel.password();
     let config = {

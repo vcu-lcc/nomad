@@ -37,9 +37,7 @@
       </div>
     </div>
     <div id="notifications">
-      <div class="container">
-        <div class="row"></div>
-      </div>
+      <div data-bind="template: { name: 'notification-template', foreach: notifications }"></div>
     </div>
   </header>
 
@@ -88,9 +86,13 @@
     </div>
   </footer>
 </body>
-<script src="js/app.js"></script>
-<script>
-  require('./renderer.js');
+
+<script type="text/html" id="notification-template">
+  <div class="alert alert-header" data-bind="css: alertModifier">
+    <span data-bind="text: message"></span>
+  </div>
 </script>
+
+<script src="js/app.js"></script>
 
 </html>
