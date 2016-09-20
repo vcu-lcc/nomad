@@ -37,29 +37,53 @@
       </div>
     </div>
     <div id="notifications">
-      <div data-bind="template: { name: 'notification-template', foreach: notifications, beforeRemove: hideNotification, afterAdd: showNotification}"></div>
+      <div data-bind="template: { name: 'notification-template', foreach: notifications, beforeRemove: hideNotification, afterRender: showNotification}"></div>
     </div>
   </header>
 
   <main>
+
     <div class="container vertical-align" data-bind="visible: currentSection() == 'login'">
       <div class="row">
         <div class="col-md-6 col-md-offset-3">
           <h1>Login</h1>
           <form>
-          <div class="input-group input-group-lg">
-            <input type="text" class="form-control" placeholder="Username" aria-describedby="sizing-addon1" data-bind="value: username">
-            <span class="input-group-addon" id="sizing-addon1">@vcu.edu</span>
-          </div>
-          <input type="password" class="form-control input-lg" placeholder="Password" aria-describedby="sizing-addon1" data-bind="value: password">
-          <button class="btn btn-ts-dark btn-lg pull-right" data-bind="click: login">Login</button>
+            <div class="form-group">
+              <div class="input-group input-group-lg">
+                <input type="text" class="form-control" placeholder="Username" aria-describedby="sizing-addon1" data-bind="value: username">
+                <span class="input-group-addon" id="sizing-addon1">@vcu.edu</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <input type="password" class="form-control input-lg" placeholder="Password" aria-describedby="sizing-addon1" data-bind="value: password">
+            </div>
+            <button class="btn btn-ts-dark btn-lg pull-right" data-bind="click: login">Login</button>
           </form>
         </div>
       </div>
     </div>
-    <div class="container" data-bind="visible: currentSection() == 'apps'">
+
+    <div class="container" data-bind="visible: currentSection() == 'apps'" style="display: none">
       <h1>Welcome <span data-bind="text: user().displayName"></span></h1>
+      <div class="row section">
+        <div class="col-md-12"><h1>Please name this computer</h1></div>
+        <form class="form-inline">
+          <div class="form-group">
+            <label for="">Campus <span data-bind="text: campus"></span></label>
+            <select class="selectpicker" data-live-search="true" 
+            data-bind="value: campus, options: Object.keys(computerLocations)">
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="">Building <span data-bind="text: building"></span></label>
+            <select class="selectpicker" data-live-search="true" 
+            data-bind="value: building, options: Object.keys(computerLocations[campus()])">
+            </select>
+          </div>
+        </form>
+      </div>
     </div>
+
   </main>
 
   <footer>
