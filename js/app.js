@@ -14,12 +14,30 @@ class Notification {
 let appModel = new AppViewModel();
 ko.applyBindings(appModel);
 
-
+//lab numbering L00-L99
+//with lab numbering get rid of dash
 
 function AppViewModel() {
     this.school = ko.observable("Technology Services");
     this.sections = ["login", "apps"]
     this.currentSection = ko.observable("login");
+
+
+    //Computer Type Buttons
+    this.computerType = ko.observable();
+    //Naming Forms format(boolean for enabling/disabling): [campus,building,room,floor,physicalLocation,computerNumber];
+    this.namingFormsEnabled = ko.observable({
+        campus: true,
+        building: true,
+        room: true,
+        floor: true,
+        physicalLocation: true,
+        computerNumber: true
+    });
+    //http://davidarvelo.com/blog/array-number-range-sequences-in-javascript-es6/
+    this.floors =  Array.from(Array(100).keys());
+    this.physicalLocations = ["Lobby", "Hallway", "Elevator"];
+    this.computerNumbers  = Array.from(Array(100).keys());
 
     this.username = ko.observable();
     this.password = ko.observable();
@@ -79,7 +97,13 @@ function AppViewModel() {
     this.campus = ko.observable("MPC");
     this.building = ko.observable();
     this.room = ko.observable();
-    this.number = ko.observable();
+    this.floor = ko.observable();
+    this.physicalLocation = ko.observable();
+    this.computerNumber = ko.observable();
+
+    this.computerName = ko.computed(function(){
+        return this.campus() + "-" + this.building() + "-" + this.room() + "-" + leftPad(this.computerNumber());
+    },this);
 
     this.campus.subscribe((newValue)=>$('.selectpicker').selectpicker('render'));
 
@@ -99,6 +123,14 @@ var observer = new MutationObserver(function(mutations) {
 $("body").on("click", ".bootstrap-select",function(){
     console.log("refresh");
     $('.selectpicker').selectpicker('refresh');
+});
+$("#computerType").on("click", "button", function(){
+    let computerType = $(this).text();
+    $("#computerType").find("button").each(function(){
+        $(this).removeClass("btn-ts-dark");
+    });
+    $(this).addClass("btn-ts-dark");
+    appModel.computerType(computerType);
 });
 
 function login() {
@@ -153,17 +185,41 @@ function login() {
     //         console.log('Members: ' + (group.member || []).length);
     //     }
     // });
-
 }
-function infiniteRefresh(){
-    refreshSelects();
-    setTimeout(infiniteRefresh(),1000);
+function userExists(searchUser){
+    console.log("Search existence of user " + searchUser);
+    let username = appModel.username();
+    let password = appModel.password();
+    let config = {
+        url: 'ldap://rams.adp.vcu.edu',
+        baseDN: 'dc=rams, dc=ADP, dc=vcu, dc=edu',
+        username: "RAMS\\" + username,
+        password: password
+    };
+    let ad = new ActiveDirectory(config);
+    let status;
+    ad.findUser(searchUser, (err, user) => {
+        console.log("searching");
+        if (err) {
+            console.log("error " + err);
+            return false;
+        }
+        console.log("no error");
+        return true;
+    });
 }
-function refreshSelects(){
-    console.log("refresh");
-    $('.selectpicker').selectpicker('refresh');
+function leftPad(padee, length=2, padChar=0){
+    if(padee==undefined)
+        return;
+    padee = padee+"";
+    let diff = length - padee.length;
+    if(diff <= 0)
+        return padee;
+    let pad = "";
+    for(let i = 0; i < diff; i++)
+        pad += padChar;
+    return pad + padee;
 }
-
 function showNotification(elem) {
     $(elem).collapse('show');
 }

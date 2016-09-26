@@ -65,22 +65,56 @@
 
     <div class="container" data-bind="visible: currentSection() == 'apps'" style="display: none">
       <h1>Welcome <span data-bind="text: user().displayName"></span></h1>
-      <div class="row section">
+      <div class="row section" id="computerType">
+        <div class="col-md-12"><h1>What kind of computer is this?</h1></div>
+        <div class="col-md-3"><button type="button" class="btn btn-ts-light">Faculty/Staff</button></div>
+        <div class="col-md-3"><button type="button" class="btn btn-ts-light">Lab/Classroom</button></div>
+        <div class="col-md-3"><button type="button" class="btn btn-ts-light">Kiosk</button></div>
+        <div class="col-md-3"><button type="button" class="btn btn-ts-light">Digital Signage</button></div>
+      </div>
+      <div class="row section" id="computerNaming" data-bind="visible: computerType() != undefined">
         <div class="col-md-12"><h1>Please name this computer</h1></div>
         <form class="form-inline">
-          <div class="form-group">
+          <div class="form-group" data-bind="visible: namingFormsEnabled().campus">
             <label for="">Campus <span data-bind="text: campus"></span></label>
             <select class="selectpicker" data-live-search="true" 
             data-bind="value: campus, options: Object.keys(computerLocations)">
             </select>
           </div>
-          <div class="form-group">
+          <div class="form-group" data-bind="visible: namingFormsEnabled().building">
             <label for="">Building <span data-bind="text: building"></span></label>
             <select class="selectpicker" data-live-search="true" 
             data-bind="value: building, options: Object.keys(computerLocations[campus()])">
             </select>
           </div>
+          <div class="form-group" data-bind="visible: namingFormsEnabled().room">
+            <label for="">Room <span data-bind="text: room"></span></label>
+            <select class="selectpicker" data-live-search="true" 
+            data-bind="value: room, options: computerLocations[campus()][building()]">
+            </select>
+          </div>
+          <div class="form-group" data-bind="visible: namingFormsEnabled().floor">
+            <label for="">Floor <span data-bind="text: floor"></span></label>
+            <select class="selectpicker" data-live-search="true" 
+            data-bind="value: floor, options: floors">
+            </select>
+          </div>
+          <div class="form-group" data-bind="visible: namingFormsEnabled().physicalLocation">
+            <label for="">Physical Location <span data-bind="text: physicalLocation"></span></label>
+            <select class="selectpicker" data-live-search="true" 
+            data-bind="value: physicalLocation, options: physicalLocations">
+            </select>
+          </div>
+          <div class="form-group" data-bind="visible: namingFormsEnabled().computerNumber">
+            <label for="">Computer Number <span data-bind="text: computerNumber"></span></label>
+            <select class="selectpicker" data-live-search="true" 
+            data-bind="value: computerNumber, options: computerNumbers">
+            </select>
+          </div>
         </form>
+        <div class="col-md-12">
+          <blockquote data-bind="text: computerName()"></blockquote>
+        </div>
       </div>
     </div>
 

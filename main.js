@@ -9,8 +9,9 @@ const BrowserWindow = electron.BrowserWindow
 let mainWindow
 
 function createWindow () {
+  const {width, height} = electron.screen.getPrimaryDisplay().workAreaSize
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 1200, height: 800})
+  mainWindow = new BrowserWindow({width: width * .8, height: height, x: 0, y: 0})
   mainWindow.setMenu(null)
 
   // and load the index.html of the app.
