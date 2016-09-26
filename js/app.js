@@ -25,6 +25,7 @@ function AppViewModel() {
 
     //Computer Type Buttons
     this.computerType = ko.observable();
+
     //Naming Forms format(boolean for enabling/disabling): [campus,building,room,floor,physicalLocation,computerNumber];
     this.namingFormsEnabled = ko.observable({
         campus: true,
@@ -35,9 +36,9 @@ function AppViewModel() {
         computerNumber: true
     });
     //http://davidarvelo.com/blog/array-number-range-sequences-in-javascript-es6/
-    this.floors =  Array.from(Array(100).keys());
+    this.floors = Array.from(Array(100).keys());
     this.physicalLocations = ["Lobby", "Hallway", "Elevator"];
-    this.computerNumbers  = Array.from(Array(100).keys());
+    this.computerNumbers = Array.from(Array(100).keys());
 
     this.username = ko.observable();
     this.password = ko.observable();
@@ -46,14 +47,14 @@ function AppViewModel() {
 
     this.computerLocations = {
         "MPC": {
-            "HIB":["100","200","300","333","356","347","361","400","500"],
-            "ALC":["1001","1200","1407","2010","2020","2035","3003","3050","3052","4001","4010","4050"],
-            "TAB":["108","202","312","412"],
-            "CAB":["B46"]
+            "HIB": ["100", "200", "300", "333", "356", "347", "361", "400", "500"],
+            "ALC": ["1001", "1200", "1407", "2010", "2020", "2035", "3003", "3050", "3052", "4001", "4010", "4050"],
+            "TAB": ["108", "202", "312", "412"],
+            "CAB": ["B46"]
         },
         "MVC": {
-            "SAN":["288","289","290","299","300","301","314","420","451","521","576","600","601"],
-            "VMI":["100","121"]
+            "SAN": ["288", "289", "290", "299", "300", "301", "314", "420", "451", "521", "576", "600", "601"],
+            "VMI": ["100", "121"]
         }
     };
     // [
@@ -101,18 +102,18 @@ function AppViewModel() {
     this.physicalLocation = ko.observable();
     this.computerNumber = ko.observable();
 
-    this.computerName = ko.computed(function(){
+    this.computerName = ko.computed(function () {
         return this.campus() + "-" + this.building() + "-" + this.room() + "-" + leftPad(this.computerNumber());
-    },this);
+    }, this);
 
-    this.campus.subscribe((newValue)=>$('.selectpicker').selectpicker('render'));
+    this.campus.subscribe((newValue) => $('.selectpicker').selectpicker('render'));
 
-var observer = new MutationObserver(function(mutations) {
-	// For the sake of...observation...let's output the mutation to console to see how this all works
-	mutations.forEach(function(mutation) {
-		console.log(mutation);
-	});    
-});
+    var observer = new MutationObserver(function (mutations) {
+        // For the sake of...observation...let's output the mutation to console to see how this all works
+        mutations.forEach(function (mutation) {
+            console.log(mutation);
+        });
+    });
 
     this.notifications = ko.observableArray();
     this.removeNotification = (notification) => {
@@ -120,18 +121,21 @@ var observer = new MutationObserver(function(mutations) {
     }
 
 }
-$("body").on("click", ".bootstrap-select",function(){
+
+//Listeners
+$("body").on("click", ".bootstrap-select", function () {
     console.log("refresh");
     $('.selectpicker').selectpicker('refresh');
 });
-$("#computerType").on("click", "button", function(){
+$("#computerType").on("click", "button", function () {
     let computerType = $(this).text();
-    $("#computerType").find("button").each(function(){
+    $("#computerType").find("button").each(function () {
         $(this).removeClass("btn-ts-dark");
     });
     $(this).addClass("btn-ts-dark");
     appModel.computerType(computerType);
 });
+$("#computerNaming").find("input").keyup(_.debounce(userExists,500));
 
 function login() {
     appModel.notifications.removeAll();
@@ -186,10 +190,11 @@ function login() {
     //     }
     // });
 }
-function userExists(searchUser){
-    console.log("Search existence of user " + searchUser);
+function userExists() {
+    console.log("searching");
     let username = appModel.username();
     let password = appModel.password();
+    console.log(username);
     let config = {
         url: 'ldap://rams.adp.vcu.edu',
         baseDN: 'dc=rams, dc=ADP, dc=vcu, dc=edu',
@@ -197,26 +202,33 @@ function userExists(searchUser){
         password: password
     };
     let ad = new ActiveDirectory(config);
-    let status;
-    ad.findUser(searchUser, (err, user) => {
-        console.log("searching");
+    let checkUsername = $(this).val();
+    if (checkUsername = "")
+        return;
+    ad.findUser($(this).val(), function(err, user) {
         if (err) {
             console.log("error " + err);
-            return false;
+            $("#usernameCheck").addClass("has-error").removeClass("has-success");
+            return; 
         }
         console.log("no error");
-        return true;
+        if(user == undefined){
+            $("#usernameCheck").addClass("has-error").removeClass("has-success");
+            return;
+        }
+        
+        $("#usernameCheck").addClass("has-success").removeClass("has-error");
     });
 }
-function leftPad(padee, length=2, padChar=0){
-    if(padee==undefined)
+function leftPad(padee, length = 2, padChar = 0) {
+    if (padee == undefined)
         return;
-    padee = padee+"";
+    padee = padee + "";
     let diff = length - padee.length;
-    if(diff <= 0)
+    if (diff <= 0)
         return padee;
     let pad = "";
-    for(let i = 0; i < diff; i++)
+    for (let i = 0; i < diff; i++)
         pad += padChar;
     return pad + padee;
 }

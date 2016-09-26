@@ -14,6 +14,7 @@
   <script src="js/bootstrap.min.js"></script>
   <script src="js/bootstrap-select.min.js"></script>
   <script src="js/knockout-3.4.0.js"></script>
+  <script src="js/underscore.js"></script>
   <script>if (window.module) module = window.module;</script>
 </head>
 
@@ -73,6 +74,17 @@
         <div class="col-md-3"><button type="button" class="btn btn-ts-light">Digital Signage</button></div>
       </div>
       <div class="row section" id="computerNaming" data-bind="visible: computerType() != undefined">
+        <div class="col-md-12">
+          <h1>Which faculty member is this computer for?</h1>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group" id="usernameCheck">
+              <div class="input-group input-group-lg">
+                <input type="text" class="form-control" placeholder="Username" aria-describedby="sizing-addon1" >
+                <span class="input-group-addon" id="sizing-addon1">@vcu.edu</span>
+              </div>
+            </div>
+        </div>
         <div class="col-md-12"><h1>Please name this computer</h1></div>
         <form class="form-inline">
           <div class="form-group" data-bind="visible: namingFormsEnabled().campus">
