@@ -203,9 +203,11 @@ function userExists() {
     };
     let ad = new ActiveDirectory(config);
     let checkUsername = $(this).val();
-    if (checkUsername = "")
+    if (checkUsername == ""){
+        $("#usernameCheck").removeClass("has-success has-error");
         return;
-    ad.findUser($(this).val(), function(err, user) {
+    }
+    ad.findUser(checkUsername, function(err, user) {
         if (err) {
             console.log("error " + err);
             $("#usernameCheck").addClass("has-error").removeClass("has-success");
