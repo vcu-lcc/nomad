@@ -15,13 +15,9 @@
   "author": "Quark J Wei",
   "license": "CC0-1.0",
   "devDependencies": {
-<<<<<<< HEAD
     "electron-prebuilt": "^1.2.0"
   },
   "dependencies": {
     "activedirectory": "^0.7.2"
-=======
-    "electron": "^1.3.4"
->>>>>>> 62d428a1a51303c9a33c691b487c1998ba78faf8
   }
 }
