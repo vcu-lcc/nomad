@@ -68,58 +68,60 @@
       <h1>Welcome <span data-bind="text: user().displayName"></span></h1>
       <div class="row section" id="computerType">
         <div class="col-md-12"><h1>What kind of computer is this?</h1></div>
-        <div class="col-md-3"><button type="button" class="btn btn-ts-light">Faculty/Staff</button></div>
-        <div class="col-md-3"><button type="button" class="btn btn-ts-light">Lab/Classroom</button></div>
-        <div class="col-md-3"><button type="button" class="btn btn-ts-light">Kiosk</button></div>
-        <div class="col-md-3"><button type="button" class="btn btn-ts-light">Digital Signage</button></div>
+        <div class="col-xs-6 col-sm-3"><button type="button" class="btn btn-ts-light">Faculty/Staff</button></div>
+        <div class="col-xs-6 col-sm-3"><button type="button" class="btn btn-ts-light">Lab/Classroom</button></div>
+        <div class="col-xs-6 col-sm-3"><button type="button" class="btn btn-ts-light">Kiosk</button></div>
+        <div class="col-xs-6 col-sm-3"><button type="button" class="btn btn-ts-light">Digital Signage</button></div>
       </div>
       <div class="row section" id="computerNaming" data-bind="visible: computerType() != undefined">
-        <div class="col-md-12">
-          <h1>Which faculty member is this computer for?</h1>
-        </div>
-        <div class="col-md-12">
-            <div class="form-group" id="usernameCheck">
-              <div class="input-group input-group-lg">
-                <input type="text" class="form-control" placeholder="Username" aria-describedby="sizing-addon1" >
-                <span class="input-group-addon" id="sizing-addon1">@vcu.edu</span>
+        <section data-bind="visible: namingFormsEnabled().faculty">
+          <div class="col-md-12">
+            <h1>Which faculty member is this computer for?</h1>
+          </div>
+          <div class="col-md-12">
+              <div class="form-group" id="usernameCheck">
+                <div class="input-group input-group-lg">
+                  <input type="text" class="form-control" placeholder="Username" aria-describedby="sizing-addon1" >
+                  <span class="input-group-addon" id="sizing-addon1">@vcu.edu</span>
+                </div>
               </div>
-            </div>
-        </div>
+          </div>
+        </section>
         <div class="col-md-12"><h1>Please name this computer</h1></div>
         <div class="col-md-12">
         <form class="form-inline">
           <div class="form-group" data-bind="visible: namingFormsEnabled().campus">
-            <label for="">Campus <span data-bind="text: campus"></span></label>
+            <label for="">Campus </label>
             <select class="selectpicker" data-live-search="true" 
             data-bind="value: campus, options: Object.keys(computerLocations)">
             </select>
           </div>
           <div class="form-group" data-bind="visible: namingFormsEnabled().building">
-            <label for="">Building <span data-bind="text: building"></span></label>
+            <label for="">Building </label>
             <select class="selectpicker" data-live-search="true" 
             data-bind="value: building, options: Object.keys(computerLocations[campus()])">
             </select>
           </div>
           <div class="form-group" data-bind="visible: namingFormsEnabled().room">
-            <label for="">Room <span data-bind="text: room"></span></label>
+            <label for="">Room </label>
             <select class="selectpicker" data-live-search="true" 
             data-bind="value: room, options: computerLocations[campus()][building()]">
             </select>
           </div>
           <div class="form-group" data-bind="visible: namingFormsEnabled().floor">
-            <label for="">Floor <span data-bind="text: floor"></span></label>
+            <label for="">Floor </label>
             <select class="selectpicker" data-live-search="true" 
             data-bind="value: floor, options: floors">
             </select>
           </div>
           <div class="form-group" data-bind="visible: namingFormsEnabled().physicalLocation">
-            <label for="">Physical Location <span data-bind="text: physicalLocation"></span></label>
+            <label for="">Physical Location </label>
             <select class="selectpicker" data-live-search="true" 
             data-bind="value: physicalLocation, options: physicalLocations">
             </select>
           </div>
           <div class="form-group" data-bind="visible: namingFormsEnabled().computerNumber">
-            <label for="">Computer Number <span data-bind="text: computerNumber"></span></label>
+            <label for="">Computer Number </label>
             <select class="selectpicker" data-live-search="true" 
             data-bind="value: computerNumber, options: computerNumbers">
             </select>
