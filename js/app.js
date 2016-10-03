@@ -28,6 +28,7 @@ function AppViewModel() {
 
     //Naming Forms format(boolean for enabling/disabling): [campus,building,room,floor,physicalLocation,computerNumber];
     this.namingFormsEnabled = ko.observable({
+        faculty: true,
         campus: true,
         building: true,
         room: true,
@@ -134,6 +135,54 @@ $("#computerType").on("click", "button", function () {
     });
     $(this).addClass("btn-ts-dark");
     appModel.computerType(computerType);
+
+    switch(computerType){
+        case "Faculty/Staff":
+            appModel.namingFormsEnabled({
+                faculty: true,
+                campus: false,
+                building: false,
+                room: false,
+                floor: false,
+                physicalLocation: false,
+                computerNumber: true
+            });
+            break;
+        case "Lab/Classroom":
+            appModel.namingFormsEnabled({
+                faculty: false,
+                campus: true,
+                building: true,
+                room: true,
+                floor: false,
+                physicalLocation: false,
+                computerNumber: true
+            });
+            break;
+        case "Kiosk":
+            appModel.namingFormsEnabled({
+                faculty: false,
+                campus: true,
+                building: true,
+                room: false,
+                floor: true,
+                physicalLocation: true,
+                computerNumber: true
+            });
+            break;
+        case "Digital Signage":
+            appModel.namingFormsEnabled({
+                faculty: false,
+                campus: true,
+                building: true,
+                room: false,
+                floor: true,
+                physicalLocation: true,
+                computerNumber: true
+            });
+            break;
+    }
+
 });
 $("#computerNaming").find("input").keyup(_.debounce(userExists,500));
 
@@ -218,7 +267,7 @@ function userExists() {
             $("#usernameCheck").addClass("has-error").removeClass("has-success");
             return;
         }
-        
+        console.log(user);
         $("#usernameCheck").addClass("has-success").removeClass("has-error");
     });
 }

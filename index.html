@@ -89,40 +89,40 @@
         </section>
         <div class="col-md-12"><h1>Please name this computer</h1></div>
         <div class="col-md-12">
-        <form class="form-inline">
+        <form class="form-horizontal">
           <div class="form-group" data-bind="visible: namingFormsEnabled().campus">
-            <label for="">Campus </label>
-            <select class="selectpicker" data-live-search="true" 
+            <label class="col-xs-3 control-label" for="">Campus </label>
+            <select class="col-xs-9 selectpicker" data-live-search="true" 
             data-bind="value: campus, options: Object.keys(computerLocations)">
             </select>
           </div>
           <div class="form-group" data-bind="visible: namingFormsEnabled().building">
-            <label for="">Building </label>
-            <select class="selectpicker" data-live-search="true" 
+            <label class="col-xs-3 control-label" for="">Building </label>
+            <select class="col-xs-9 selectpicker" data-live-search="true" 
             data-bind="value: building, options: Object.keys(computerLocations[campus()])">
             </select>
           </div>
           <div class="form-group" data-bind="visible: namingFormsEnabled().room">
-            <label for="">Room </label>
-            <select class="selectpicker" data-live-search="true" 
+            <label class="col-xs-3 control-label" for="">Room </label>
+            <select class="col-xs-9 selectpicker" data-live-search="true" 
             data-bind="value: room, options: computerLocations[campus()][building()]">
             </select>
           </div>
           <div class="form-group" data-bind="visible: namingFormsEnabled().floor">
-            <label for="">Floor </label>
-            <select class="selectpicker" data-live-search="true" 
+            <label class="col-xs-3 control-label" for="">Floor </label>
+            <select class="col-xs-9 selectpicker" data-live-search="true" 
             data-bind="value: floor, options: floors">
             </select>
           </div>
           <div class="form-group" data-bind="visible: namingFormsEnabled().physicalLocation">
-            <label for="">Physical Location </label>
-            <select class="selectpicker" data-live-search="true" 
+            <label class="col-xs-3 control-label" for="">Physical Location </label>
+            <select class="col-xs-9 selectpicker" data-live-search="true" 
             data-bind="value: physicalLocation, options: physicalLocations">
             </select>
           </div>
           <div class="form-group" data-bind="visible: namingFormsEnabled().computerNumber">
-            <label for="">Computer Number </label>
-            <select class="selectpicker" data-live-search="true" 
+            <label class="col-xs-3 control-label" for="">Computer Number </label>
+            <select class="col-xs-9 selectpicker" data-live-search="true" 
             data-bind="value: computerNumber, options: computerNumbers">
             </select>
           </div>
