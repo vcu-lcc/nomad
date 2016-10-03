@@ -297,6 +297,7 @@ function searchUsers() {
         appModel.possibleUsers([]);
         appModel.possibleUsersOptions([]);
         $('.selectpicker').selectpicker('refresh');
+        $(element).siblings().remove();
         return;
     }
     let query = "cn=" + checkUsername + "*";
