@@ -188,7 +188,6 @@ $("#computerType").on("click", "button", function () {
     }
 
 });
-$("#computerNaming").find("input").keyup(_.debounce(userExists,500));
 $("#eidSearch").on("keyup", "input", _.debounce(searchUsers,500));
 
 function login() {
@@ -244,38 +243,7 @@ function login() {
     //     }
     // });
 }
-function userExists() {
-    console.log("searching");
-    let username = appModel.username();
-    let password = appModel.password();
-    console.log(username);
-    let config = {
-        url: 'ldap://rams.adp.vcu.edu',
-        baseDN: 'dc=rams, dc=ADP, dc=vcu, dc=edu',
-        username: "RAMS\\" + username,
-        password: password
-    };
-    let ad = new ActiveDirectory(config);
-    let checkUsername = $(this).val();
-    if (checkUsername == ""){
-        $("#usernameCheck").removeClass("has-success has-error");
-        return;
-    }
-    ad.findUser(checkUsername, function(err, user) {
-        if (err) {
-            console.log("error " + err);
-            $("#usernameCheck").addClass("has-error").removeClass("has-success");
-            return; 
-        }
-        console.log("no error");
-        if(user == undefined){
-            $("#usernameCheck").addClass("has-error").removeClass("has-success");
-            return;
-        }
-        console.log(user);
-        $("#usernameCheck").addClass("has-success").removeClass("has-error");
-    });
-}
+
 function searchUsers() {
     
     let element = this;
