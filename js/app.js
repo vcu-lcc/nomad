@@ -96,6 +96,10 @@ function AppViewModel() {
     // ];
     this.computerTypes = ["Lab Computer", "Podium Computer"];
 
+    this.computerUser = ko.observable("");
+    this.possibleUsers = ko.observable([]);
+    this.possibleUsersOptions = ko.observable([]);
+
     this.campus = ko.observable("MPC");
     this.building = ko.observable();
     this.room = ko.observable();
@@ -185,6 +189,7 @@ $("#computerType").on("click", "button", function () {
 
 });
 $("#computerNaming").find("input").keyup(_.debounce(userExists,500));
+$("#eidSearch").on("keyup", "input", _.debounce(searchUsers,500));
 
 function login() {
     appModel.notifications.removeAll();
@@ -268,6 +273,56 @@ function userExists() {
             return;
         }
         console.log(user);
+        $("#usernameCheck").addClass("has-success").removeClass("has-error");
+    });
+}
+function searchUsers() {
+    
+    let element = this;
+    $(element).after('<span class="selectpicker-loading"></span>');
+    console.log("searching");
+    let username = appModel.username();
+    let password = appModel.password();
+    let config = {
+        url: 'ldap://rams.adp.vcu.edu',
+        baseDN: 'dc=rams, dc=ADP, dc=vcu, dc=edu',
+        username: "RAMS\\" + username,
+        password: password
+    };
+    let ad = new ActiveDirectory(config);
+    
+    let checkUsername = $(this).val();
+    if (checkUsername == ""){
+        $("#usernameCheck").removeClass("has-success has-error");
+        appModel.possibleUsers([]);
+        appModel.possibleUsersOptions([]);
+        $('.selectpicker').selectpicker('refresh');
+        return;
+    }
+    let query = "cn=" + checkUsername + "*";
+    console.log("query: " + query);
+    ad.findUsers(query, function(err, users) {
+        if (err) {
+            console.log("error " + err);
+            $("#usernameCheck").addClass("has-error").removeClass("has-success");
+            $(element).siblings().remove();
+            return; 
+        }
+        console.log("no error");
+        if(users == undefined){
+            $("#usernameCheck").addClass("has-error").removeClass("has-success");
+            $(element).siblings().remove();
+            return;
+        }
+        console.log(users);
+        let usersObject={};
+        users.forEach(function(data){
+            usersObject[data.cn] = data;
+        });
+        appModel.possibleUsers(usersObject);
+        appModel.possibleUsersOptions(Array.from(users, user => user.cn));
+        $(element).siblings().remove();
+        $('.selectpicker').selectpicker('refresh');
         $("#usernameCheck").addClass("has-success").removeClass("has-error");
     });
 }

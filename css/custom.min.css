@@ -14,3 +14,20 @@ main{flex:1;}
     width: 100%;
     margin-bottom: 10px;
 }
+/* loading icon for input */
+span.selectpicker-loading::after{
+    font-family: 'Glyphicons Halflings';
+    content: "\e031";
+    top: 15px;
+    right: 20px;
+    position: absolute;
+    animation: spin 2s infinite linear;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
+}
