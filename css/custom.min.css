@@ -2,6 +2,7 @@
 /* sticky footer */
 body{min-height:100vh;flex-direction:column;display:flex}
 main{flex:1;}
+.footer{padding-bottom:10px;}
 /* flexbox v-align middle */
 .vertical-align{display: flex;align-items:center;min-height:100%!important}
 /* header alerts */

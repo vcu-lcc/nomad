@@ -1,4 +1,5 @@
 let ActiveDirectory = require('activedirectory');
+const exec = require('child_process').exec;
 class Notification {
     constructor(name, type = "success", message, dismissable = true) {
         this.name = name;
@@ -22,7 +23,22 @@ function AppViewModel() {
     this.sections = ["login", "apps"]
     this.currentSection = ko.observable("login");
 
-
+    //Computer Make, Model, and Mac
+    this.systemInfo = ko.observable({manufacturer:"",model:"",name:"",systemtype:""});
+    exec('wmic computersystem get model,name,manufacturer,systemtype', (err, stdout, stderr) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        let lines = stdout.replace(/\s+$/,"").replace(/\s+\n/,"\n").split(/\n/);
+        lines = lines.map(line => line.split(/\s{2,}/));
+        let systemInfo = {};
+        for(let i = 0; i < lines[0].length; i++){
+            systemInfo[lines[0][i].toLowerCase()] = lines[1][i];
+        }
+        console.log(systemInfo);
+        this.systemInfo(systemInfo);
+    });
     //Computer Type Buttons
     this.computerType = ko.observable();
 
@@ -108,7 +124,6 @@ function AppViewModel() {
     this.computerNumber = ko.observable();
 
     this.computerName = ko.computed(() => {
-        console.log(this.computerType());
         switch(this.computerType()){
             case "Faculty/Staff":
                 return this.campus() + "-" + this.building() + "-" + this.room() + "-" + leftPad(this.computerNumber());

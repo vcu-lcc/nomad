@@ -43,7 +43,7 @@
   </header>
 
   <main>
-
+    
     <div class="container vertical-align" data-bind="visible: currentSection() == 'login'">
       <div class="row">
         <div class="col-md-6 col-md-offset-3">
@@ -150,6 +150,14 @@
               <li>Phone: (804) 828-2227</li>
               <li><a href="mailto:itsc@vcu.edu" title="Click here to open your mail client to email Technology Services">Contact Us</a></li>
             </ul>
+          </div>
+        </div>
+        <div class="row" data-bind="enabled: systemInfo()">
+          <div class="col-md-3">
+            <strong>Computer Manufacturer:</strong> <span data-bind="text: systemInfo().manufacturer"></span>
+          </div>
+          <div class="col-md-3">
+            <strong>Computer Model:</strong> <span data-bind="text: systemInfo().model"></span>
           </div>
         </div>
         <!-- /.row -->
