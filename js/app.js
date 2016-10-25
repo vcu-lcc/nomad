@@ -107,8 +107,18 @@ function AppViewModel() {
     this.physicalLocation = ko.observable();
     this.computerNumber = ko.observable();
 
-    this.computerName = ko.computed(function () {
-        return this.campus() + "-" + this.building() + "-" + this.room() + "-" + leftPad(this.computerNumber());
+    this.computerName = ko.computed(() => {
+        console.log(this.computerType());
+        switch(this.computerType()){
+            case "Faculty/Staff":
+                return this.campus() + "-" + this.building() + "-" + this.room() + "-" + leftPad(this.computerNumber());
+            case "Lab/Classroom":
+                return this.campus() + "-" + this.building() + "-" + this.room() + "-" + leftPad(this.computerNumber());
+            case "Kiosk":
+                return this.campus() + "-" + this.building() + "-" + this.room() + "-" + leftPad(this.computerNumber());
+            case "Digital Signage":
+                return this.campus() + "-" + this.building() + "-" + this.room() + "-" + leftPad(this.computerNumber());
+    }
     }, this);
 
     this.campus.subscribe((newValue) => $('.selectpicker').selectpicker('render'));
