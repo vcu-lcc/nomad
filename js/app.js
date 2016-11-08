@@ -125,11 +125,11 @@ function AppViewModel() {
             case "Faculty/Staff":
                 return this.campus() + "-" + this.building() + "-" + this.room() + "-" + leftPad(this.computerNumber());
             case "Lab/Classroom":
-                return this.campus() + "-" + this.building() + "-" + this.room() + "-" + leftPad(this.computerNumber());
+                return this.campus() + this.building() + this.room() + "-" + "L" + leftPad(this.computerNumber());
             case "Kiosk":
-                return this.campus() + "-" + this.building() + "-" + this.room() + "-" + leftPad(this.computerNumber());
+                return this.campus() + this.building() + this.floor() + this.physicalLocation() + "-" + "K" + leftPad(this.computerNumber(), 1);
             case "Digital Signage":
-                return this.campus() + "-" + this.building() + "-" + this.room() + "-" + leftPad(this.computerNumber());
+                return this.campus() + this.building() + this.floor() + this.physicalLocation() + "-" + "C" + leftPad(this.computerNumber(), 1);
     }
     }, this);
 
