@@ -28,3 +28,29 @@ span.selectpicker-loading::after{
   0% {transform: rotate(0deg)}
   100% {transform: rotate(359deg)}
 }
+.package-icon {
+    width: 16px;
+}
+.package-grid-item {
+    float: left;
+    margin: 1px;
+    padding: 5px;
+    width: 32.5%;
+    background-color: lightgrey;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.package-grid-item:hover {
+    cursor: pointer;
+    background-color: darkgrey;
+}
+.package-grid-item.enabled {
+    background-color: forestgreen;
+}
+.package-grid-item.enabled:hover {
+    background-color: seagreen;
+}
+.package-name{
+    white-space: nowrap;
+}

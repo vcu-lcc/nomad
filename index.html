@@ -14,6 +14,7 @@
   <script src="js/bootstrap.min.js"></script>
   <script src="js/bootstrap-select.min.js"></script>
   <script src="js/knockout-3.4.0.js"></script>
+  <script src="js/knockout.mapping-latest.js"></script>
   <script src="js/underscore.js"></script>
   <script>if (window.module) module = window.module;</script>
 </head>
@@ -133,6 +134,21 @@
           <blockquote data-bind="text: computerName()"></blockquote>
         </div>
       </div>
+      <div class="row section">
+        <h1>Applications:</h1>
+      </div>
+      <!-- ko foreach: {data: feeds, as: '_feed'} -->
+      <div class="row" data-bind="visible: _feed.packages().length > 0">
+        <h3 data-bind="text: _feed.Feed_Name" class = "col-xs-12"></h3>
+        <!-- ko foreach: {data: _feed.packages, as: '_package'} -->
+        <div class="package-grid-item" data-bind="css: {enabled: _package.checked() == true}, click: $root.togglePackageSelected">
+          <input type="checkbox" data-bind="checked: _package.checked">
+          <img data-bind=" attr: {src: _package.iconUrl}" class="package-icon">
+          <span class="package-name" data-bind="text: _package.Package_Id"></span>
+        </div>
+        <!-- /ko -->
+      </div>
+      <!-- /ko -->
     </div>
 
   </main>

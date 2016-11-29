@@ -1,6 +1,7 @@
 const ActiveDirectory = require('activedirectory');
 const StringDecoder = require('string_decoder').StringDecoder;
 const exec = require('child_process').execSync;
+const xml2js = require('xml2js');
 class Notification {
     constructor(name, type = "success", message, dismissable = true) {
         this.name = name;
@@ -109,7 +110,7 @@ function AppViewModel() {
     // ];
     this.computerTypes = ["Lab Computer", "Podium Computer"];
 
-    this.computerUser = ko.observable("");
+    this.computerUser = ko.observable({initials:""});
     this.possibleUsers = ko.observable([]);
     this.possibleUsersOptions = ko.observable([]);
 
@@ -119,6 +120,9 @@ function AppViewModel() {
     this.floor = ko.observable();
     this.physicalLocation = ko.observable();
     this.computerNumber = ko.observable();
+
+    this.feeds = ko.observableArray([]);
+
 
     this.computerName = ko.computed(() => {
         switch(this.computerType()){
@@ -130,8 +134,8 @@ function AppViewModel() {
                 return this.campus() + this.building() + this.floor() + this.physicalLocation() + "-" + "K" + leftPad(this.computerNumber(), 1);
             case "Digital Signage":
                 return this.campus() + this.building() + this.floor() + this.physicalLocation() + "-" + "C" + leftPad(this.computerNumber(), 1);
-    }
-    }, this);
+        }
+    });
 
     this.campus.subscribe((newValue) => $('.selectpicker').selectpicker('render'));
 
@@ -145,6 +149,13 @@ function AppViewModel() {
     this.notifications = ko.observableArray();
     this.removeNotification = (notification) => {
         this.notifications.remove(notification);
+    }
+    this.togglePackageSelected = (data,event) => {
+        console.log(data);
+        console.log(event);
+        if(event.toElement.type!="checkbox")
+            data.checked(!data.checked());
+        return true;
     }
 
 }
@@ -211,8 +222,9 @@ $("#computerType").on("click", "button", function () {
 
 });
 $("#eidSearch").on("keyup", "input", _.debounce(searchUsers,500));
+$("#eidSearch").on("keyup", "input", _.debounce(searchUsers,500));
 
-function login() {
+    function login() {
     appModel.notifications.removeAll();
     //Boilerplate config
     let username = appModel.username();
@@ -251,6 +263,29 @@ function login() {
         console.log(user);
         appModel.currentSection('apps');
     });
+    //Let's grab stuff from Nuget
+    $.get("http://nuget.ts.vcu.edu/api/json/Feeds_GetFeeds?API_Key=3oVZdk5YgxWJw36s4jqG6S22UbRUK43p", (feedList)=> {
+        feedList.forEach( (feed) => {
+            feed.packages = [];
+            $.get("http://nuget.ts.vcu.edu/api/json/NuGetPackages_GetPackages?API_Key=3oVZdk5YgxWJw36s4jqG6S22UbRUK43p&Feed_Id=" + feed.Feed_Id, (feedData) => {
+                feedData.forEach((data,index)=>{
+                    let xml = atob(data.NuspecFile_Bytes);
+                    xml = xml.substring(xml.indexOf("<"));
+                    xml2js.parseString(xml, (err, parsedData) => {
+                        let metadata = parsedData.package.metadata[0];
+                        data["title"] = metadata.title ? metadata.title[0] : data.Package_Id;
+                        data["description"] = metadata.description[0];
+                        data["iconUrl"] = metadata.iconUrl ? metadata.iconUrl[0] : "http://nuget.ts.vcu.edu/resources/images/icons/package-chocolatey.svg";
+                        data["checked"] = false;
+                    });
+                    feed.packages.push(data);
+                });
+                appModel.feeds.push(ko.mapping.fromJS(feed));
+            });
+        });
+        console.log(appModel.feeds());
+    });
+
     // //Attempt to find groups
     // ad.findGroup(groupName, function (err, group) {
     //     if (err) {
@@ -290,6 +325,16 @@ function searchUsers() {
         $(element).siblings().remove();
         return;
     }
+
+    for(let possibleUser in possibleUsers){
+        if(checkUsername.toLowerCase() == possibleUser.cn.toLowerCase()){
+            possibleUser.initials = possibleUser.givenName[0];
+            
+            possibleUser.initials += possibleUser.sn[0];
+            appModel.computerUser = ko.mapping.fromJS(possibleUser);
+        }
+    }
+
     let query = "cn=" + checkUsername + "*";
     console.log("query: " + query);
     ad.findUsers(query, function(err, users) {
