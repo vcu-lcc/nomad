@@ -138,7 +138,7 @@
         <h1>Applications:</h1>
       </div>
       <!-- ko foreach: {data: feeds, as: '_feed'} -->
-      <div class="row" data-bind="visible: _feed.packages().length > 0">
+      <div class="row section" data-bind="visible: _feed.packages().length > 0">
         <h3 data-bind="text: _feed.Feed_Name" class = "col-xs-12"></h3>
         <!-- ko foreach: {data: _feed.packages, as: '_package'} -->
         <div class="package-grid-item" data-bind="css: {enabled: _package.checked() == true}, click: $root.togglePackageSelected">
@@ -149,6 +149,9 @@
         <!-- /ko -->
       </div>
       <!-- /ko -->
+      <div class= "row section">
+      <a class="btn btn-ts-dark" data-bind="click: installPackagesChoco">Install Apps</a>
+      </div>
     </div>
 
   </main>

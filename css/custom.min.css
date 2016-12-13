@@ -29,13 +29,16 @@ span.selectpicker-loading::after{
   100% {transform: rotate(359deg)}
 }
 .package-icon {
-    width: 16px;
+    width: 32px;
+    margin-top: -8px;
+    margin-right: 10px;
 }
 .package-grid-item {
     float: left;
     margin: 1px;
     padding: 5px;
     width: 32.5%;
+    height: 42px;
     background-color: lightgrey;
     white-space: nowrap;
     overflow: hidden;
@@ -51,6 +54,13 @@ span.selectpicker-loading::after{
 .package-grid-item.enabled:hover {
     background-color: seagreen;
 }
+.package-grid-item > input[type=checkbox] {
+    margin: 10px 10px 0;
+}
 .package-name{
     white-space: nowrap;
+    font-weight: bold;
+}
+.section{
+    margin-bottom:20px;
 }

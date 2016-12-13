@@ -2,6 +2,13 @@ const ActiveDirectory = require('activedirectory');
 const StringDecoder = require('string_decoder').StringDecoder;
 const exec = require('child_process').execSync;
 const xml2js = require('xml2js');
+const elevator = require('elevator');
+const Sudoer = require('electron-sudo').default;
+
+let sudoerOptions = {name: 'elevate application'},
+    sudoer = new Sudoer(sudoerOptions);
+
+
 class Notification {
     constructor(name, type = "success", message, dismissable = true) {
         this.name = name;
@@ -26,12 +33,12 @@ function AppViewModel() {
     this.currentSection = ko.observable("login");
 
     //Computer Make, Model, and Mac
-    
+
     let lines = exec('wmic computersystem get model,name,manufacturer,systemtype').toString('utf8');
     console.log(lines);
-    lines = lines.replace(/\s+$/,"").replace(/\s+\n/,"\n").split(/\n/).map(line => line.split(/\s{2,}/));
+    lines = lines.replace(/\s+$/, "").replace(/\s+\n/, "\n").split(/\n/).map(line => line.split(/\s{2,}/));
     let systemInfo = {};
-    for(let i = 0; i < lines[0].length; i++){
+    for (let i = 0; i < lines[0].length; i++) {
         systemInfo[lines[0][i].toLowerCase()] = lines[1][i];
     }
     console.log(systemInfo);
@@ -110,7 +117,7 @@ function AppViewModel() {
     // ];
     this.computerTypes = ["Lab Computer", "Podium Computer"];
 
-    this.computerUser = ko.observable({initials:""});
+    this.computerUser = ko.observable({ initials: "" });
     this.possibleUsers = ko.observable([]);
     this.possibleUsersOptions = ko.observable([]);
 
@@ -125,7 +132,7 @@ function AppViewModel() {
 
 
     this.computerName = ko.computed(() => {
-        switch(this.computerType()){
+        switch (this.computerType()) {
             case "Faculty/Staff":
                 return this.campus() + "-" + this.building() + "-" + this.room() + "-" + leftPad(this.computerNumber());
             case "Lab/Classroom":
@@ -150,10 +157,10 @@ function AppViewModel() {
     this.removeNotification = (notification) => {
         this.notifications.remove(notification);
     }
-    this.togglePackageSelected = (data,event) => {
+    this.togglePackageSelected = (data, event) => {
         console.log(data);
         console.log(event);
-        if(event.toElement.type!="checkbox")
+        if (event.toElement.type != "checkbox")
             data.checked(!data.checked());
         return true;
     }
@@ -173,7 +180,7 @@ $("#computerType").on("click", "button", function () {
     $(this).addClass("btn-ts-dark");
     appModel.computerType(computerType);
 
-    switch(computerType){
+    switch (computerType) {
         case "Faculty/Staff":
             appModel.namingFormsEnabled({
                 faculty: true,
@@ -221,10 +228,10 @@ $("#computerType").on("click", "button", function () {
     }
 
 });
-$("#eidSearch").on("keyup", "input", _.debounce(searchUsers,500));
-$("#eidSearch").on("keyup", "input", _.debounce(searchUsers,500));
+$("#eidSearch").on("keyup", "input", _.debounce(searchUsers, 500));
+$("#eidSearch").on("keyup", "input", _.debounce(searchUsers, 500));
 
-    function login() {
+function login() {
     appModel.notifications.removeAll();
     //Boilerplate config
     let username = appModel.username();
@@ -264,11 +271,11 @@ $("#eidSearch").on("keyup", "input", _.debounce(searchUsers,500));
         appModel.currentSection('apps');
     });
     //Let's grab stuff from Nuget
-    $.get("http://nuget.ts.vcu.edu/api/json/Feeds_GetFeeds?API_Key=3oVZdk5YgxWJw36s4jqG6S22UbRUK43p", (feedList)=> {
-        feedList.forEach( (feed) => {
+    $.get("http://nuget.ts.vcu.edu/api/json/Feeds_GetFeeds?API_Key=3oVZdk5YgxWJw36s4jqG6S22UbRUK43p", (feedList) => {
+        feedList.forEach((feed) => {
             feed.packages = [];
             $.get("http://nuget.ts.vcu.edu/api/json/NuGetPackages_GetPackages?API_Key=3oVZdk5YgxWJw36s4jqG6S22UbRUK43p&Feed_Id=" + feed.Feed_Id, (feedData) => {
-                feedData.forEach((data,index)=>{
+                feedData.forEach((data, index) => {
                     let xml = atob(data.NuspecFile_Bytes);
                     xml = xml.substring(xml.indexOf("<"));
                     xml2js.parseString(xml, (err, parsedData) => {
@@ -302,7 +309,7 @@ $("#eidSearch").on("keyup", "input", _.debounce(searchUsers,500));
 }
 
 function searchUsers() {
-    
+
     let element = this;
     $(element).after('<span class="selectpicker-loading"></span>');
     console.log("searching");
@@ -315,9 +322,9 @@ function searchUsers() {
         password: password
     };
     let ad = new ActiveDirectory(config);
-    
+
     let checkUsername = $(this).val();
-    if (checkUsername == ""){
+    if (checkUsername == "") {
         $("#usernameCheck").removeClass("has-success has-error");
         appModel.possibleUsers([]);
         appModel.possibleUsersOptions([]);
@@ -326,10 +333,10 @@ function searchUsers() {
         return;
     }
 
-    for(let possibleUser in possibleUsers){
-        if(checkUsername.toLowerCase() == possibleUser.cn.toLowerCase()){
+    for (let possibleUser in possibleUsers) {
+        if (checkUsername.toLowerCase() == possibleUser.cn.toLowerCase()) {
             possibleUser.initials = possibleUser.givenName[0];
-            
+
             possibleUser.initials += possibleUser.sn[0];
             appModel.computerUser = ko.mapping.fromJS(possibleUser);
         }
@@ -337,22 +344,22 @@ function searchUsers() {
 
     let query = "cn=" + checkUsername + "*";
     console.log("query: " + query);
-    ad.findUsers(query, function(err, users) {
+    ad.findUsers(query, function (err, users) {
         if (err) {
             console.log("error " + err);
             $("#usernameCheck").addClass("has-error").removeClass("has-success");
             $(element).siblings().remove();
-            return; 
+            return;
         }
         console.log("no error");
-        if(users == undefined){
+        if (users == undefined) {
             $("#usernameCheck").addClass("has-error").removeClass("has-success");
             $(element).siblings().remove();
             return;
         }
         console.log(users);
-        let usersObject={};
-        users.forEach(function(data){
+        let usersObject = {};
+        users.forEach(function (data) {
             usersObject[data.cn] = data;
         });
         appModel.possibleUsers(usersObject);
@@ -379,4 +386,49 @@ function showNotification(elem) {
 }
 function hideNotification(elem) {
     $(elem).collapse('hide');
+}
+function installPackagesChoco() {
+    let count = 0;
+    let commands = [];
+    appModel.feeds().forEach(feed => {
+        let command = ["choco install ", " -s  https://nuget.ts.vcu.edu/nuget/", " -y -r --failstderr --allow-empty-checksums"];
+        let packages = [];
+        feed.packages().forEach(pkg => {
+            if (pkg.checked())
+                packages.push(pkg.Package_Id());
+        });
+        if (packages.length > 0) {
+            command[0] += packages.join(" ");
+            command[1] += feed.Feed_Name();
+            console.log(command.join(""));
+            count++;
+            // commands.push("start /wait " + command.join("") + " &");
+            sudoer.spawn(command.join("")).then(function (cp) {
+                console.group(feed.Feed_Name());
+                console.log(cp.output);
+                console.groupEnd();
+                cp.on('close', () => { console.log(feed.Feed_Name() + " successfully installed")});
+            /*
+                cp.output.stdout (Buffer)
+                cp.output.stderr (Buffer)
+            */
+            });
+            // elevator.execute(command.join(""), {
+            //     terminating: true,
+            //     waitForTermination: true,
+            //     doNotPushdCurrentDirectory: true,
+            //     unicode: true
+            // }, function (error, stdout, stderr) {
+            //     debugger;
+            //     if (error) {
+            //         throw error;
+            //     }
+
+            //     console.log(stdout);
+            //     console.log(stderr);
+            // });
+        }
+    });
+    //After installs are complete, email C:\ProgramData\chocolatey\logs\chocolatey.log to some email.
+
 }
