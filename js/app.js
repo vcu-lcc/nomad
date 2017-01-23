@@ -41,24 +41,13 @@ function AppViewModel() {
     });
 
     //Computer Make, Model, and Mac
-    try{
-    exec('Get-Host',function(err,out,code){
-        if(err  instanceof Error){  //We're using command prompt
-            throw(err);
-        } else {    //We're using powershell - powershell logic
-
-        }
-    });
-    } catch(ex) {   //command prompt logic
-        let lines = exec('wmic computersystem get model,name,manufacturer,systemtype').toString('utf8');
-        lines = lines.replace(/\s+$/, "").replace(/\s+\n/, "\n").split(/\n/).map(line => line.split(/\s{2,}/));
-        let systemInfo = {};
-        for (let i = 0; i < lines[0].length; i++) {
-            systemInfo[lines[0][i].toLowerCase()] = lines[1][i];
-        }
-        this.systemInfo = ko.observable(systemInfo);
+    let lines = exec('C:\\Windows\\System32\\wbem\\WMIC.exe computersystem get model,name,manufacturer,systemtype').toString('utf8');
+    lines = lines.replace(/\s+$/, "").replace(/\s+\n/, "\n").split(/\n/).map(line => line.split(/\s{2,}/));
+    let systemInfo = {};
+    for (let i = 0; i < lines[0].length; i++) {
+        systemInfo[lines[0][i].toLowerCase()] = lines[1][i];
     }
-
+    this.systemInfo = ko.observable(systemInfo);
 
     //Computer Type Buttons
     this.computerType = ko.observable();
