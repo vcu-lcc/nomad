@@ -21,7 +21,9 @@
     "activedirectory": "^0.7.2",
     "electron": "^1.3.4",
     "electron-sudo": "^4.0.12",
+    "elevator": "^2.1.0",
     "getmac": "^1.2.1",
+    "tail-forever": "^0.3.13",
     "xml2js": "^0.4.17"
   }
 }

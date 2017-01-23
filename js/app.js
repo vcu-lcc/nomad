@@ -2,10 +2,12 @@ const ActiveDirectory = require('activedirectory');
 const StringDecoder = require('string_decoder').StringDecoder;
 const exec = require('child_process').execSync;
 const xml2js = require('xml2js');
-const elevator = require('elevator');
 const Sudoer = require('electron-sudo').default;
+const Tail = require('tail-forever');
 
-let sudoerOptions = {name: 'elevate application'},
+let installedPackages = '';
+
+let sudoerOptions = {name: 'nomda installer service'},
     sudoer = new Sudoer(sudoerOptions);
 
 
@@ -59,7 +61,7 @@ function AppViewModel() {
     });
     //http://davidarvelo.com/blog/array-number-range-sequences-in-javascript-es6/
     this.floors = Array.from(Array(100).keys());
-    this.physicalLocations = ["Lobby", "Hallway", "Elevator"];
+    this.physicalLocations = ["LOB", "HWY", "ELV"];
     this.computerNumbers = Array.from(Array(100).keys());
 
     this.username = ko.observable();
@@ -117,9 +119,34 @@ function AppViewModel() {
     // ];
     this.computerTypes = ["Lab Computer", "Podium Computer"];
 
-    this.computerUser = ko.observable({ initials: "" });
-    this.possibleUsers = ko.observable([]);
+    this.computerUser = ko.observable();
+    this.possibleUsers = ko.observable();
     this.possibleUsersOptions = ko.observable([]);
+    this.computerUserTopOu = ko.computed(() => {
+        if(!this.computerUser()) return "";
+        let user = this.possibleUsers()[this.computerUser()];
+        if(!user) return "";
+        let DN = user.dn.split(",");
+        for (let piece of DN) {
+            let subpieces = piece.split("=")
+            let type = subpieces[0];
+            let value = subpieces[1];
+            if (user[type] === undefined) {
+                user[type] = [value];
+            }
+            else {
+                user[type].push(value);
+            }
+        }
+        let topOU = user.OU[user.OU.length-1].toUpperCase().split(" ");
+        if(topOU.length==1)
+            return topOU[0].substring(0,3);
+        let output = "";
+        for(let i = 0; i < Math.min(3,topOU.length); i++){
+            output += topOU[i][0];
+        }
+        return output;
+    })
 
     this.campus = ko.observable("MPC");
     this.building = ko.observable();
@@ -133,9 +160,25 @@ function AppViewModel() {
 
     this.computerName = ko.computed(() => {
         switch (this.computerType()) {
-            case "Faculty/Staff":
-                return this.campus() + "-" + this.building() + "-" + this.room() + "-" + leftPad(this.computerNumber());
-            case "Lab/Classroom":
+            case "Faculty Desktop":
+                if(!this.computerUser() || !this.possibleUsers()[this.computerUser()]) return "Please enter in an eID";
+                return this.computerUserTopOu()
+                + this.building() 
+                + this.possibleUsers()[this.computerUser()]["initials"]
+                + "-"
+                + "D"
+                + this.computerNumber();
+            case "Faculty Laptop":
+                if(!this.computerUser() || !this.possibleUsers()[this.computerUser()]) return "Please enter in an eID";
+                return this.computerUserTopOu()
+                + this.building() 
+                + this.possibleUsers()[this.computerUser()]["initials"]
+                + "-"
+                + "M"
+                + this.computerNumber();
+            case "Classroom Podium":
+                return this.campus() + this.building() + this.room() + "-" + "P" + this.computerNumber();
+            case "Computer Lab":
                 return this.campus() + this.building() + this.room() + "-" + "L" + leftPad(this.computerNumber());
             case "Kiosk":
                 return this.campus() + this.building() + this.floor() + this.physicalLocation() + "-" + "K" + leftPad(this.computerNumber(), 1);
@@ -181,18 +224,40 @@ $("#computerType").on("click", "button", function () {
     appModel.computerType(computerType);
 
     switch (computerType) {
-        case "Faculty/Staff":
+        case "Faculty Desktop":
             appModel.namingFormsEnabled({
                 faculty: true,
                 campus: false,
-                building: false,
+                building: true,
                 room: false,
                 floor: false,
                 physicalLocation: false,
                 computerNumber: true
             });
             break;
-        case "Lab/Classroom":
+        case "Faculty Laptop":
+            appModel.namingFormsEnabled({
+                faculty: true,
+                campus: false,
+                building: true,
+                room: false,
+                floor: false,
+                physicalLocation: false,
+                computerNumber: true
+            });
+            break;
+        case "Classroom Podium":
+            appModel.namingFormsEnabled({
+                faculty: false,
+                campus: true,
+                building: true,
+                room: true,
+                floor: false,
+                physicalLocation: false,
+                computerNumber: true
+            });
+            break;
+        case "Computer Lab":
             appModel.namingFormsEnabled({
                 faculty: false,
                 campus: true,
@@ -333,15 +398,6 @@ function searchUsers() {
         return;
     }
 
-    for (let possibleUser in possibleUsers) {
-        if (checkUsername.toLowerCase() == possibleUser.cn.toLowerCase()) {
-            possibleUser.initials = possibleUser.givenName[0];
-
-            possibleUser.initials += possibleUser.sn[0];
-            appModel.computerUser = ko.mapping.fromJS(possibleUser);
-        }
-    }
-
     let query = "cn=" + checkUsername + "*";
     console.log("query: " + query);
     ad.findUsers(query, function (err, users) {
@@ -361,6 +417,16 @@ function searchUsers() {
         let usersObject = {};
         users.forEach(function (data) {
             usersObject[data.cn] = data;
+            usersObject[data.cn].initials = "";
+            if(data.displayName){
+                data.displayName.split(" ").forEach( (name, index) => {
+                    if(index < 3)
+                        usersObject[data.cn].initials += name[0];
+                });
+            } else {
+                usersObject[data.cn].initials = data.givenName[0];
+                usersObject[data.cn].initials += data.sn[0];
+            }
         });
         appModel.possibleUsers(usersObject);
         appModel.possibleUsersOptions(Array.from(users, user => user.cn));
@@ -398,16 +464,22 @@ function installPackagesChoco() {
                 packages.push(pkg.Package_Id());
         });
         if (packages.length > 0) {
-            command[0] += packages.join(" ");
+            installedPackages += packages.join(" ") + " ";
+            command[0] += packages.join(" ") + " ";
             command[1] += feed.Feed_Name();
             console.log(command.join(""));
             count++;
             // commands.push("start /wait " + command.join("") + " &");
             sudoer.spawn(command.join("")).then(function (cp) {
                 console.group(feed.Feed_Name());
-                console.log(cp.output);
-                console.groupEnd();
-                cp.on('close', () => { console.log(feed.Feed_Name() + " successfully installed")});
+                console.log(cp);
+                tail = new Tail(cp.files.output);
+                tail.on("line", (line) => console.log(line));
+                cp.on('close', () => { 
+                    console.log(feed.Feed_Name() + " successfully installed");
+                    tail.unwatch();
+                    console.groupEnd();
+                });
             /*
                 cp.output.stdout (Buffer)
                 cp.output.stderr (Buffer)
@@ -431,4 +503,17 @@ function installPackagesChoco() {
     });
     //After installs are complete, email C:\ProgramData\chocolatey\logs\chocolatey.log to some email.
 
+}
+function uninstall(input = installedPackages){
+     sudoer.spawn('choco uninstall -y ' + input + " --failstderr").then(function (cp) {
+        console.group("uninstalling packages: " + input);
+        console.log(cp);
+        tail = new Tail(cp.files.output);
+        tail.on("line", (line) => console.log(line));
+        cp.on('close', () => { 
+            console.log(input + " sucessfully uninstalled");
+            tail.unwatch();
+            console.groupEnd();
+        });
+     });
 }
