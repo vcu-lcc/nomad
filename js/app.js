@@ -33,18 +33,32 @@ function AppViewModel() {
     this.school = ko.observable("Technology Services");
     this.sections = ["login", "apps"]
     this.currentSection = ko.observable("login");
+    this.systemInfo = ko.observable({
+        manufacturer:"unknown",
+        model:"unknown",
+        name:"unknown",
+        systemtype:"unknown"
+    });
 
     //Computer Make, Model, and Mac
+    try{
+    exec('Get-Host',function(err,out,code){
+        if(err  instanceof Error){  //We're using command prompt
+            throw(err);
+        } else {    //We're using powershell - powershell logic
 
-    let lines = exec('wmic computersystem get model,name,manufacturer,systemtype').toString('utf8');
-    console.log(lines);
-    lines = lines.replace(/\s+$/, "").replace(/\s+\n/, "\n").split(/\n/).map(line => line.split(/\s{2,}/));
-    let systemInfo = {};
-    for (let i = 0; i < lines[0].length; i++) {
-        systemInfo[lines[0][i].toLowerCase()] = lines[1][i];
+        }
+    });
+    } catch(ex) {   //command prompt logic
+        let lines = exec('wmic computersystem get model,name,manufacturer,systemtype').toString('utf8');
+        lines = lines.replace(/\s+$/, "").replace(/\s+\n/, "\n").split(/\n/).map(line => line.split(/\s{2,}/));
+        let systemInfo = {};
+        for (let i = 0; i < lines[0].length; i++) {
+            systemInfo[lines[0][i].toLowerCase()] = lines[1][i];
+        }
+        this.systemInfo = ko.observable(systemInfo);
     }
-    console.log(systemInfo);
-    this.systemInfo = ko.observable(systemInfo);
+
 
     //Computer Type Buttons
     this.computerType = ko.observable();
