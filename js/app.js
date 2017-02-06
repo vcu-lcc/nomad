@@ -1,11 +1,12 @@
 const ActiveDirectory = require('activedirectory');
-const StringDecoder = require('string_decoder').StringDecoder;
 const exec = require('child_process').execSync;
 const xml2js = require('xml2js');
 const Sudoer = require('electron-sudo').default;
-const Tail = require('tail-forever');
+const TailFollow = require('tail-follow');
+const WMIC = 'C:\\Windows\\System32\\wbem\\WMIC.exe';
 
 let installedPackages = '';
+let installCheckpoints = [];
 
 let sudoerOptions = {name: 'nomda installer service'},
     sudoer = new Sudoer(sudoerOptions);
@@ -30,6 +31,8 @@ ko.applyBindings(appModel);
 //with lab numbering get rid of dash
 
 function AppViewModel() {
+    this.installStatus = ko.observable();
+    this.output = ko.observableArray();
     this.school = ko.observable("Technology Services");
     this.sections = ["login", "apps"]
     this.currentSection = ko.observable("login");
@@ -41,7 +44,7 @@ function AppViewModel() {
     });
 
     //Computer Make, Model, and Mac
-    let lines = exec('C:\\Windows\\System32\\wbem\\WMIC.exe computersystem get model,name,manufacturer,systemtype').toString('utf8');
+    let lines = exec(WMIC + ' computersystem get model,name,manufacturer,systemtype').toString('utf8');
     lines = lines.replace(/\s+$/, "").replace(/\s+\n/, "\n").split(/\n/).map(line => line.split(/\s{2,}/));
     let systemInfo = {};
     for (let i = 0; i < lines[0].length; i++) {
@@ -456,9 +459,19 @@ function showNotification(elem) {
 function hideNotification(elem) {
     $(elem).collapse('hide');
 }
+function setup(){
+    let oldName = process.env.computername;
+    let newName = appModel.computerName();
+    if(newName && !newName.includes(" ")){
+        exec(WMIC + ' ComputerSystem where Name="' + oldName + '" call Rename Name="' + newName +'"');
+        updateProgress("Computer renamed from " + oldName + " to " + newName);
+    }
+    installPackagesChoco();
+}
 function installPackagesChoco() {
     let count = 0;
     let commands = [];
+    let feeds = [];
     appModel.feeds().forEach(feed => {
         let command = ["choco install ", " -s  https://nuget.ts.vcu.edu/nuget/", " -y -r --failstderr --allow-empty-checksums"];
         let packages = [];
@@ -472,40 +485,40 @@ function installPackagesChoco() {
             command[1] += feed.Feed_Name();
             console.log(command.join(""));
             count++;
-            // commands.push("start /wait " + command.join("") + " &");
-            sudoer.spawn(command.join("")).then(function (cp) {
-                console.group(feed.Feed_Name());
-                console.log(cp);
-                tail = new Tail(cp.files.output);
-                tail.on("line", (line) => console.log(line));
-                cp.on('close', () => { 
-                    console.log(feed.Feed_Name() + " successfully installed");
-                    tail.unwatch();
-                    console.groupEnd();
-                });
-            /*
-                cp.output.stdout (Buffer)
-                cp.output.stderr (Buffer)
-            */
-            });
-            // elevator.execute(command.join(""), {
-            //     terminating: true,
-            //     waitForTermination: true,
-            //     doNotPushdCurrentDirectory: true,
-            //     unicode: true
-            // }, function (error, stdout, stderr) {
-            //     debugger;
-            //     if (error) {
-            //         throw error;
-            //     }
-
-            //     console.log(stdout);
-            //     console.log(stderr);
-            // });
+            commands.push(command);
+            feeds.push(feed);
         }
     });
+    installFeedPackages(commands,feeds);
     //After installs are complete, email C:\ProgramData\chocolatey\logs\chocolatey.log to some email.
 
+}
+function installFeedPackages(commands,feeds){
+    let feed = feeds.shift();
+    updateProgress('Installing packages from feed "' + feed.Feed_Name() + '"');
+    sudoer.spawn(commands.shift().join("")).then(function (cp) {
+        console.group(feed.Feed_Name());
+        console.log(cp);
+        let tail = new TailFollow(cp.files.output)
+            .on('data', updateProgress);
+        cp.on('close', () => { 
+            console.log(feed.Feed_Name() + " successfully installed");
+            console.groupEnd();
+            updateProgress('Finished installing packages from feed "' + feed.Feed_Name() + '"');
+            if(commands.length)
+                installFeedPackages(commands,feeds);
+            else
+                updateProgress("Imaging complete");
+        });
+    });
+}
+function updateProgress(line){
+    // console.log(line.toString());
+    let length = appModel.output().length;
+    if(length){
+        if(appModel.output()[length-1].includes("%")) appModel.output.pop();
+    }
+    appModel.output.push(line.toString());
 }
 function uninstall(input = installedPackages){
      sudoer.spawn('choco uninstall -y ' + input + " --failstderr").then(function (cp) {
