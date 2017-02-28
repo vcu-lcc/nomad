@@ -3,6 +3,7 @@ const exec = require('child_process').execSync;
 const xml2js = require('xml2js');
 const Sudoer = require('electron-sudo').default;
 const TailFollow = require('tail-follow');
+const byline = require('byline');
 const WMIC = 'C:\\Windows\\System32\\wbem\\WMIC.exe';
 
 let installedPackages = '';
@@ -503,26 +504,26 @@ function installFeedPackages(commands,feeds){
     sudoer.spawn(commands.shift().join("")).then(function (cp) {
         console.group(feed.Feed_Name());
         console.log(cp);
-        let tail = new TailFollow(cp.files.output)
-            .on('data', updateProgress);
+        let tail = new TailFollow(cp.files.output);
+        byline(tail).on('data',updateProgress);
         cp.on('close', () => {
             console.log(feed.Feed_Name() + " successfully installed");
             console.groupEnd();
             updateProgress('Finished installing packages from feed "' + feed.Feed_Name() + '"');
             if(commands.length)
                 installFeedPackages(commands,feeds);
-            else
+            else{
                 updateProgress("Imaging complete");
+                uninstall();
+            }
         });
     });
 }
 function updateProgress(line){
-    // console.log(line.toString());
+    line = line.toString();
     let length = appModel.output().length;
-    if(line.startsWith("Downloading")){
-        console.log("Downloading: "+ line);
-    }
     if(line.includes("%")){
+        
     } else if(line.startsWith("Downloading")){
         console.log("Downloading: "+ line);
     }
@@ -533,5 +534,8 @@ function updateProgress(line){
 }
 function uninstall(input = installedPackages){
      sudoer.spawn('choco uninstall -y ' + input + " --failstderr").then(function (cp) {
+         cp.on('close', () => {
+             console.log("uninstall complete");
+         });
      });
 }

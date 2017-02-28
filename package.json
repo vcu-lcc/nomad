@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "activedirectory": "^0.7.2",
+    "byline": "^5.0.0",
     "electron": "^1.3.4",
     "electron-sudo": "^4.0.12",
     "elevator": "^2.1.0",
