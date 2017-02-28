@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/vcubranding-main-2.0.css">
   <link rel="stylesheet" href="css/custom.min.css">
   <link rel="stylesheet" href="css/font-awesome.min.css">
+  <link rel="stylesheet" href="css/circle.css">
   <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
   <script src="js/jquery-2.2.4.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
@@ -152,27 +153,24 @@
       </div>
       <!-- /ko -->
       <div class= "row section">
-      <button class="btn btn-ts-dark btn-lg" data-bind="click: setup" data-toggle="modal" data-target="#installInfo" data-backdrop="static" data-keyboard="false">Setup Computer</button>
+      <button class="btn btn-ts-dark btn-lg" data-bind="click: setup" data-backdrop="static" data-keyboard="false">Setup Computer</button>
 
-      <!-- Modal -->
-      <div class="modal fade" id="installInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title" id="myModalLabel">Output</h4>
-            </div>
-            <div class="modal-body" data-bind="foreach: output">
-              <p data-bind="text: $data"></p>
-            </div>
-            <div class="modal-footer">
-              <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>-->
-            </div>
-          </div>
-        </div>
-      </div>
       </div>
     </div>
+    
+    <div class="container" data-bind="visible: currentSection() == 'installer'" style="display: none">
+      <div class="c100 p50 big">
+          <span><img src="http://iosicongallery.com/img/512/slack-2014.png"><span>50%</span></span>
+          <div class="slice">
+              <div class="bar"></div>
+              <div class="fill"></div>
+          </div>
+      </div>
 
+      <div class="row" data-bind="foreach: output">
+          <p data-bind="text: $data"></p>
+      </div>
+    </div>
   </main>
 
   <footer>
@@ -213,10 +211,8 @@
   <div class="alert alert-header text-center" data-bind="css: alertModifier">
     <div class="container">
       <b data-bind="text: message"></b>
-      <button type="button" class="close"<span aria-hidden="true" data-bind="click: $parent.removeNotification">&times;</span></button>
+      <button type="button" class="close"><span aria-hidden="true" data-bind="click: $parent.removeNotification">&times;</span></button>
     </div>
-    
-
   </div>
 </div>
 </script>

@@ -474,14 +474,17 @@ function installPackagesChoco() {
     let feeds = [];
     appModel.feeds().forEach(feed => {
         let command = ["choco install ", " -s  https://nuget.ts.vcu.edu/nuget/", " -y -r --failstderr --allow-empty-checksums"];
+        let pkgIds = [];
         let packages = [];
         feed.packages().forEach(pkg => {
-            if (pkg.checked())
-                packages.push(pkg.Package_Id());
+            if (pkg.checked()){
+                pkgIds.push(pkg.Package_Id());
+                packages.push(pkg);
+            }
         });
         if (packages.length > 0) {
-            installedPackages += packages.join(" ") + " ";
-            command[0] += packages.join(" ") + " ";
+            installedPackages += pkgIds.join(" ") + " ";
+            command[0] += pkgIds.join(" ") + " ";
             command[1] += feed.Feed_Name();
             console.log(command.join(""));
             count++;
@@ -494,6 +497,7 @@ function installPackagesChoco() {
 
 }
 function installFeedPackages(commands,feeds){
+    appModel.currentSection('installer');
     let feed = feeds.shift();
     updateProgress('Installing packages from feed "' + feed.Feed_Name() + '"');
     sudoer.spawn(commands.shift().join("")).then(function (cp) {
@@ -501,7 +505,7 @@ function installFeedPackages(commands,feeds){
         console.log(cp);
         let tail = new TailFollow(cp.files.output)
             .on('data', updateProgress);
-        cp.on('close', () => { 
+        cp.on('close', () => {
             console.log(feed.Feed_Name() + " successfully installed");
             console.groupEnd();
             updateProgress('Finished installing packages from feed "' + feed.Feed_Name() + '"');
@@ -515,6 +519,13 @@ function installFeedPackages(commands,feeds){
 function updateProgress(line){
     // console.log(line.toString());
     let length = appModel.output().length;
+    if(line.startsWith("Downloading")){
+        console.log("Downloading: "+ line);
+    }
+    if(line.includes("%")){
+    } else if(line.startsWith("Downloading")){
+        console.log("Downloading: "+ line);
+    }
     if(length){
         if(appModel.output()[length-1].includes("%")) appModel.output.pop();
     }
@@ -522,14 +533,5 @@ function updateProgress(line){
 }
 function uninstall(input = installedPackages){
      sudoer.spawn('choco uninstall -y ' + input + " --failstderr").then(function (cp) {
-        console.group("uninstalling packages: " + input);
-        console.log(cp);
-        tail = new Tail(cp.files.output);
-        tail.on("line", (line) => console.log(line));
-        cp.on('close', () => { 
-            console.log(input + " sucessfully uninstalled");
-            tail.unwatch();
-            console.groupEnd();
-        });
      });
 }
