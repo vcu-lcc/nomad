@@ -159,16 +159,18 @@
     </div>
     
     <div class="container" data-bind="visible: currentSection() == 'installer'" style="display: none">
-      <!-- ko if: installingPackage -->
-      <div data-bind="attr: {class: installingPackage().css}">
-          <span><img data-bind=" attr: {src: installingPackage().iconUrl}"><span data-bind="html: installingPackage().status"></span></span>
-          <div class="slice">
-              <div class="bar"></div>
-              <div class="fill"></div>
-          </div>
+      <!-- ko with: installingPackage -->
+      <div class="row" style="margin: 50px auto; display:flex; justify-content: center">
+        <div data-bind="attr: {class: css}">
+            <span><img data-bind=" attr: {src: iconUrl}"><span data-bind="html: status"></span></span>
+            <div class="slice">
+                <div class="bar"></div>
+                <div class="fill"></div>
+            </div>
+        </div>
       </div>
       <!-- /ko -->
-      <div class="row" data-bind="foreach: output">
+      <div class="row" data-bind="foreach: output" style="margin-left:50px">
           <p data-bind="text: $data"></p>
       </div>
     </div>

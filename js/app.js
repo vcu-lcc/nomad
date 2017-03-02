@@ -494,7 +494,7 @@ function installPackagesChoco() {
         }
     });
     console.log(packages);
-    shiftCurrentPackage(packages)
+    shiftCurrentPackage(packages);
     installFeedPackages(commands,feeds, packages);
     //After installs are complete, email C:\ProgramData\chocolatey\logs\chocolatey.log to some email.
 
@@ -516,7 +516,7 @@ function installFeedPackages(commands,feeds, packages){
                 installFeedPackages(commands,feeds, packages);
             else{
                 updateProgress("Imaging complete", packages);
-                uninstall();
+                // uninstall();
             }
         });
     });
@@ -524,28 +524,32 @@ function installFeedPackages(commands,feeds, packages){
 function updateProgress(line, packages){
     line = line.toString();
     let length = appModel.output().length;
-    if(line.includes("%")){
+
+    if( packages && packages[0] && line == packages[0].Package_Id() + " v" + packages[0].Version_Text() ){
+        shiftCurrentPackage(packages);
+    } else if(line.includes("%")){
         let pkg = appModel.installingPackage();
         let percent = line.match(/\d+\%/)[0];
-        console.log("percent: " + percent);
         percent = percent ? percent.substring(0,percent.length-1) : '0';
         appModel.installingPackage().css(`c100 p${percent} big`);
         appModel.installingPackage().status(percent+'%');
     } else if (line.includes("was successful")){
+        appModel.installingPackage().status('<span style="font-size: 50%">Completed</span>');
         shiftCurrentPackage(packages);
+    } else if (line.includes("was NOT successful")){
+        appModel.installingPackage().css(`c100 p100 big orange`);
+        appModel.installingPackages().status('<span style="font-size: 60%">Failed</span>');
     } else if (line.includes("already installed")){
         shiftPackages(packages, line);
-    } else if (line.includes("Hashes match.")){
+    } else if (line.includes("Hashes match.") ||  ( appModel.installingPackage() && line == "Installing " + appModel.installingPackage().Package_Id() + "..." )){
         appModel.installingPackage().css(`c100 p100 big`);
-        appModel.installingPackage().status('<span style="font-size: 60%">Installing</span>');
-    } else if (line.startsWith("Downloading")){
-        console.log("Downloading: "+ line);
+        appModel.installingPackage().status('<span style="font-size: 50%">Installing</span>');
     }
     
     if(length){
-        if(appModel.output()[length-1].includes("%") && line.includes("%")) appModel.output.pop();
+        if(appModel.output()[0].includes("%") && line.includes("%")) appModel.output.shift();
     }
-    appModel.output.push(line.toString());
+    appModel.output.unshift(line.toString());
 }
 function shiftPackages(packages, line){
     console.log("shifting using line: " + line);
@@ -554,7 +558,7 @@ function shiftPackages(packages, line){
             while(!line.includes(shiftCurrentPackage(packages).Package_Id())){  };
         }
     } else {
-        shiftCurrentPackage();
+        shiftCurrentPackage(packages);
     }
 }
 function shiftCurrentPackage(packages){
@@ -564,7 +568,7 @@ function shiftCurrentPackage(packages){
         pkg.status = ko.observable();
         appModel.installingPackage(pkg);
         appModel.installingPackage().css(`c100 p0 big`);
-        appModel.installingPackage().status('<span style="font-size: 60%">Preparing</span>');
+        appModel.installingPackage().status('<span style="font-size: 50%">Preparing</span>');
         return appModel.installingPackage();
     }
 }
