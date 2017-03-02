@@ -32,7 +32,7 @@ ko.applyBindings(appModel);
 //with lab numbering get rid of dash
 
 function AppViewModel() {
-    this.installStatus = ko.observable();
+    this.installingPackage = ko.observable();
     this.output = ko.observableArray();
     this.school = ko.observable("Technology Services");
     this.sections = ["login", "apps"]
@@ -473,17 +473,17 @@ function installPackagesChoco() {
     let count = 0;
     let commands = [];
     let feeds = [];
+    let packages = [];
     appModel.feeds().forEach(feed => {
         let command = ["choco install ", " -s  https://nuget.ts.vcu.edu/nuget/", " -y -r --failstderr --allow-empty-checksums"];
         let pkgIds = [];
-        let packages = [];
         feed.packages().forEach(pkg => {
             if (pkg.checked()){
                 pkgIds.push(pkg.Package_Id());
                 packages.push(pkg);
             }
         });
-        if (packages.length > 0) {
+        if (pkgIds.length > 0) {
             installedPackages += pkgIds.join(" ") + " ";
             command[0] += pkgIds.join(" ") + " ";
             command[1] += feed.Feed_Name();
@@ -493,11 +493,13 @@ function installPackagesChoco() {
             feeds.push(feed);
         }
     });
-    installFeedPackages(commands,feeds);
+    console.log(packages);
+    shiftCurrentPackage(packages)
+    installFeedPackages(commands,feeds, packages);
     //After installs are complete, email C:\ProgramData\chocolatey\logs\chocolatey.log to some email.
 
 }
-function installFeedPackages(commands,feeds){
+function installFeedPackages(commands,feeds, packages){
     appModel.currentSection('installer');
     let feed = feeds.shift();
     updateProgress('Installing packages from feed "' + feed.Feed_Name() + '"');
@@ -505,32 +507,66 @@ function installFeedPackages(commands,feeds){
         console.group(feed.Feed_Name());
         console.log(cp);
         let tail = new TailFollow(cp.files.output);
-        byline(tail).on('data',updateProgress);
+        byline(tail).on('data',data=>updateProgress(data,packages));
         cp.on('close', () => {
             console.log(feed.Feed_Name() + " successfully installed");
             console.groupEnd();
             updateProgress('Finished installing packages from feed "' + feed.Feed_Name() + '"');
             if(commands.length)
-                installFeedPackages(commands,feeds);
+                installFeedPackages(commands,feeds, packages);
             else{
-                updateProgress("Imaging complete");
+                updateProgress("Imaging complete", packages);
                 uninstall();
             }
         });
     });
 }
-function updateProgress(line){
+function updateProgress(line, packages){
     line = line.toString();
     let length = appModel.output().length;
     if(line.includes("%")){
-        
-    } else if(line.startsWith("Downloading")){
+        let pkg = appModel.installingPackage();
+        let percent = line.match(/\d+\%/)[0];
+        console.log("percent: " + percent);
+        percent = percent ? percent.substring(0,percent.length-1) : '0';
+        appModel.installingPackage().css(`c100 p${percent} big`);
+        appModel.installingPackage().status(percent+'%');
+    } else if (line.includes("was successful")){
+        shiftCurrentPackage(packages);
+    } else if (line.includes("already installed")){
+        shiftPackages(packages, line);
+    } else if (line.includes("Hashes match.")){
+        appModel.installingPackage().css(`c100 p100 big`);
+        appModel.installingPackage().status('<span style="font-size: 60%">Installing</span>');
+    } else if (line.startsWith("Downloading")){
         console.log("Downloading: "+ line);
     }
+    
     if(length){
-        if(appModel.output()[length-1].includes("%")) appModel.output.pop();
+        if(appModel.output()[length-1].includes("%") && line.includes("%")) appModel.output.pop();
     }
     appModel.output.push(line.toString());
+}
+function shiftPackages(packages, line){
+    console.log("shifting using line: " + line);
+    if(line){
+        if(packages.length){
+            while(!line.includes(shiftCurrentPackage(packages).Package_Id())){  };
+        }
+    } else {
+        shiftCurrentPackage();
+    }
+}
+function shiftCurrentPackage(packages){
+    if(packages.length){
+        let pkg = packages.shift();
+        pkg.css = ko.observable();
+        pkg.status = ko.observable();
+        appModel.installingPackage(pkg);
+        appModel.installingPackage().css(`c100 p0 big`);
+        appModel.installingPackage().status('<span style="font-size: 60%">Preparing</span>');
+        return appModel.installingPackage();
+    }
 }
 function uninstall(input = installedPackages){
      sudoer.spawn('choco uninstall -y ' + input + " --failstderr").then(function (cp) {

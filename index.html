@@ -159,14 +159,15 @@
     </div>
     
     <div class="container" data-bind="visible: currentSection() == 'installer'" style="display: none">
-      <div class="c100 p50 big">
-          <span><img src="http://iosicongallery.com/img/512/slack-2014.png"><span>50%</span></span>
+      <!-- ko if: installingPackage -->
+      <div data-bind="attr: {class: installingPackage().css}">
+          <span><img data-bind=" attr: {src: installingPackage().iconUrl}"><span data-bind="html: installingPackage().status"></span></span>
           <div class="slice">
               <div class="bar"></div>
               <div class="fill"></div>
           </div>
       </div>
-
+      <!-- /ko -->
       <div class="row" data-bind="foreach: output">
           <p data-bind="text: $data"></p>
       </div>
