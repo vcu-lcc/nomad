@@ -1,11 +1,3 @@
-// Import ReactJS and React-DOM
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-// Import react-desktop components
-import {
-  Button
-} from 'react-desktop/windows';
-
 const ActiveDirectory = require('activedirectory');
 const exec = require('child_process').execSync;
 const xml2js = require('xml2js');
@@ -586,25 +578,3 @@ function uninstall(input = installedPackages){
          });
      });
 }
-
-/*
-// Example code for future implementation
-class MyApp extends React.Component {
-    constructor() {
-        super();
-        this.defaultProps = {
-        color: '#cc7f29'
-        };
-    }
-
-    render() {  
-        return (
-            <Button push color={this.props.color} onClick={() => console.log('Clicked!')}>
-                Press me!
-            </Button>
-        );
-    }
-}
-
-ReactDOM.render(<MyApp></MyApp>, document.querySelector('#react-root'));
-*/
