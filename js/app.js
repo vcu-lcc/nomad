@@ -313,6 +313,7 @@ function login() {
         username: "RAMS\\" + username,
         password: password
     };
+    console.log(config);
     let ad = new ActiveDirectory(config);
     //Get user info
     ad.findUser(username, function (err, user) {
