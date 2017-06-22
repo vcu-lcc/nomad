@@ -17,20 +17,28 @@ module.exports = class SlideShow extends React.Component {
     }
     getView(index) {
         return this.cachedViews[index] || (this.cachedViews[index] = // This is so that we don't clone an element twice.
+            /*
+                @FIXME: Child constructors still call twice
+            */
             (function(awaitingCallback) {
                 return React.cloneElement(this.state.views[index].element, {
-                    onFinished: function(details) {
+                    callback: function(details, finished) {
                         if (!awaitingCallback) {
                             return;
                         }
                         awaitingCallback = false;
                         try {
-                            this.state.views[index].callback(details);
+                            this.state.views[index].callback({
+                                finished: !!finished,
+                                details
+                            });
                         } catch (err) {
                             console.error('Error in callback to slide ' + index, err);
                         }
-                        if (this.state.viewIndex < this.state.views.length - 1) {
-                            this.nextPage();
+                        if (finished) {
+                            if (this.state.viewIndex < this.state.views.length - 1) {
+                                this.nextPage();
+                            }
                         }
                     }.bind(this)
                 });
