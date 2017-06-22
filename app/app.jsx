@@ -4,8 +4,7 @@ import ReactDOM from 'react-dom';
 // The main wrapper function for encapsulating different 'fragments'
 import SlideShow from './app/ui';
 // One particular fragment. The format of this (and subsequent imports) will change soon.
-import authenticate from './app/authentication';
-
+import ActiveDirectoryLoginForm from './app/authentication';
 
 class TestApplication1 extends React.Component {
 	constructor(props) {
@@ -43,14 +42,15 @@ class TestApplication2 extends React.Component {
 	render() {
 		return (
 			<div>
-				<p>This is the second fragment.</p>
+				<p>This is the third fragment.</p>
 			</div>
 		);
 	}
 }
 
 let testApplication1 = <TestApplication1></TestApplication1>;
-let testApplication2 = <TestApplication2></TestApplication2>;
+let loginForm = <ActiveDirectoryLoginForm></ActiveDirectoryLoginForm>
+let testApplication3 = <TestApplication2></TestApplication2>;
 
 const applicationPath = [{
 	element: testApplication1,
@@ -58,7 +58,12 @@ const applicationPath = [{
 		console.log(details);
 	}
 }, {
-	element: testApplication2,
+	element: loginForm,
+	callback: function(details) {
+		console.log(details);
+	}
+}, {
+	element: testApplication3,
 	callback: function(details) {
 		console.log(details);
 	}

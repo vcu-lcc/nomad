@@ -11,331 +11,285 @@ import {
     View
 } from 'react-desktop/windows';
 
-module.exports = (function(model, view, controller) {
-    model = {
-        ActiveDirectory: require('activedirectory'),
-        currentSession: null,
-        init: function() {
-        },
-        verify: function(details) {
-            model.currentSession = new model.ActiveDirectory({
-                url: 'ldap://rams.adp.vcu.edu',
-                baseDN: 'dc=rams, dc=ADP, dc=vcu, dc=edu',
-                username: 'RAMS\\' + details.username,
-                password: details.password
-            });
-            model.currentSession.findUser(details.username, function(err, auth) {
-                if (auth) {
-                    details.callback({
-                        success: true,
-                        details: auth,
-                        session: model.currentSession
-                    });
-                } else {
-                    details.callback({
-                        successful: false,
-                        details: err
-                    });
-                }
-            });
-        }
-    };
-
-    controller = {
-        promise: {
-            resolve: null,
-            reject: null
-        },
-        init: function(props) {
-            model.init(props);
-            view.init(props);
-            return new Promise(function(resolve, reject) {
-                controller.promise.resolve = resolve;
-                controller.promise.reject = reject;
-            });
-        },
-        verifyIdentity: function(details) {
-            model.verify(details);
-        },
-        assertError: function(obj) {
-            controller.promise.reject(obj);
-        },
-        resolve: function(obj) {
-            controller.promise.resolve(obj);
-        }
-    };
-
-    view = {
-        init: function(props) {
-            view.getLogin(props.parentElement, function(props) {
-                /*
-                    This function gets called asynchronously, after the user clicks the submit button.
-                    At this point, props includes a username, password, and callback (used for providing
-                    validation back)
-                */
-                props.callbacks.push(function(details) {
-                    if (details.success) {
-                        view.finish.call(this, function() {
-                            controller.resolve({
-                                user: details.details,
-                                session: details.session
-                            });
-                        });
-                    } else {
-                        controller.assertError({
-                            details: details.details
-                        });
-                    }
+class API {
+    constructor() {
+    }
+    authenticate(_credentials, _callback) {
+        let calledBack = false;
+        const currentSession = new require('activedirectory')({
+            url: 'ldap://rams.adp.vcu.edu',
+            baseDN: 'dc=rams,dc=ADP,dc=vcu,dc=edu',
+            username: 'RAMS\\' + _credentials.username,
+            password: _credentials.password
+        });
+        currentSession.findUser(_credentials.username, function parseResponse(err, auth) {
+            if (calledBack) {
+                throw new Error('Prevented duplicate callback.');
+            }
+            calledBack = true;
+            if (auth) {
+                _callback({
+                    success: true,
+                    details: auth,
+                    credentials: _credentials,
+                    session: currentSession
                 });
-                controller.verifyIdentity(props);
-            });
-        },
-        getLogin: function(parentElement, callback) {
-            /*
-                Asynchronous function that prompts the user an embedded form for login credentials,
-                then passes back an object containing username and password for function callback.
-            */
-            let submit = function() {
+            } else {
+                _callback({
+                    successful: false,
+                    details: err,
+                    credentials: _credentials,
+                    session: currentSession
+                });
+            }
+        }.bind(this));
+    }
+}
+
+module.exports = class ActiveDirectoryLoginForm extends React.Component {
+    constructor(props) {
+        super();
+        this.state = {
+            loading: false,
+            error: false,
+            errorBackground: false,
+            success: false,
+            transitionEnd: null
+        };
+        this.username = '';
+        this.password = '';
+        this.api = new API();
+    }
+
+    submit() {
+        this.setState({
+            loading: true
+        });
+        this.api.authenticate({
+            username: this.username,
+            password: this.password
+        }, function(result) {
+            if (result.success) {
                 this.setState({
-                    loading: true
+                    loading: false,
+                    success: true,
+                    error: false,
+                    transitionEnd: function() {
+                        this.props.onFinished(result);
+                    }.bind(this)
                 });
-                let params = {
-                    username: this.username,
-                    password: this.password,
-                    callbacks: []
-                };
-                params.callbacks.push(function(result) {
-                    if (result.success) {
-                        this.setState({
-                            loading: false,
-                            error: false
-                        });
-                    } else {
-                        this.setState({
-                            errorBackground: false
-                        });
-                        setTimeout(function() {
-                            this.setState({
-                                loading: false,
-                                error: true,
-                                errorBackground: true
-                            });
-                        }.bind(this), 0);
-                    }
-                }.bind(this));
-                params.callback = function() {
-                    let args = arguments;
-                    params.callbacks.forEach(function(i) {
-                        i.apply(this, args);
-                    }.bind(this));
-                }.bind(this);
-                callback(params);
-            };
-            class LoginFragment extends React.Component {
-                constructor() {
-                    super();
-                    this.state = {
+            } else {
+                this.setState({
+                    errorBackground: false
+                });
+                setTimeout(function() {
+                    this.setState({
                         loading: false,
-                        error: false,
-                        errorBackground: false,
-                        success: false,
-                        finishedCallback: null
-                    };
-                    this.username = '';
-                    this.password = '';
-                }
+                        error: true,
+                        errorBackground: true
+                    });
+                }.bind(this), 0);
+            }
+        }.bind(this));
+        this.username = '';
+        this.password = '';
+    }
 
-                render() {
-                    return (
-                        <View
+    render() {
+        return (
+            <View
+                verticalAlignment="center"
+                horizontalAlignment="center"
+            >
+                <style>
+                    {`
+                        .background-fade {
+                            background: none !important;
+                        }
+
+                        .slidedown {
+                            transform: translateY(0) !important;
+                        }
+
+                        .fadein {
+                            opacity: .9 !important;
+                        }
+                    `}
+                </style>
+                <div
+                    className={this.state.success ? 'fadein' : ''}
+                    style={{
+                        pointerEvents: this.state.success ? 'all' : 'none',
+                        position: 'absolute',
+                        width: '100%',
+                        height: '100%',
+                        background: 'white',
+                        zIndex: '1',
+                        opacity: '0',
+                        display: 'flex',
+                        transition: 'opacity 500ms ease-in-out'
+                    }}
+                >
+                    <div
+                        className={this.state.success ? 'slidedown fadein' : ''}
+                        onTransitionEnd={this.state.transitionEnd}
+                        style={{
+                            position: 'absolute',
+                            width: '100%',
+                            height: '100%',
+                            zIndex: '1',
+                            opacity: '0',
+                            display: 'flex',
+                            transition: 'transform 500ms ease-in-out, opacity 500ms ease-in-out',
+                            transform: 'translateY(-100%)'
+                        }}
+                    >
+                        <Label
                             verticalAlignment="center"
                             horizontalAlignment="center"
+                            height="100%"
+                            width="100%"
                         >
-                            <style>
-                                {`
-                                    .background-fade {
-                                        background: none !important;
-                                    }
-
-                                    .slidedown {
-                                        transform: translateY(0) !important;
-                                        opacity: .9 !important;
-                                    }
-                                `}
-                            </style>
-                            <div
-                                className={this.state.success ? 'slidedown' : ''}
-                                onTransitionEnd={this.state.finishedCallback}
-                                style={{
-                                    position: 'absolute',
-                                    width: '100%',
-                                    height: '100%',
-                                    background: 'white',
-                                    zIndex: '1',
-                                    opacity: '0.1',
-                                    display: 'flex',
-                                    transition: 'transform 500ms ease-in-out, opacity 500ms ease-in-out',
-                                    transform: 'translateY(-100%)'
-                                }}
-                            >
-                                <Label
-                                    verticalAlignment="center"
-                                    horizontalAlignment="center"
-                                    height="100%"
-                                    width="100%"
-                                >
-                                    <img
-                                        src="images/check.png"
-                                        height="60px"
-                                        width="60px"
-                                        draggable={false}
-                                        style={{
-                                            padding: '10px',
-                                            userSelect: 'none',
-                                            WebkitUserDrag: 'none'
-                                        }}
-                                    />
-                                    <span
-                                        style={{
-                                            fontSize: 'x-large'
-                                        }}
-                                    >
-                                        Login Successful
-                                    </span>
-                                </Label>
-                            </div>
                             <img
-                                src="images/vcu.png"
-                                height="130px"
-                                width="130px"
+                                src="images/check.png"
+                                height="60px"
+                                width="60px"
                                 draggable={false}
-                                onClick={() => location.reload()}
                                 style={{
                                     padding: '10px',
-                                    borderRight: 'solid #EEEEEE 1px',
                                     userSelect: 'none',
                                     WebkitUserDrag: 'none'
                                 }}
                             />
-                            <View
-                                padding="10px"
-                                layout="vertical"
+                            <span
+                                style={{
+                                    fontSize: 'x-large'
+                                }}
                             >
-                                <div
-                                    style={{
-                                        padding: '5px' // These are workarounds, so that Radium doesn't complain
-                                    }}
-                                >
-                                    <Label>
-                                        <span
-                                            style={{
-                                                fontSize: '16px',
-                                                fontWeight: '600'
-                                            }}
-                                        >
-                                            Enterprise Login
-                                        </span>
-                                    </Label>
-                                </div>
-                                <div
-                                    style={{
-                                        maxHeight: '40px',
-                                        padding: '5px 5px 0 5px' // These are workarounds, so that Radium doesn't complain
-                                    }}
-                                >
-                                    <TextInput
-                                        placeholder="Username"
-                                        width={256}
-                                        onChange={e => void(this.username = e.target.value)}
-                                    />
-                                </div>
-                                <div
-                                    style={{
-                                        maxHeight: '40px',
-                                        padding: '5px 5px 0 5px' // These are workarounds, so that Radium doesn't complain
-                                    }}
-                                >
-                                    <TextInput
-                                        password={true}
-                                        placeholder="Password"
-                                        width={256}
-                                        onChange={e => void(this.password = e.target.value)}
-                                    />
-                                </div>
-                                <div
-                                    style={{
-                                        marginTop: '10px',
-                                        marginRight: '5px',
-                                        marginBottom: '5px',
-                                        marginLeft: '5px',
-                                        display: 'flex',
-                                        flexDirection: 'row-reverse'
-                                    }}
-                                >
-                                    <Button
-                                        type="submit"
-                                        onClick={submit.bind(this)}
-                                    >
-                                        Sign in
-                                    </Button>
-                                    <div
-                                        style={{
-                                            paddingLeft: '8px',
-                                            paddingRight: '8px',
-                                            display: 'flex',
-                                            alignItems: 'center'
-                                        }}
-                                    >
-                                        <View
-                                            horizontalAlignment="center"
-                                            verticalAlignment="center"
-                                        >
-                                            <ProgressCircle
-                                                hidden={!this.state.loading}
-                                                size={25}
-                                            />
-                                        </View>
-                                    </div>
-                                    <div
-                                        style={{
-                                            flexGrow: '1',
-                                            display: 'flex',
-                                            alignItems: 'center'
-                                        }}
-                                    >
-                                        <div
-                                            style={{
-                                                background: '#FFCCCC',
-                                                paddingLeft: '10px',
-                                                paddingRight: '10px',
-                                                borderRadius: '3px',
-                                                transition: this.state.errorBackground ? 'background 500ms ease-out' : ''
-                                            }}
-                                            className={this.state.errorBackground ? 'background-fade' : ''}
-                                        >
-                                            <Label
-                                                hidden={!this.state.error}
-                                                color="#FF0033"
-                                            >
-                                                Login Failure
-                                            </Label>
-                                        </div>
-                                    </div>
-                                </div>
+                                Login Successful
+                            </span>
+                        </Label>
+                    </div>
+                </div>
+                <img
+                    src="images/vcu.png"
+                    height="130px"
+                    width="130px"
+                    draggable={false}
+                    onClick={() => location.reload()}
+                    style={{
+                        padding: '10px',
+                        borderRight: 'solid #EEEEEE 1px',
+                        userSelect: 'none',
+                        WebkitUserDrag: 'none'
+                    }}
+                />
+                <View
+                    padding="10px"
+                    layout="vertical"
+                >
+                    <div
+                        style={{
+                            padding: '5px' // These are workarounds, so that Radium doesn't complain
+                        }}
+                    >
+                        <Label>
+                            <span
+                                style={{
+                                    fontSize: '16px',
+                                    fontWeight: '600'
+                                }}
+                            >
+                                Enterprise Login
+                            </span>
+                        </Label>
+                    </div>
+                    <div
+                        style={{
+                            maxHeight: '40px',
+                            padding: '5px 5px 0 5px' // These are workarounds, so that Radium doesn't complain
+                        }}
+                    >
+                        <TextInput
+                            placeholder="Username"
+                            width={256}
+                            onChange={e => void(this.username = e.target.value)}
+                        />
+                    </div>
+                    <div
+                        style={{
+                            maxHeight: '40px',
+                            padding: '5px 5px 0 5px' // These are workarounds, so that Radium doesn't complain
+                        }}
+                    >
+                        <TextInput
+                            password={true}
+                            placeholder="Password"
+                            width={256}
+                            onChange={e => void(this.password = e.target.value)}
+                        />
+                    </div>
+                    <div
+                        style={{
+                            marginTop: '10px',
+                            marginRight: '5px',
+                            marginBottom: '5px',
+                            marginLeft: '5px',
+                            display: 'flex',
+                            flexDirection: 'row-reverse'
+                        }}
+                    >
+                        <Button
+                            type="submit"
+                            onClick={this.submit.bind(this)}
+                        >
+                            Sign in
+                        </Button>
+                        <div
+                            style={{
+                                paddingLeft: '8px',
+                                paddingRight: '8px',
+                                display: 'flex',
+                                alignItems: 'center'
+                            }}
+                        >
+                            <View
+                                horizontalAlignment="center"
+                                verticalAlignment="center"
+                            >
+                                {
+                                    this.state.loading ? <ProgressCircle size={25} /> : null
+                                }
                             </View>
-                        </View>
-                    );
-                }
-            }
-
-            ReactDOM.render(<LoginFragment></LoginFragment>, parentElement);
-        },
-        finish: function(callback) {
-            this.setState({
-                success: true,
-                finishedCallback: callback
-            });
-        }
-    };
-    return controller.init;
-})();
+                        </div>
+                        <div
+                            style={{
+                                flexGrow: '1',
+                                display: 'flex',
+                                alignItems: 'center'
+                            }}
+                        >
+                            <div
+                                style={{
+                                    background: '#FFCCCC',
+                                    paddingLeft: '10px',
+                                    paddingRight: '10px',
+                                    borderRadius: '3px',
+                                    transition: this.state.errorBackground ? 'background 500ms ease-out' : ''
+                                }}
+                                className={this.state.errorBackground ? 'background-fade' : ''}
+                            >
+                                <Label
+                                    hidden={!this.state.error}
+                                    color="#FF0033"
+                                >
+                                    Login Failure
+                                </Label>
+                            </div>
+                        </div>
+                    </div>
+                </View>
+            </View>
+        );
+    }
+};
