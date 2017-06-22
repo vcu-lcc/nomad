@@ -1,5 +1,4 @@
 import React from 'react';
-import $ from 'jquery';
 
 /*
     Wrapper function/Factory for generating a new wrapper
