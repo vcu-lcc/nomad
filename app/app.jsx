@@ -9,11 +9,14 @@ import ActiveDirectoryLoginForm from './app/authentication';
 class TestApplication1 extends React.Component {
 	constructor(props) {
 		super(props);
+		setTimeout(function() {
+			props.callback({}, true);
+		}.bind(this), 1000);
 	}
 	render() {
 		return (
 			<div>
-				<p>This is where the second view fragment will be.</p>
+				<h1>{this.props.children}</h1>
 			</div>
 		);
 	}
@@ -22,12 +25,18 @@ class TestApplication1 extends React.Component {
 const applicationPath = [{
 	element: <ActiveDirectoryLoginForm></ActiveDirectoryLoginForm>,
 	callback: function(details) {
-		console.log(details);
 	}
 }, {
-	element: <TestApplication1></TestApplication1>,
+	element: <TestApplication1>Second</TestApplication1>,
 	callback: function(details) {
-		console.log(details);
+	}
+}, {
+	element: <TestApplication1>Third</TestApplication1>,
+	callback: function(details) {
+	}
+}, {
+	element: <TestApplication1>Fourth</TestApplication1>,
+	callback: function(details) {
 	}
 }];
 

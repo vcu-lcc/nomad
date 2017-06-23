@@ -6,42 +6,62 @@ import React from 'react';
 module.exports = class SlideShow extends React.Component {
     constructor(props) {
         super(props);
+        window.a = function() {
+            return JSON.stringify(this.state);
+        }.bind(this);
         this.state = {
             views: props.views, // An array that contains all of our views. This is accessed by reference.
             viewIndex: 0, // The current View index
-            transition: null, // A function (or falsey value) that serves as a callback for onTransitionEnd
-            transitionElem: null // A View (or falsey value) that gets animated in.
+            class0: 'rendered',
+            pos0: 0,
+            class1: '',
+            pos1: 1
         };
-        this.cachedViews = {};
+        this.queue = [];
+    }
+    transition(view, force) {
+        let newState = {};
+        switch(this.state['class' + view]) {
+            case 'rendered':
+                !force || ((newState['class' + view] = 'rendered eject')
+                        && (newState['class' + +!view] = 'rendered'));
+                break;
+            case 'rendered eject':
+                newState['pos' + view] = this.state['pos' + view] + 2;
+            default:
+                newState['class' + view] = '';
+        }
+        this.setState(newState);
     }
     getView(index) {
-        return this.cachedViews[index] || (this.cachedViews[index] = // This is so that we don't clone an element twice.
-            /*
-                @FIXME: Child constructors still call twice
-            */
-            (function(awaitingCallback) {
-                return React.cloneElement(this.state.views[index].element, {
-                    callback: function(details, finished) {
-                        if (!awaitingCallback) {
-                            return;
+        let waitingOnFinish = true;
+        let _this = this;
+        if (index < this.state.views.length) {
+            return React.cloneElement(this.state.views[index].element, {
+                callback: function(details, finished) {
+                    try {
+                        this.state.views[index].callback({
+                            finished: !!finished,
+                            details
+                        });
+                    } catch (err) {
+                        console.error('Error in callback to slide ' + index, err);
+                    }
+                    if (finished && waitingOnFinish) {
+                        waitingOnFinish = false;
+                        if (this.state.viewIndex < this.state.views.length - 1) {
+                            this.eject(this.state.viewIndex % 2);
+                            this.state.viewIndex++;
                         }
-                        awaitingCallback = false;
-                        try {
-                            this.state.views[index].callback({
-                                finished: !!finished,
-                                details
-                            });
-                        } catch (err) {
-                            console.error('Error in callback to slide ' + index, err);
-                        }
-                        if (finished) {
-                            if (this.state.viewIndex < this.state.views.length - 1) {
-                                this.nextPage();
-                            }
-                        }
-                    }.bind(this)
-                });
-            }.bind(this))(true));
+                    } else {
+                        throw new Error('Prevented duplicate final callback from slide', index);
+                    }
+                }.bind(_this)
+            });
+        }
+    }
+    eject(index) {
+        this.transition(index, true);
     }
     render() {
         return (
@@ -57,71 +77,60 @@ module.exports = class SlideShow extends React.Component {
             >
                 <style>
                     {`
-                        div.fixed {
+                        #view {
+                            align-items: center;
+                            display: flex;
+                            flex-direction: column;
+                            height: 100%;
+                            justify-content: center;
+                            position: absolute;
+                            transition: transform 500ms ease-in-out;
+                            width: 100%;
+                            transform: translateX(100vw);
+                        }
+                        #view.rendered {
                             transform: translateX(0);
                         }
-                        div.right {
-                            transform: translateX(100vw);
+                        #view.rendered.eject {
+                            transform: translateX(-100vw);
                         }
                     `}
                 </style>
                 <div
-                    className="fixed"
-                    style={{
-                        alignItems: 'center',
-                        display: 'flex',
-                        height: '100%',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        position: 'absolute',
-                        transform: this.state.transition ? 'translateX(-100vw)' : null,
-                        transition: this.state.transition ? 'transform 500ms ease-in-out' : null,
-                        width: '100%',
-                        zIndex: '1'
-                    }}
-                    onTransitionEnd={this.state.transition}
+                    id="view"
+                    className={this.state.class0}
+                    onTransitionEnd={i => this.transition(0)}
                 >
                     <div
-                        style={{
-                            position: 'relative',
-                            width: '100%',
-                            height: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}
+                        onTransitionEnd={e => e.stopPropagation()}
                     >
-                        <div
-                            style={{
-                                position: 'absolute'
-                            }}
-                        >
-                            {this.getView(this.state.viewIndex)}
-                        </div>
+                        {
+                           (function() {
+                                if (this.state.class0 != '') {
+                                    return this.getView(this.state.pos0);
+                                }
+                            }.bind(this))()
+                        }
                     </div>
+                </div>
+                <div
+                    id="view"
+                    className={this.state.class1}
+                    onTransitionEnd={i => this.transition(1)}
+                >
                     <div
-                        style={{
-                            position: 'absolute',
-                            transform: 'translateX(100vw)'
-                        }}
+                        onTransitionEnd={e => e.stopPropagation()}
                     >
-                        {this.state.transitionElem}
+                        {
+                           (function() {
+                                if (this.state.class1 != '') {
+                                    return this.getView(this.state.pos1);
+                                }
+                            }.bind(this))()
+                        }
                     </div>
                 </div>
             </div>
         );
-    }
-    nextPage() {
-        this.setState({
-            transitionElem: this.getView(this.state.viewIndex + 1),
-            transition: function() {
-                // Async callback after transition ends
-                this.setState({
-                    transition: null,
-                    transitionElem: null,
-                    viewIndex: this.state.viewIndex + 1
-                });
-            }.bind(this)
-        });
     }
 }
