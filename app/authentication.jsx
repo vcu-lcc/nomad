@@ -118,6 +118,7 @@ module.exports = class ActiveDirectoryLoginForm extends React.Component {
                 </style>
                 <div
                     className={this.state.success ? 'fadein' : ''}
+                    onTransitionEnd={this.state.transitionEnd}
                     style={{
                         pointerEvents: this.state.success ? 'all' : 'none',
                         position: 'absolute',
@@ -132,7 +133,7 @@ module.exports = class ActiveDirectoryLoginForm extends React.Component {
                 >
                     <div
                         className={this.state.success ? 'slidedown fadein' : ''}
-                        onTransitionEnd={this.state.transitionEnd}
+                        onTransitionEnd={e => e.stopPropagation()}
                         style={{
                             position: 'absolute',
                             width: '100%',
