@@ -1,18 +1,19 @@
 {
-  "name": "CNGEN",
+  "name": "nomad",
   "version": "0.0.0",
-  "description": "Computer naming/package selection program",
+  "description": "Post-image computer customization program",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
   "keywords": [
+    "nomad",
     "CNGEN",
     "Chocolatey",
     "packages",
     "VCU"
   ],
-  "author": "Quark J Wei",
+  "author": "Darren Chan",
   "license": "CC0-1.0",
   "devDependencies": {
     "babel-cli": "^6.24.1",
@@ -30,7 +31,6 @@
     "electron-sudo": "^4.0.12",
     "elevator": "^2.1.0",
     "getmac": "^1.2.1",
-    "jquery": "^3.2.1",
     "react": "^15.6.1",
     "react-desktop": "^0.3.1",
     "react-dom": "^15.6.1",
@@ -42,9 +42,6 @@
     "presets": [
       "env",
       "react"
-    ],
-    "ignore": [
-      "js/lib/*"
     ]
   }
 }
