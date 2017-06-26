@@ -51,7 +51,9 @@ module.exports = class SlideShow extends React.Component {
                         waitingOnFinish = false;
                         if (this.state.viewIndex < this.state.views.length - 1) {
                             this.eject(this.state.viewIndex % 2);
-                            this.state.viewIndex++;
+                            this.setState({
+                                viewIndex: this.state.viewIndex + 1
+                            });
                         }
                     } else {
                         throw new Error('Prevented duplicate final callback from slide', index);
