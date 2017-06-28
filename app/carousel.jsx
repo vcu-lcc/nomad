@@ -6,130 +6,101 @@ import React from 'react';
 module.exports = class Carousel extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            views: props.views, // An array that contains all of our views. This is accessed by reference.
-            viewIndex: 0, // The current View index
-            class0: 'rendered',
-            pos0: 0,
-            class1: '',
-            pos1: 1
-        };
-        this.queue = [];
-    }
-    transition(view, force) {
-        let newState = {};
-        switch(this.state['class' + view]) {
-            case 'rendered':
-                !force || ((newState['class' + view] = 'rendered eject')
-                        && (newState['class' + +!view] = 'rendered'));
-                break;
-            case 'rendered eject':
-                newState['pos' + view] = this.state['pos' + view] + 2;
-            default:
-                newState['class' + view] = '';
+        if (!(this.props.adapter instanceof Carousel.ArrayAdapter)) {
+            throw new Error('An invalid adapter was provided. adapter\'s class must extend Carousel.ArrayAdapter');
         }
-        this.setState(newState);
+        this.counter = 0;
+        this.state = {
+            views: [this.getNext(null)],
+            slide: false
+        };
     }
-    getView(index) {
-        let waitingOnFinish = true;
-        let _this = this;
-        if (index < this.state.views.length) {
-            return React.cloneElement(this.state.views[index].element, {
-                callback: function(details, finished) {
-                    try {
-                        this.state.views[index].callback({
-                            finished: !!finished,
-                            details
-                        });
-                    } catch (err) {
-                        console.error('Error in callback to slide ' + index, err);
-                    }
-                    if (finished && waitingOnFinish) {
-                        waitingOnFinish = false;
-                        if (this.state.viewIndex < this.state.views.length - 1) {
-                            this.eject(this.state.viewIndex % 2);
-                            this.setState({
-                                viewIndex: this.state.viewIndex + 1
-                            });
-                        }
-                    } else {
-                        throw new Error('Prevented duplicate final callback from slide', index);
-                    }
-                }.bind(_this)
+    getNext(previousProps) {
+        let finished = false;
+        const api = this;
+        const nextView = this.props.adapter.next(previousProps);
+        return nextView ? (
+            <div
+                style={{
+                    alignItems: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                    justifyContent: 'center',
+                    width: '100vw'
+                }}
+                onTransitionEnd={e => e.stopPropagation()}
+                key={String(this.counter++)}
+            >
+                {
+                    React.cloneElement(nextView, {
+                        postMessage: function(details) {
+                            this.props.adapter.onMessage(details);
+                        }.bind(api),
+                        finish: function(details) {
+                            if (!finished) {
+                                this.push(details);
+                                finished = true;
+                                return;
+                            }
+                            throw new Error('Duplicate finish callback!');
+                        }.bind(api)
+                    })
+                }
+            </div>
+        ) : false;
+    }
+    push(callbackParams) {
+        let newView = this.getNext(callbackParams);
+        if (newView) {
+            this.setState({
+                views: this.state.views.concat([newView]),
+                slide: true
             });
         }
     }
-    eject(index) {
-        this.transition(index, true);
+    pop() {
+        this.setState({
+            views: this.state.views.slice(1, this.state.views.length),
+            slide: false
+        });
     }
     render() {
         return (
             <div
+                onTransitionEnd={this.pop.bind(this)}
+                className="hold"
                 style={{
                     alignItems: 'center',
                     display: 'flex',
                     height: '100%',
                     justifyContent: 'center',
                     position: 'fixed',
-                    width: '100%'
+                    transition: this.state.slide ? 'transform 500ms ease-in-out' : null,
+                    transform: this.state.slide ? 'translateX(-100vw)' : null,
+                    minWidth: '100%'
                 }}
             >
                 <style>
                     {`
-                        #view {
-                            align-items: center;
-                            display: flex;
-                            flex-direction: column;
-                            height: 100%;
-                            justify-content: center;
-                            position: absolute;
-                            transition: transform 500ms ease-in-out;
-                            width: 100%;
-                            transform: translateX(100vw);
-                        }
-                        #view.rendered {
+                        div.hold {
                             transform: translateX(0);
-                        }
-                        #view.rendered.eject {
-                            transform: translateX(-100vw);
                         }
                     `}
                 </style>
-                <div
-                    id="view"
-                    className={this.state.class0}
-                    onTransitionEnd={i => this.transition(0)}
-                >
-                    <div
-                        onTransitionEnd={e => e.stopPropagation()}
-                    >
-                        {
-                           (function() {
-                                if (this.state.class0 != '') {
-                                    return this.getView(this.state.pos0);
-                                }
-                            }.bind(this))()
-                        }
-                    </div>
-                </div>
-                <div
-                    id="view"
-                    className={this.state.class1}
-                    onTransitionEnd={i => this.transition(1)}
-                >
-                    <div
-                        onTransitionEnd={e => e.stopPropagation()}
-                    >
-                        {
-                           (function() {
-                                if (this.state.class1 != '') {
-                                    return this.getView(this.state.pos1);
-                                }
-                            }.bind(this))()
-                        }
-                    </div>
-                </div>
+                {this.state.views}
             </div>
         );
+    }
+};
+
+module.exports.ArrayAdapter = class {
+    constructor() {
+    }
+    next(props) {
+        throw new Error('ArrayAdapter.next() not implemented!');
+    }
+    onMessage(props) {
+        throw new Error('ArrayAdapter.onMessage() not implemented!');
     }
 }

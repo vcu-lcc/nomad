@@ -75,7 +75,7 @@ module.exports = class ActiveDirectoryLoginForm extends React.Component {
                     success: true,
                     error: false,
                     transitionEnd: function() {
-                        this.props.callback(result, true);
+                        this.props.finish(result);
                     }.bind(this)
                 });
             } else {

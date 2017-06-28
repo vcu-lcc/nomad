@@ -10,7 +10,7 @@ class TestApplication1 extends React.Component {
 	constructor(props) {
 		super(props);
 		setTimeout(function() {
-			props.callback({}, true);
+			props.finish({});
 		}.bind(this), 1000);
 	}
 	render() {
@@ -22,25 +22,33 @@ class TestApplication1 extends React.Component {
 	}
 }
 
-const applicationPath = {
-	element: <ActiveDirectoryLoginForm></ActiveDirectoryLoginForm>,
-	callback: function(details) {
+class NomadArrayAdapter extends Carousel.ArrayAdapter {
+	constructor() {
+		super();
+		this.stage = -1;
+		this.credentials = null;
 	}
-}, {
-	element: <ComputerNameGenerator></ComputerNameGenerator>,
-	callback: function(details) {
+	next(previousCallbackProps) {
+		switch(++this.stage) {
+			case 0:
+				return <ActiveDirectoryLoginForm />;
+			case 1: {
+				this.credentials = previousCallbackProps;
+				return <ComputerNameGenerator />;
+			}
+			default:
+				return null;
+		}
 	}
-}, {
-	element: <TestApplication1>Done</TestApplication1>,
-	callback: function(details) {
+	onMessage(details) {
+		switch(this.stage) {
+		}
 	}
-}];
+}
 
-const carousel = (
+ReactDOM.render((
 	<Carousel
-		views={applicationPath}
+		adapter={new NomadArrayAdapter()}
 	>
 	</Carousel>
-);
-
-ReactDOM.render(carousel, document.querySelector('#react-root'));
+), document.querySelector('#react-root'));
