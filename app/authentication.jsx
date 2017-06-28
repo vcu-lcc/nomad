@@ -28,15 +28,13 @@ class API {
             }
             calledBack = true;
             if (auth) {
-                _callback({
-                    success: true,
+                _callback(true, {
                     details: auth,
                     credentials: _credentials,
                     session: currentSession
                 });
             } else {
-                _callback({
-                    successful: false,
+                _callback(false, {
                     details: err,
                     credentials: _credentials,
                     session: currentSession
@@ -68,14 +66,14 @@ module.exports = class ActiveDirectoryLoginForm extends React.Component {
         this.api.authenticate({
             username: this.username,
             password: this.password
-        }, function(result) {
-            if (result.success) {
+        }, function(success, details) {
+            if (success) {
                 this.setState({
                     loading: false,
                     success: true,
                     error: false,
                     transitionEnd: function() {
-                        this.props.finish(result);
+                        this.props.finish(details);
                     }.bind(this)
                 });
             } else {
@@ -89,6 +87,7 @@ module.exports = class ActiveDirectoryLoginForm extends React.Component {
                         errorBackground: true
                     });
                 }.bind(this), 0);
+                this.props.postMessage(details);
             }
         }.bind(this));
         this.username = '';

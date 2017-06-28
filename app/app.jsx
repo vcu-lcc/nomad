@@ -6,7 +6,7 @@ import Carousel from './app/carousel';
 import ActiveDirectoryLoginForm from './app/authentication';
 import ComputerNameGenerator from './app/computer-name-generator';
 
-class TestApplication1 extends React.Component {
+class MessageSpan extends React.Component {
 	constructor(props) {
 		super(props);
 		setTimeout(function() {
@@ -42,6 +42,9 @@ class NomadArrayAdapter extends Carousel.ArrayAdapter {
 	}
 	onMessage(details) {
 		switch(this.stage) {
+			case 0: {
+				console.error(details.details.name, details.details.message);
+			}
 		}
 	}
 }
