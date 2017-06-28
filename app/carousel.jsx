@@ -3,7 +3,7 @@ import React from 'react';
 /*
     Wrapper function/Factory for generating a new wrapper
 */
-module.exports = class SlideShow extends React.Component {
+module.exports = class Carousel extends React.Component {
     constructor(props) {
         super(props);
         this.state = {

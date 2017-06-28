@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 // The main wrapper function for encapsulating different 'fragments'
-import SlideShow from './app/ui';
+import Carousel from './app/carousel';
 import ActiveDirectoryLoginForm from './app/authentication';
 import ComputerNameGenerator from './app/computer-name-generator';
 
@@ -36,11 +36,11 @@ const applicationPath = {
 	}
 }];
 
-const slideShow = (
-	<SlideShow
+const carousel = (
+	<Carousel
 		views={applicationPath}
 	>
-	</SlideShow>
+	</Carousel>
 );
 
-ReactDOM.render(slideShow, document.querySelector('#react-root'));
+ReactDOM.render(carousel, document.querySelector('#react-root'));
