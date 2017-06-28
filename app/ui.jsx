@@ -6,9 +6,6 @@ import React from 'react';
 module.exports = class SlideShow extends React.Component {
     constructor(props) {
         super(props);
-        window.a = function() {
-            return JSON.stringify(this.state);
-        }.bind(this);
         this.state = {
             views: props.views, // An array that contains all of our views. This is accessed by reference.
             viewIndex: 0, // The current View index
