@@ -1,47 +1,31 @@
 {
   "name": "nomad",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Post-image computer customization program",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  },
-  "keywords": [
-    "nomad",
-    "CNGEN",
-    "Chocolatey",
-    "packages",
-    "VCU"
-  ],
+  "main": "index.js",
   "author": "Darren Chan",
-  "license": "CC0-1.0",
-  "devDependencies": {
-    "babel-cli": "^6.24.1",
-    "babel-core": "^6.25.0",
-    "babel-loader": "^7.0.0",
-    "babel-preset-env": "^1.5.2",
-    "babel-preset-react": "^6.24.1",
-    "electron-prebuilt": "^1.2.0",
-    "electron-prebuilt-compile": "^1.6.11"
-  },
+  "license": "AGPL-3.0",
   "dependencies": {
     "activedirectory": "^0.7.2",
-    "byline": "^5.0.0",
-    "electron": "^1.3.4",
-    "electron-sudo": "^4.0.12",
-    "elevator": "^2.1.0",
-    "getmac": "^1.2.1",
+    "electron": "^1.6.11",
     "react": "^15.6.1",
     "react-desktop": "^0.3.1",
-    "react-dom": "^15.6.1",
-    "tail-follow": "^1.5.0",
-    "webpack": "^2.6.1",
-    "xml2js": "^0.4.17"
+    "react-dom": "^15.6.1"
   },
-  "babel": {
-    "presets": [
-      "env",
-      "react"
-    ]
+  "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "file-loader": "^0.11.2",
+    "html-webpack-plugin": "^2.29.0",
+    "path": "^0.12.7",
+    "url-loader": "^0.5.9",
+    "webpack": "^3.2.0",
+    "webpack-dev-server": "^2.5.1"
+  },
+  "scripts": {
+    "build": "webpack",
+    "start": "electron ."
   }
 }
