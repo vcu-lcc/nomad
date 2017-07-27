@@ -17,27 +17,194 @@
 import React from 'react';
 import {
     Button,
-    Label,
-    ProgressCircle,
-    Text,
-    TextInput,
-    View
+    ProgressCircle
 } from 'react-desktop/windows';
+import PropTypes from 'prop-types';
 import Dropdown from '../Shared/Dropdown/dropdown.jsx';
+import FieldSet from '../Shared/FieldSet/FieldSet.jsx';
+import InputBox from '../Shared/InputBox/InputBox.jsx';
+import Radium from 'radium';
 
-module.exports = class ComputerNameGenerator extends React.Component {
+const styles = {
+    base: {
+        display: 'flex',
+        alignItems: 'center',
+        userSelect: 'none',
+        cursor: 'default',
+        fontFamily: '"Segoe UI"'
+    },
+    computerNamePreview: {
+        flexGrow: '1',
+        fontSize: 'larger'
+    },
+    label: {
+        fontSize: 'larger',
+        paddingRight: '16px'
+    },
+    secondaryWrapper: {
+        alignItems: 'center',
+        display: 'flex',
+        minWidth: '600px'
+    },
+    horizontalMargin: {
+        margin: '0 16px'
+    }
+}
+
+class ComputerNameGenerator extends React.Component {
 	constructor(props) {
 		super(props);
+        this.state = {
+            University: null,
+            Campus: null,
+            Building: null,
+            Room: null,
+            ComputerNumber: null,
+            ComputerName: '',
+            loading: false
+        }
 	}
 
+    calculateComputerName() {
+        this.setState({
+            ComputerName: 'null'
+        });
+    }
+
 	render() {
-		return (
-			<div>
-				<Dropdown
-					label="Campus"
-					options={["MCV", "MPC"]}
-				></Dropdown>
-			</div>
-		);
+        return (
+            <FieldSet>
+                <Dropdown
+                    label="University"
+                    onselect={function(i) {
+                        this.setState({
+                            University: this.props.universities[i],
+                            Campus: null,
+                            Building: null,
+                            Room: null,
+                            ComputerNumber: null
+                        });
+                        this.calculateComputerName();
+                    }.bind(this)}
+                >
+                    {this.props.universities.map(i => i.Name)}
+                </Dropdown>
+                {
+                    this.state.University &&
+                        (<Dropdown
+                            label="Campus"
+                            onselect={function(i) {
+                                this.setState({
+                                    Campus: this.state.University.Campuses[i],
+                                    Building: null,
+                                    Room: null,
+                                    ComputerNumber: null
+                                });
+                                this.calculateComputerName();
+                            }.bind(this)}
+                        >
+                            {this.state.University.Campuses.map(i => i.Name)}
+                        </Dropdown>)
+                }
+                {
+                    this.state.Campus &&
+                        (<Dropdown
+                            label="Building"
+                            onselect={function(i) {
+                                this.setState({
+                                    Building: this.state.Campus.Buildings[i],
+                                    Room: null,
+                                    ComputerNumber: null
+                                });
+                                this.calculateComputerName();
+                            }.bind(this)}
+                        >
+                            {this.state.Campus.Buildings.map(i => i.Name)}
+                        </Dropdown>)
+                }
+                {
+                    this.state.Building &&
+                        (<Dropdown
+                            label="Room"
+                            onselect={function(i) {
+                                this.setState({
+                                    Room: this.state.Building.Rooms[i],
+                                    ComputerNumber: null
+                                });
+                                this.calculateComputerName();
+                            }.bind(this)}
+                        >
+                            {this.state.Building.Rooms.map(i => i.Name)}
+                        </Dropdown>)
+                }
+                {
+                    this.state.Room &&
+                        (<InputBox
+                            placeholder="Computer ID"
+                            onChange={function(s) {
+                                this.setState({
+                                    ComputerNumber: s
+                                });
+                                this.calculateComputerName();
+                            }.bind(this)}
+                        >
+                        </InputBox>)
+                }
+                <div
+                    style={[styles.base]}
+                >
+                    <div
+                        style={[styles.label]}
+                    >
+                        Computer Name:
+                    </div>
+                    <div
+                        style={[styles.secondaryWrapper]}
+                    >
+                        <div
+                            style={[styles.computerNamePreview]}
+                        >
+                            {this.state.ComputerName}
+                        </div>
+                        <div
+                            style={[styles.horizontalMargin]}
+                        >
+                        {
+                            this.state.loading && (<ProgressCircle />)
+                        }
+                        </div>
+                        {
+                            this.state.ComputerNumber &&
+                                (<Button push
+                                    placeholder="Computer ID"
+                                    onClick={function() {
+                                        this.calculateComputerName();
+                                        this.setState({
+                                            loading: true
+                                        });
+                                        setTimeout(() => {
+                                            this.setState({
+                                                loading: false
+                                            });
+                                        }, 1000);
+                                    }.bind(this)}
+                                >
+                                Apply
+                                </Button>)
+                        }
+                    </div>
+                </div>
+            </FieldSet>
+        );
 	}
 }
+
+ComputerNameGenerator.defaultProps = {
+    template: ''
+};
+
+ComputerNameGenerator.propTypes = {
+    template: PropTypes.string
+};
+
+export default Radium(ComputerNameGenerator);

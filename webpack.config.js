@@ -10,7 +10,12 @@ const HtmlWebpackPluginConfig = new HtmlWebpackPlugin({
 module.exports = {
 	entry: './client/index.js',
 	output: {
-		path: path.resolve('dist'),
+		path: path.resolve('build') + '/release',
+		filename: 'index_bundle.js'
+	},
+	devServer: {
+		path: path.resolve('build') + '/debug',
+		inline: true,
 		filename: 'index_bundle.js'
 	},
 	module: {
@@ -40,4 +45,4 @@ module.exports = {
 		HtmlWebpackPluginConfig
 	],
 	target: 'node'
-}
+};

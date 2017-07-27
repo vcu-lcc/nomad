@@ -22,18 +22,24 @@ module.exports = class Carousel extends React.Component {
     constructor(props) {
         super(props);
         if (!(this.props.adapter instanceof Carousel.ArrayAdapter)) {
-            throw new Error('An invalid adapter was provided. adapter\'s class must extend Carousel.ArrayAdapter');
+            throw new Error('An invalid adapter was provided. The specified adapter must be an object who\'s class extends Carousel.ArrayAdapter');
         }
+        this.props.adapter.parent = {
+            next: function() {
+                this.next();
+            }.bind(this)
+        };
         this.counter = 0;
+        this.queue = [];
         this.state = {
-            views: [this.getNext(null)],
+            views: [this.getNext({})],
             slide: false
         };
     }
     getNext(previousProps) {
         let finished = false;
         const api = this;
-        const nextView = this.props.adapter.next(previousProps);
+        const nextView = this.props.adapter.getNext(previousProps);
         return nextView ? (
             <div
                 style={{
@@ -54,7 +60,7 @@ module.exports = class Carousel extends React.Component {
                         }.bind(api),
                         finish: function(details) {
                             if (!finished) {
-                                this.push(details);
+                                this.next(details);
                                 finished = true;
                                 return;
                             }
@@ -65,25 +71,37 @@ module.exports = class Carousel extends React.Component {
             </div>
         ) : false;
     }
-    push(callbackParams) {
+    next(callbackParams = {}) {
         let newView = this.getNext(callbackParams);
         if (newView) {
-            this.setState({
-                views: this.state.views.concat([newView]),
-                slide: true
-            });
+            if (this.state.slide) {
+                this.queue.push(newView);
+            } else {
+                this.setState({
+                    views: this.state.views.concat([newView]),
+                    slide: true
+                });
+            }
         }
     }
-    pop() {
+    _destroyPreviousView() {
         this.setState({
             views: this.state.views.slice(1, this.state.views.length),
             slide: false
         });
+        if (this.queue.length > 0) {
+            setTimeout(function() {
+                this.setState({
+                    views: this.state.views.concat([this.queue.shift()]),
+                    slide: true
+                });
+            }.bind(this), 0);
+        }
     }
     render() {
         return (
             <div
-                onTransitionEnd={this.pop.bind(this)}
+                onTransitionEnd={this._destroyPreviousView.bind(this)}
                 className="hold"
                 style={{
                     alignItems: 'center',
@@ -112,8 +130,8 @@ module.exports = class Carousel extends React.Component {
 module.exports.ArrayAdapter = class {
     constructor() {
     }
-    next(props) {
-        throw new Error('ArrayAdapter.next() not implemented!');
+    getNext(props) {
+        throw new Error('ArrayAdapter.getNext() not implemented!');
     }
     onMessage(props) {
         throw new Error('ArrayAdapter.onMessage() not implemented!');

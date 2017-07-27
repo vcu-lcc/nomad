@@ -15,58 +15,73 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import React from 'react';
+import _ from 'lodash';
+import Radium from 'radium';
 
-module.exports = class Dropdown extends React.Component {
+const styles = {
+	base: {
+		userSelect: 'none',
+		cursor: 'default',
+		fontFamily: '"Segoe UI"',
+		':focus': {
+			outline: 'none'
+		}
+	}
+}
+
+class Dropdown extends React.Component {
 	constructor(props) {
 		super(props);
+		this.root = null;
+		this.dropdownBox = null;
 		this.state = {
-			activeIndex: 0,
-			isExpanded: false
+			activeIndex: this.props.children.length == 1 ? 0 : -1,
+			isExpanded: false,
+			offset: 0,
+			maxHeight: 'auto',
+			onselect: typeof this.props.onselect == 'function' ? this.props.onselect : function() {}
 		};
-	}
-	createOption(i) {
-		return (
-			<div
-				key={i}
-				style={{
-					transform: this.state.isExpanded || this.state.activeIndex == i ? 'scale(1)' : null,
-					transition: 'transform 250ms ease-out, height 250 ease-out',
-					height: this.state.isExpanded || this.state.activeIndex == i ? '22px' : null,
-					overflowY: 'hidden'
-				}}
-				className={this.state.activeIndex == i ? 'active option' : 'option'}
-				onClick={function() {
-					!this.state.isExpanded || this.setState({
-						activeIndex: i
-					});
-				}.bind(this)}
-			>
-				{this.props.options[i]}
-			</div>
-		)
-	}
-	createOptions(options) {
-		let children = [];
-		for (let i = 0; i != options.length; i++) {
-			children.push(this.createOption(i));
+		switch(this.props.children.length) {
+			case 0:
+				setTimeout(this.state.onselect.bind(window, null), 0);
+				break;
+			case 1:
+				setTimeout(this.state.onselect.bind(window, 0), 0);
+				break;
 		}
-		return children;
+	}
+	componentDidMount() {
+		let offsetTop = this.root.getBoundingClientRect().top - this.state.offset;
+		let offsetBottom = window.innerHeight - offsetTop - this.root.getBoundingClientRect().height + this.state.offset;
+		this.setState({
+			maxHeight: Math.min(offsetTop, offsetBottom) * 0.8 + 'px'
+		});
+	}
+	componentWillReceiveProps(nextProps) {
+		if (!_.isEqual(this.props.children, nextProps.children)) {
+			this.setState({
+				activeIndex: this.props.children.length == 1 ? 0 : -1,
+				isExpanded: false
+			});
+			switch(this.props.children.length) {
+				case 0:
+					setTimeout(this.state.onselect.bind(window, null), 0);
+					break;
+				case 1:
+					setTimeout(this.state.onselect.bind(window, 0), 0);
+					break;
+			}
+		}
 	}
 	render() {
 		return (
 			<div
-				style={{
-					userSelect: 'none',
-					cursor: 'default',
+				ref={root => this.root = root}
+				key="wrapper"
+				style={[styles.base, {
 					display: 'flex',
-					fontFamily: '"Segoe UI"',
 					alignItems: 'center'
-				}}
-				onBlur={function() {
-					this.setState({
-						isExpanded: false
-					});
-				}.bind(this)}
+				}]}
 			>
 				<div
 					style={{
@@ -78,70 +93,137 @@ module.exports = class Dropdown extends React.Component {
 				</div>
 				<div
 					style={{
-						width: this.props.width || '150px'
-						// Manipulate this offsetTop
+						width: this.props.width || '600px',
+						minHeight: '38px'
 					}}
-					onClick={function() {
-						this.setState({
-							isExpanded: !this.state.isExpanded
-						});
-					}.bind(this)}
 				>
-					<style>{`
-						div.dropbox {
-							padding: 5px 10px 5px 10px;
-							border: #BDBDBD solid 2px;
-						}
-						div.dropbox:hover {
-							border: #9E9E9E solid 2px;
-						}
-						div.dropbox div.option {
-							transform: scale(0);
-							height: 0;
-						}
-						div.dropbox.preview div.option.active {
-							transform: scale(1);
-							padding: 5px 10px 5px 10px;
-						}
-						div.dropbox.expanded {
-							padding: 5px 0 5px 0;
-						}
-						div.dropbox.expanded div.option {
-							padding: 10px 10px 10px 20px;
-						}
-						div.dropbox.expanded div.option:hover {
-							background: #BDBDBD;
-						}
-						div.dropbox.expanded div.option.active {
-							background: #E1F5FE;
-						}
-						div.dropbox.expanded div.option.active:hover {
-							background: #81D4FA;
-						}
-					`}</style>
 					<div
-						className={'dropbox ' + (this.state.isExpanded ? 'expanded' : 'preview')}
 						style={{
-							display: 'flex'
+							background: 'white',
+							position: this.state.isExpanded ? 'absolute' : null,
+							width: this.props.width || '600px',
+							transform: this.state.isExpanded ? 'translateY(-' + this.state.offset + 'px)' : null,
+							zIndex: 1
 						}}
+						onClick={() => this.setState({isExpanded: !this.state.isExpanded})}
+						onBlur={() => this.setState({isExpanded: false})}
 					>
+						<style>{`
+							div.dropbox {
+								padding: 5px 10px 5px 10px;
+								border: #BDBDBD solid 2px;
+							}
+							div.dropbox:hover {
+								border: #9E9E9E solid 2px;
+							}
+							div.dropbox div.option {
+								transform: scale(0);
+								height: 0;
+							}
+							div.dropbox.preview div.option.active {
+								transform: scale(1);
+							}
+							div.dropbox.expanded {
+								padding: 5px 0 5px 0;
+							}
+							div.dropbox.expanded div.option {
+								padding: 5px 10px 5px 20px;
+							}
+							div.dropbox.expanded div.option:hover {
+								background: #BDBDBD;
+							}
+							div.dropbox.expanded div.option.active {
+								background: #E1F5FE;
+							}
+							div.dropbox.expanded div.option.active:hover {
+								background: #81D4FA;
+							}
+						`}</style>
 						<div
-							style={{
-								flexGrow: 1,
-								transform: 'translateY(-2px)'
-							}}
+							tabIndex={'0'}
+							ref={r => this.dropdownBox = r}
+							key="dropbox"
+							style={[styles.base]}
+							className={'dropbox ' + (this.state.isExpanded ? 'expanded' : 'preview')}
 						>
-							{this.createOptions(this.props.options)}
+							<div
+								style={{
+									display: this.state.isExpanded ? 'none' : 'flex'
+								}}
+							>
+								<div
+									style={{
+										// This is the preview tag
+										flexGrow: 1
+									}}
+								>
+									<div
+										style={{
+											transform: 'scale(1)',
+											transition: 'transform 250ms ease-out, height 250 ease-out',
+											height: '22px',
+											overflowY: 'hidden'
+										}}
+										className={this.state.isExpanded ? 'option' : 'active option'}
+									>
+										{this.state.activeIndex == -1 ? '' : this.props.children[this.state.activeIndex]}
+									</div>
+								</div>
+								<img
+									src={require("./dropdown.svg")}
+								/>
+							</div>
+							<div
+								style={{
+									// This is the expanded options tag
+									flexGrow: 1,
+									transform: 'translateY(-2px)',
+									display: this.state.isExpanded ? 'block' : 'none',
+									maxHeight: this.state.maxHeight,
+									overflowY: 'auto'
+								}}
+							>
+								{this.props.children.map((e, i, unused, entry) => (
+									<div
+										key={i}
+										style={{
+											transform: 'scale(1)',
+											transition: 'transform 250ms ease-out, height 250 ease-out',
+											height: '22px',
+											overflowY: 'hidden'
+										}}
+										className={this.state.activeIndex == i ? 'active option' : 'option'}
+										ref={r => entry = r}
+										onClick={function() {
+											if (this.state.isExpanded) {
+												if (this.state.activeIndex != i) {
+													try {
+														this.state.onselect(i);
+													} catch (err) {
+														console.error(err);
+													}
+												}
+												entry.scrollIntoView();
+												let gap = entry.getBoundingClientRect().top - entry.parentElement.getBoundingClientRect().top;
+												entry.parentElement.scrollTop -= parseInt(this.state.maxHeight) / 2 - gap -
+													entry.getBoundingClientRect().height;
+												this.setState({
+													offset: entry.getBoundingClientRect().top - entry.parentElement.getBoundingClientRect().top,
+													activeIndex: i
+												});
+											}
+										}.bind(this)}
+									>
+										{e}
+									</div>
+								))}
+							</div>
 						</div>
-						<img
-							style={{
-								display: this.state.isExpanded ? 'none' : 'block'
-							}}
-							src={require("./dropdown.svg")}
-						/>
 					</div>
 				</div>
 			</div>
 		);
 	}
 }
+
+export default Radium(Dropdown);
