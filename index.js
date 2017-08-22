@@ -16,9 +16,9 @@ function createWindow () {
 
   // and load the index.html of the app.
   if (process.argv.includes('--release')) {
-    mainWindow.loadURL(`file://${__dirname}/build/release/index.html`);
+    mainWindow.loadURL(`file://${__dirname}/build/index.html`);
   } else {
-    mainWindow.loadURL(`file://${__dirname}/build/debug/index.html`);
+    mainWindow.loadURL(`http://localhost:8080/index.html`);
   }
 
   // Open the DevTools.

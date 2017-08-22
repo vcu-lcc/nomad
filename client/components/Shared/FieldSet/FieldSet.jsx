@@ -30,7 +30,7 @@ class FieldSet extends React.Component {
                 }}
             >
                 {
-                    this.props.children.map((e, i) => (
+                    React.Children.toArray(this.props.children).map((e, i) => (
                         <div
                             style={{
                                 margin: '10px'

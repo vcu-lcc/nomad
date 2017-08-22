@@ -8,16 +8,15 @@ const HtmlWebpackPluginConfig = new HtmlWebpackPlugin({
 });
 
 module.exports = {
-	entry: './client/index.js',
+	entry: ['babel-polyfill', './client/index.js'],
 	output: {
-		path: path.resolve('build') + '/release',
+		path: path.resolve('build'),
 		filename: 'index_bundle.js'
 	},
 	devServer: {
-		path: path.resolve('build') + '/debug',
-		inline: true,
 		filename: 'index_bundle.js'
 	},
+	devtool: 'inline-source-map',
 	module: {
 		loaders: [{
 			test: /\.js$/,

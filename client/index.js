@@ -29,8 +29,17 @@ import ComputerNameGenerator from './components/ComputerNameGenerator/ComputerNa
 class ConfigStore {
 	constructor(callback) {
 		this.config = {
-			"Universities": [],
-			"Chainload": []
+			'Template': '',
+			'ComputerTypes': [
+				'Classroom Podium Workstation',
+				'Lab Workstation',
+				'Kiosk',
+				'Channel Player',
+				'Faculty/Staff Computer',
+				'Servers'
+			],
+			'Universities': [],
+			'Chainload': []
 		};
 	}
 	set(key, value) {
@@ -42,34 +51,34 @@ class ConfigStore {
 	apply(newConfig) {
 		newConfig = _.merge(this.config, newConfig);
 	}
-	loadRemoteConfig(urls) {
-		return new Promise((resolve, reject) => {
-			Promise.all(
-				Array.from(arguments).map(
-					i => new Promise(this._fetchConfig.bind(this, i))
-				)
-			).then(function(configs) {
-				configs.forEach(i => this.apply(i));
-				if (this.config.Chainload.length > 0) {
-					let chainload = this.config.Chainload;
-					this.config.Chainload = [];
-					loadRemoteConfig(...chainload).then(() => resolve());
-				} else {
-					resolve();
-				}
-			}.bind(this));
-		});
+	async loadRemoteConfig(/*...urls*/) {
+		for (let url of arguments) {
+			try {
+				this.apply(await this._fetchConfig(url));
+			} catch (err) {
+				console.error('Error while obtaining JSON config from ' + url, err);
+			}
+		}
+		let chainload = this.config.Chainload;
+		if (chainload.length > 0) {
+			this.config.Chainload = [];
+			await loadRemoteConfig(...chainload);
+		}
 	}
-	_fetchConfig(url, resolve, reject) {
-		let xhr = new XMLHttpRequest();
-		xhr.open('GET', url, true);
-		xhr.onload = function() {
-			resolve(JSON.parse(xhr.responseText));
-		}.bind(this);
-		xhr.onerror = function(e) {
-			reject(e);
-		}.bind(this);
-		xhr.send();
+	async _fetchConfig(url) {
+		return new Promise((resolve, reject) => {
+			var request = require('request');
+			request({
+				url,
+				json: true
+			}, (error, response, body) => {
+				if (error || response.statusCode != 200) {
+					reject(new Error(error || 'Unexpected status code: ' + response.statusCode));
+				} else {
+					resolve(body);
+				}
+			});
+		});
 	}
 }
 
@@ -87,7 +96,8 @@ class NomadArrayAdapter extends Carousel.ArrayAdapter {
 			case 1: {
 				this.configStore.set('credentials', previousCallbackProps.credentials);
 				this.configStore.loadRemoteConfig(
-					'https://files.nuget.ts.vcu.edu/EMS/vcu.json'
+					'https://files.nuget.ts.vcu.edu/EMS/vcu.json',
+					'http://localhost/vcu.json'
 				).then(() => this.parent.next());
 				return (
 					<div
@@ -118,6 +128,8 @@ class NomadArrayAdapter extends Carousel.ArrayAdapter {
 			case 2: {
 				return <ComputerNameGenerator
 					universities={this.configStore.get('Universities')}
+					template={this.configStore.get('Template')}
+					ComputerTypes={this.configStore.get('ComputerTypes')}
 				/>;
 			}
 			default:

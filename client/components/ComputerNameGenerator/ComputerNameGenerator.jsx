@@ -53,103 +53,101 @@ const styles = {
 
 class ComputerNameGenerator extends React.Component {
 	constructor(props) {
-		super(props);
+        super(props);
+        let that = this;
+        this.options = {
+            label: 'Computer Type',
+            options: [{
+                    value: 'Classroom Podium Workstation',
+                    callback: function() {
+                        return {
+                            label: 'Campus',
+                            options: this.props.universities.length > 0 ? this.props.universities[0].Campuses.map((campus, i) => {
+                                return {
+                                    value: campus.Name,
+                                    callback: function() {
+                                        debugger;
+                                        return {
+                                            label: 'Building',
+                                            options: []
+                                        };
+                                    }
+                                }
+                            }) : []
+                        };
+                    }.bind(that)
+                }, {
+                    value: 'Lab Workstation',
+                    callback: function() {
+                        return {
+                            label: 'Campus',
+                            options: []
+                        };
+                    }.bind(that)
+                }, {
+                    value: 'Kiosk',
+                    callback: function() {
+                        return {
+                            label: 'Campus',
+                            options: []
+                        };
+                    }.bind(that)
+                }, {
+                    value: 'Channel Player',
+                    callback: function() {
+                        return {
+                            label: 'Campus',
+                            options: []
+                        };
+                    }.bind(that)
+                }, {
+                    value: 'Faculty/Staff Computer',
+                    callback: function() {
+                        return {
+                            label: 'Top Level Organizational Unit',
+                            options: []
+                        };
+                    }.bind(that)
+                }, {
+                    value: 'Server',
+                    callback: function() {
+                        return {
+                            label: 'Department',
+                            options: []
+                        };
+                    }.bind(that)
+                }]
+        };
         this.state = {
-            University: null,
-            Campus: null,
-            Building: null,
-            Room: null,
-            ComputerNumber: null,
             ComputerName: '',
-            loading: false
+            loading: false,
+            fields: []
         }
-	}
+        setTimeout(this._processFields.bind(this, [this.options]), 0);
+    }
 
-    calculateComputerName() {
-        this.setState({
-            ComputerName: 'null'
-        });
+    _processFields(path, index=0) {
+        let fields = this.state.fields.slice(0, index);
+        for (let i = index; i < path.length; i++) {
+            fields.push(<Dropdown
+                label={path[i].label}
+                key={i}
+                onselect={ii => {
+                    if (typeof ii == 'number') {
+                        this._processFields(path.concat([path[i].options[ii].callback()]), index + 1);
+                    }
+                }}
+            >
+                {path[i].options.map(i => i.value)}
+            </Dropdown>)
+        }
+        this.setState({ fields });
     }
 
 	render() {
         return (
             <FieldSet>
-                <Dropdown
-                    label="University"
-                    onselect={function(i) {
-                        this.setState({
-                            University: this.props.universities[i],
-                            Campus: null,
-                            Building: null,
-                            Room: null,
-                            ComputerNumber: null
-                        });
-                        this.calculateComputerName();
-                    }.bind(this)}
-                >
-                    {this.props.universities.map(i => i.Name)}
-                </Dropdown>
-                {
-                    this.state.University &&
-                        (<Dropdown
-                            label="Campus"
-                            onselect={function(i) {
-                                this.setState({
-                                    Campus: this.state.University.Campuses[i],
-                                    Building: null,
-                                    Room: null,
-                                    ComputerNumber: null
-                                });
-                                this.calculateComputerName();
-                            }.bind(this)}
-                        >
-                            {this.state.University.Campuses.map(i => i.Name)}
-                        </Dropdown>)
-                }
-                {
-                    this.state.Campus &&
-                        (<Dropdown
-                            label="Building"
-                            onselect={function(i) {
-                                this.setState({
-                                    Building: this.state.Campus.Buildings[i],
-                                    Room: null,
-                                    ComputerNumber: null
-                                });
-                                this.calculateComputerName();
-                            }.bind(this)}
-                        >
-                            {this.state.Campus.Buildings.map(i => i.Name)}
-                        </Dropdown>)
-                }
-                {
-                    this.state.Building &&
-                        (<Dropdown
-                            label="Room"
-                            onselect={function(i) {
-                                this.setState({
-                                    Room: this.state.Building.Rooms[i],
-                                    ComputerNumber: null
-                                });
-                                this.calculateComputerName();
-                            }.bind(this)}
-                        >
-                            {this.state.Building.Rooms.map(i => i.Name)}
-                        </Dropdown>)
-                }
-                {
-                    this.state.Room &&
-                        (<InputBox
-                            placeholder="Computer ID"
-                            onChange={function(s) {
-                                this.setState({
-                                    ComputerNumber: s
-                                });
-                                this.calculateComputerName();
-                            }.bind(this)}
-                        >
-                        </InputBox>)
-                }
+                { this.state.fields }
                 <div
                     style={[styles.base]}
                 >
@@ -174,7 +172,7 @@ class ComputerNameGenerator extends React.Component {
                         }
                         </div>
                         {
-                            this.state.ComputerNumber &&
+                            this.state.Computer && this.state.Computer.ID &&
                                 (<Button push
                                     placeholder="Computer ID"
                                     onClick={function() {
@@ -200,11 +198,13 @@ class ComputerNameGenerator extends React.Component {
 }
 
 ComputerNameGenerator.defaultProps = {
-    template: ''
+    template: '',
+    ComputerTypes: []
 };
 
 ComputerNameGenerator.propTypes = {
-    template: PropTypes.string
+    template: PropTypes.string,
+    ComputerTypes: PropTypes.array
 };
 
 export default Radium(ComputerNameGenerator);

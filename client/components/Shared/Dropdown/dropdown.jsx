@@ -35,13 +35,13 @@ class Dropdown extends React.Component {
 		this.root = null;
 		this.dropdownBox = null;
 		this.state = {
-			activeIndex: this.props.children.length == 1 ? 0 : -1,
+			activeIndex: React.Children.toArray(this.props.children).length == 1 ? 0 : -1,
 			isExpanded: false,
 			offset: 0,
 			maxHeight: 'auto',
 			onselect: typeof this.props.onselect == 'function' ? this.props.onselect : function() {}
 		};
-		switch(this.props.children.length) {
+		switch(React.Children.toArray(this.props.children).length) {
 			case 0:
 				setTimeout(this.state.onselect.bind(window, null), 0);
 				break;
@@ -58,12 +58,12 @@ class Dropdown extends React.Component {
 		});
 	}
 	componentWillReceiveProps(nextProps) {
-		if (!_.isEqual(this.props.children, nextProps.children)) {
+		if (!_.isEqual(React.Children.toArray(this.props.children), nextProps.children)) {
 			this.setState({
-				activeIndex: this.props.children.length == 1 ? 0 : -1,
+				activeIndex: React.Children.toArray(this.props.children).length == 1 ? 0 : -1,
 				isExpanded: false
 			});
-			switch(this.props.children.length) {
+			switch(React.Children.toArray(this.props.children).length) {
 				case 0:
 					setTimeout(this.state.onselect.bind(window, null), 0);
 					break;
@@ -166,7 +166,7 @@ class Dropdown extends React.Component {
 										}}
 										className={this.state.isExpanded ? 'option' : 'active option'}
 									>
-										{this.state.activeIndex == -1 ? '' : this.props.children[this.state.activeIndex]}
+										{this.state.activeIndex == -1 ? '' : React.Children.toArray(this.props.children)[this.state.activeIndex]}
 									</div>
 								</div>
 								<img
@@ -183,7 +183,7 @@ class Dropdown extends React.Component {
 									overflowY: 'auto'
 								}}
 							>
-								{this.props.children.map((e, i, unused, entry) => (
+								{React.Children.toArray(this.props.children).map((e, i, unused, entry) => (
 									<div
 										key={i}
 										style={{
@@ -196,13 +196,6 @@ class Dropdown extends React.Component {
 										ref={r => entry = r}
 										onClick={function() {
 											if (this.state.isExpanded) {
-												if (this.state.activeIndex != i) {
-													try {
-														this.state.onselect(i);
-													} catch (err) {
-														console.error(err);
-													}
-												}
 												entry.scrollIntoView();
 												let gap = entry.getBoundingClientRect().top - entry.parentElement.getBoundingClientRect().top;
 												entry.parentElement.scrollTop -= parseInt(this.state.maxHeight) / 2 - gap -
@@ -211,6 +204,9 @@ class Dropdown extends React.Component {
 													offset: entry.getBoundingClientRect().top - entry.parentElement.getBoundingClientRect().top,
 													activeIndex: i
 												});
+												if (this.state.activeIndex != i) {
+													this.state.onselect(i);
+												}
 											}
 										}.bind(this)}
 									>

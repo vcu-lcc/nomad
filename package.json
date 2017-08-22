@@ -7,6 +7,9 @@
   "license": "AGPL-3.0",
   "dependencies": {
     "activedirectory": "^0.7.2",
+    "babel-plugin-syntax-async-generators": "^6.13.0",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-stage-2": "^6.24.1",
     "electron": "^1.6.11",
     "lodash": "^4.17.4",
     "prop-types": "^15.5.10",
@@ -28,8 +31,7 @@
     "webpack-dev-server": "^2.5.1"
   },
   "scripts": {
-    "build": "webpack",
-    "start": "electron . --release",
-    "dev": "webpack-dev-server"
+    "start": "start electron . && webpack-dev-server --hot --inline",
+    "production": "webpack && electron . --release"
   }
 }
