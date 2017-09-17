@@ -24,6 +24,10 @@ const styles = {
 		userSelect: 'none',
 		cursor: 'default',
 		fontFamily: '"Segoe UI"',
+		alignItems: 'center'
+	},
+	label: {
+		paddingRight: '16px',
 		fontSize: 'larger'
 	},
 	input: {
@@ -54,16 +58,26 @@ class InputBox extends React.Component {
 	render() {
 		return (
 			<div
-				style={[styles.base, {
-					width: this.props.width
-				}]}
+				style={styles.base}
 			>
-				<input
-					ref={r => this.inputBox = r}
-					onChange={() => this.props.onChange(this.getValue())}
-					style={[styles.input]}
-					placeholder={this.props.placeholder}
-				></input>
+				<div
+					style={styles.label}
+				>
+					{this.props.label}
+				</div>
+				<div
+					style={{
+						display: 'flex',
+						width: this.props.width
+					}}
+				>
+					<input
+						ref={r => this.inputBox = r}
+						onChange={() => this.props.onChange(this.getValue())}
+						style={styles.input}
+						placeholder={this.props.placeholder}
+					></input>
+				</div>
 			</div>
 		)
 	}

@@ -22,9 +22,11 @@ import {
     Text
 } from 'react-desktop/windows';
 // The main wrapper function for encapsulating different 'fragments'
-import Carousel from './components/Carousel/Carousel.jsx';
-import ActiveDirectoryLoginForm from './components/LoginForm/LoginForm.jsx';
-import ComputerNameGenerator from './components/ComputerNameGenerator/ComputerNameGenerator.jsx';
+import Carousel from './components/Shared/Carousel';
+
+import ActiveDirectoryLoginForm from './components/LoginForm';
+import ComputerNameGenerator from './components/ComputerNameGenerator';
+import PackageInstaller from './components/PackageInstaller'
 
 class ConfigStore {
 	constructor(callback) {
@@ -92,11 +94,11 @@ class NomadArrayAdapter extends Carousel.ArrayAdapter {
 		switch(++this.stage) {
 			case 0:
 				this.stage++;
-				// return <ActiveDirectoryLoginForm />;
+				//return <ActiveDirectoryLoginForm />;
 			case 1: {
 				this.configStore.set('credentials', previousCallbackProps.credentials);
 				this.configStore.loadRemoteConfig(
-					'https://files.nuget.ts.vcu.edu/EMS/vcu.json',
+					//'https://files.nuget.ts.vcu.edu/EMS/vcu.json',
 					'http://localhost/vcu.json'
 				).then(() => this.parent.next());
 				return (
@@ -132,6 +134,9 @@ class NomadArrayAdapter extends Carousel.ArrayAdapter {
 					ComputerTypes={this.configStore.get('ComputerTypes')}
 				/>;
 			}
+			case 3: {
+				return <PackageInstaller />;
+			}
 			default:
 				return null;
 		}
@@ -146,4 +151,3 @@ ReactDOM.render((
 	>
 	</Carousel>
 ), document.querySelector('#react-root'));
-
