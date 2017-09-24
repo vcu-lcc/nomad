@@ -202,19 +202,71 @@ class ComputerNameGenerator extends React.Component {
         }, {
           value: 'Kiosk',
           callback: function() {
+            this.setState({
+              ComputerName: `[CAMPUS][BUILDING][FLOOR][LOCATION][TYPE][##]`
+            });
             return {
               label: 'Campus',
-              options: []
+              options: this.props.universities.length > 0 ? this.props.universities[0].Campuses.map(campus => {
+                return {
+                  value: campus.Name,
+                  callback: function(campus) {
+                    this.setState({
+                      ComputerName: `${campus.Acronym || 'null'}[BUILDING][FLOOR][LOCATION][TYPE][##]`
+                    });
+                    return {
+                      label: 'Building',
+                      options: campus.Buildings.map(building => {
+                        return {
+                          value: building.Name,
+                          callback: function(building) {
+                            this.setState({
+                              ComputerName: `${campus.Acronym || 'null'}${building.Acronym || 'null'}[FLOOR][LOCATION][TYPE][##]`
+                            });
+                            return {
+                              label: 'Floor',
+                              options: building.Rooms.map(room => {
+                                return {
+                                  value: room.Name,
+                                  // value: (<div
+                                  //   style={{
+                                  //     display: 'flex'
+                                  //   }}
+                                  // >
+                                  //   <div>{room.Name}</div>
+                                  //   <div style={{ flexGrow: '1' }}></div>
+                                  //   <div>{room.RoomNumber}</div>
+                                  // </div>),
+                                  callback: function(room) {
+                                    this.setState({
+                                      ComputerName: `${campus.Acronym || 'null'}${building.Acronym || 'null'}${room.ID || 'null'}L[##]`
+                                    });
+                                    return {
+                                      label: 'Computer Number',
+                                      type: InputBox,
+                                      callback: function(computerNumber) {
+                                        this.setState({
+                                          ComputerName: `${campus.Acronym || 'null'}${building.Acronym || 'null'}${room.ID || 'null'}P${computerNumber.substring(0, 2) || '##'}`,
+                                          done: true
+                                        });
+                                      }.bind(this)
+                                    };
+                                  }.bind(this, room)
+                                };
+                              })
+                            };
+                          }.bind(this, building)
+                        };
+                      })
+                    };
+                  }.bind(this, campus)
+                }
+              }) : []
             };
           }.bind(that)
         }, {
           value: 'Channel Player',
-          callback: function() {
-            return {
-              label: 'Campus',
-              options: []
-            };
-          }.bind(that)
+          callback: this.options[2].callback
         }, {
           value: 'Faculty/Staff Computer',
           callback: function() {
