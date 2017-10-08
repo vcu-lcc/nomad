@@ -10,14 +10,14 @@
     "babel-plugin-syntax-async-generators": "^6.13.0",
     "babel-polyfill": "^6.23.0",
     "babel-preset-stage-2": "^6.24.1",
-    "electron": "^1.7.6",
-    "electron-sudo": "^4.0.12",
+    "electron": "^1.7.8",
     "lodash": "^4.17.4",
     "prop-types": "^15.5.10",
     "radium": "^0.19.4",
     "react": "^15.6.1",
     "react-desktop": "^0.3.1",
-    "react-dom": "^15.6.1"
+    "react-dom": "^15.6.1",
+    "sudo-prompt": "^7.1.1"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",

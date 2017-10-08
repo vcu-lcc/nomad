@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackPluginConfig = new HtmlWebpackPlugin({
@@ -6,17 +7,25 @@ const HtmlWebpackPluginConfig = new HtmlWebpackPlugin({
 	filename: 'index.html',
 	inject: 'body'
 });
+let nodeModules = fs.readdirSync('./node_modules')
+	.filter((module) => {
+		return module !== '.bin';
+	}).reduce((prev, module) => {
+		return Object.assign(prev, {[module]: 'commonjs ' + module});
+	}, {});
 
 module.exports = {
+	cache: true,
 	entry: ['babel-polyfill', './client/index.js'],
 	output: {
 		path: path.resolve('build'),
-		filename: 'index_bundle.js'
+		filename: 'index_bundle.js',
+		sourceMapFilename: 'index_bundle.map'
 	},
 	devServer: {
 		filename: 'index_bundle.js'
 	},
-	devtool: 'inline-source-map',
+	devtool: 'source-map',
 	module: {
 		loaders: [{
 			test: /\.js$/,
@@ -34,8 +43,8 @@ module.exports = {
 			test: /\.(jpg|png|svg)$/,
 			loader: 'url-loader',
 			options: {
-				limit: 10000
-				// Use urls if images are bigger than 10 KB.
+				limit: 1000
+				// Use urls if images are bigger than 1 KB.
 			},
 			exclude: /node_modules/
 		}]
@@ -43,5 +52,6 @@ module.exports = {
 	plugins: [
 		HtmlWebpackPluginConfig
 	],
-	target: 'node'
+	target: 'electron',
+	externals: nodeModules
 };

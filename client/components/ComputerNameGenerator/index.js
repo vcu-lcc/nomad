@@ -16,11 +16,14 @@
 */
 import os from 'os';
 import { exec } from 'child_process';
-import Sudoer from 'electron-sudo';
+import Sudoer from 'sudo-prompt';
 
-const sudo = async function(cmd) {
-  let sudoer = new Sudoer({ name: 'Elevate privileges' });
-  return await sudoer.exec(cmd);
+const sudo = function(cmd) {
+  return new Promise((resolve, reject) => {
+    Sudoer.exec(cmd, { name: 'Elevate privileges' }, function(error, stdout, stderr) {
+      error ? reject(error) : resolve(stdout || stderr);
+    });
+  });
 };
 
 import React from 'react';
@@ -200,7 +203,7 @@ class ComputerNameGenerator extends React.Component {
             };
           }.bind(that)
         }, {
-          value: 'Kiosk',
+          value: 'Kiosk/Channel Player',
           callback: function() {
             this.setState({
               ComputerName: `[CAMPUS][BUILDING][FLOOR][LOCATION][TYPE][##]`
@@ -265,22 +268,100 @@ class ComputerNameGenerator extends React.Component {
             };
           }.bind(that)
         }, {
-          value: 'Channel Player',
-          callback: this.options[2].callback
-        }, {
           value: 'Faculty/Staff Computer',
           callback: function() {
+            this.setState({
+              ComputerName: `[TOP OU][BUILDING][INITIALS][TYPE][#]`
+            });
             return {
-              label: 'Top Level Organizational Unit',
-              options: []
+              type: InputBox,
+              label: 'Top level OU',
+              callback: function(topLevelOU) {
+                this.setState({
+                  ComputerName: `${topLevelOU || 'null'}[BUILDING][INITIALS][TYPE][#]`
+                });
+                return {
+                  label: 'Building',
+                  options: this.props.universities.reduce((accum, curr) => accum.concat(curr.Campuses.reduce((accum, curr) => accum.concat(curr.Buildings), [])), [])
+                    .map(building => {
+                      return {
+                        value: building.Name,
+                        callback: function(building) {
+                          this.setState({
+                            ComputerName: `${topLevelOU || 'null'}${building.Acronym || 'null'}[INITIALS][TYPE][#]`
+                          });
+                          return {
+                            label: 'Initials',
+                            type: InputBox,
+                            callback: function(initials) {
+                              this.setState({
+                                ComputerName: `${topLevelOU || 'null'}${building.Acronym || 'null'}${initials || 'null'}[TYPE][#]`
+                              });
+                              return {
+                                label: 'Device Form Factor',
+                                options: ["Desktop", "Laptop", "Tablet", "Mobile"].map(formFactor => {
+                                  return {
+                                    value: formFactor,
+                                    callback: function(formFactor) {
+                                      this.setState({
+                                        ComputerName: `${topLevelOU || 'null'}${building.Acronym || 'null'}${initials || 'null'}${formFactor[0] || 'null'}[#]`
+                                      });
+                                      return {
+                                        label: 'Computer Number',
+                                        type: InputBox,
+                                        callback: function(computerNumber) {
+                                          this.setState({
+                                            ComputerName: `${topLevelOU || 'null'}${building.Acronym || 'null'}${initials || 'null'}${formFactor[0] || 'null'}${computerNumber[0] || '#'}`,
+                                            done: true
+                                          });
+                                        }.bind(this)
+                                      }
+                                    }.bind(this, formFactor)
+                                  }
+                                })
+                              };
+                            }.bind(this)
+                          }
+                        }.bind(this, building)
+                      };
+                    })
+                };
+              }.bind(that)
             };
           }.bind(that)
         }, {
           value: 'Server',
           callback: function() {
+            this.setState({
+              ComputerName: `[DEPARTMENT][FUNCTION][###]`
+            });
             return {
+              type: InputBox,
               label: 'Department',
-              options: []
+              callback: function(department) {
+                this.setState({
+                  ComputerName: `${department || 'null'}[FUNCTION][###]`
+                });
+                return {
+                  type: InputBox,
+                  label: 'Function',
+                  callback: function(funct) {
+                    this.setState({
+                      ComputerName: `${department || 'null'}${funct || 'null'}[###]`
+                    });
+                    return {
+                      label: 'Computer Number',
+                      type: InputBox,
+                      callback: function(computerNumber) {
+                        this.setState({
+                          ComputerName: `${department || 'null'}${funct || 'null'}${computerNumber.substring(0, 3) || '###'}`,
+                          done: true
+                        });
+                      }.bind(this)
+                    }
+                  }.bind(that)
+                };
+              }.bind(that)
             };
           }.bind(that)
         }]
@@ -312,7 +393,7 @@ class ComputerNameGenerator extends React.Component {
               } else {
                 let retVal = path[i].callback(ii);
                 if (typeof retVal === 'object' && retVal != null) {
-                  this._processFields(path.concat(retVal.next ? [retVal.next] : []), index + 1);
+                  this._processFields(path.concat(retVal ? [retVal] : []), index + 1);
                 }
               }
             }
@@ -375,6 +456,7 @@ class ComputerNameGenerator extends React.Component {
           >
             <div
               style={[styles.computerNamePreview]}
+              contentEditable=""
             >
               {this.state.ComputerName}
             </div>
