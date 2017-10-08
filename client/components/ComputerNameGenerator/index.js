@@ -14,57 +14,16 @@
   You should have received a copy of the GNU Affero General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import os from 'os';
-import { exec } from 'child_process';
-import Sudoer from 'sudo-prompt';
-
-const sudo = function(cmd) {
-  return new Promise((resolve, reject) => {
-    Sudoer.exec(cmd, { name: 'Elevate privileges' }, function(error, stdout, stderr) {
-      error ? reject(error) : resolve(stdout || stderr);
-    });
-  });
-};
 
 import React from 'react';
 import Radium from 'radium';
-
-import {
-  Button,
-  ProgressCircle
-} from 'react-desktop/windows';
-
 import PropTypes from 'prop-types';
+
+import ComputerName from './ComputerName';
 
 import Dropdown from '../Shared/Dropdown';
 import FieldSet from '../Shared/FieldSet';
 import InputBox from '../Shared/InputBox';
-
-const styles = {
-  base: {
-    display: 'flex',
-    alignItems: 'center',
-    userSelect: 'none',
-    cursor: 'default',
-    fontFamily: '"Segoe UI"'
-  },
-  computerNamePreview: {
-    flexGrow: '1',
-    fontSize: 'larger'
-  },
-  label: {
-    fontSize: 'larger',
-    paddingRight: '16px'
-  },
-  secondaryWrapper: {
-    alignItems: 'center',
-    display: 'flex',
-    minWidth: '600px'
-  },
-  horizontalMargin: {
-    margin: '0 16px'
-  }
-}
 
 class ComputerNameGenerator extends React.Component {
 	constructor(props) {
@@ -85,7 +44,7 @@ class ComputerNameGenerator extends React.Component {
                   value: campus.Name,
                   callback: function(campus) {
                     this.setState({
-                      ComputerName: `${campus.Acronym || 'null'}[BUILDING][ROOM]P[#]`
+                      ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}[BUILDING][ROOM]P[#]`
                     });
                     return {
                       label: 'Building',
@@ -94,7 +53,7 @@ class ComputerNameGenerator extends React.Component {
                           value: building.Name,
                           callback: function(building) {
                             this.setState({
-                              ComputerName: `${campus.Acronym || 'null'}${building.Acronym || 'null'}[ROOM]P[#]`
+                              ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}[ROOM]P[#]`
                             });
                             return {
                               label: 'Room',
@@ -112,14 +71,14 @@ class ComputerNameGenerator extends React.Component {
                                   // </div>),
                                   callback: function(room) {
                                     this.setState({
-                                      ComputerName: `${campus.Acronym || 'null'}${building.Acronym || 'null'}${room.ID || 'null'}P[#]`
+                                      ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}${room.RoomNumber.substring(Math.max(0, room.RoomNumber.length - 5), room.RoomNumber.length) || 'null'}P[#]`
                                     });
                                     return {
                                       label: 'Computer Number',
                                       type: InputBox,
                                       callback: function(computerNumber) {
                                         this.setState({
-                                          ComputerName: `${campus.Acronym || 'null'}${building.Acronym || 'null'}${room.ID || 'null'}P${computerNumber[0] || '#'}`,
+                                          ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}${room.RoomNumber.substring(Math.max(0, room.RoomNumber.length - 5), room.RoomNumber.length) || 'null'}P${computerNumber[0] || '#'}`,
                                           done: true
                                         });
                                       }.bind(this)
@@ -150,7 +109,7 @@ class ComputerNameGenerator extends React.Component {
                   value: campus.Name,
                   callback: function(campus) {
                     this.setState({
-                      ComputerName: `${campus.Acronym || 'null'}[BUILDING][ROOM]L[##]`
+                      ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}[BUILDING][ROOM]L[##]`
                     });
                     return {
                       label: 'Building',
@@ -159,32 +118,23 @@ class ComputerNameGenerator extends React.Component {
                           value: building.Name,
                           callback: function(building) {
                             this.setState({
-                              ComputerName: `${campus.Acronym || 'null'}${building.Acronym || 'null'}[ROOM]L[##]`
+                              ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}[ROOM]L[##]`
                             });
                             return {
                               label: 'Room',
                               options: building.Rooms.map(room => {
                                 return {
                                   value: room.Name,
-                                  // value: (<div
-                                  //   style={{
-                                  //     display: 'flex'
-                                  //   }}
-                                  // >
-                                  //   <div>{room.Name}</div>
-                                  //   <div style={{ flexGrow: '1' }}></div>
-                                  //   <div>{room.RoomNumber}</div>
-                                  // </div>),
                                   callback: function(room) {
                                     this.setState({
-                                      ComputerName: `${campus.Acronym || 'null'}${building.Acronym || 'null'}${room.ID || 'null'}L[##]`
+                                      ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}${room.RoomNumber.substring(Math.max(0, room.RoomNumber.length - 5), room.RoomNumber.length) || 'null'}L[##]`
                                     });
                                     return {
                                       label: 'Computer Number',
                                       type: InputBox,
                                       callback: function(computerNumber) {
                                         this.setState({
-                                          ComputerName: `${campus.Acronym || 'null'}${building.Acronym || 'null'}${room.ID || 'null'}P${computerNumber.substring(0, 2) || '##'}`,
+                                          ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}${room.RoomNumber.substring(Math.max(0, room.RoomNumber.length - 5), room.RoomNumber.length) || 'null'}P${computerNumber.substring(0, 2) || '##'}`,
                                           done: true
                                         });
                                       }.bind(this)
@@ -203,10 +153,10 @@ class ComputerNameGenerator extends React.Component {
             };
           }.bind(that)
         }, {
-          value: 'Kiosk/Channel Player',
+          value: 'Kiosk',
           callback: function() {
             this.setState({
-              ComputerName: `[CAMPUS][BUILDING][FLOOR][LOCATION][TYPE][##]`
+              ComputerName: `[CAMPUS][BUILDING]...K[##]`
             });
             return {
               label: 'Campus',
@@ -215,7 +165,7 @@ class ComputerNameGenerator extends React.Component {
                   value: campus.Name,
                   callback: function(campus) {
                     this.setState({
-                      ComputerName: `${campus.Acronym || 'null'}[BUILDING][FLOOR][LOCATION][TYPE][##]`
+                      ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}[BUILDING]...K[##]`
                     });
                     return {
                       label: 'Building',
@@ -224,37 +174,170 @@ class ComputerNameGenerator extends React.Component {
                           value: building.Name,
                           callback: function(building) {
                             this.setState({
-                              ComputerName: `${campus.Acronym || 'null'}${building.Acronym || 'null'}[FLOOR][LOCATION][TYPE][##]`
+                              ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}...K[##]`
                             });
                             return {
-                              label: 'Floor',
-                              options: building.Rooms.map(room => {
+                              label: 'Environment',
+                              options: ['Office/Room', 'Other'].map(i => {
                                 return {
-                                  value: room.Name,
-                                  // value: (<div
-                                  //   style={{
-                                  //     display: 'flex'
-                                  //   }}
-                                  // >
-                                  //   <div>{room.Name}</div>
-                                  //   <div style={{ flexGrow: '1' }}></div>
-                                  //   <div>{room.RoomNumber}</div>
-                                  // </div>),
-                                  callback: function(room) {
-                                    this.setState({
-                                      ComputerName: `${campus.Acronym || 'null'}${building.Acronym || 'null'}${room.ID || 'null'}L[##]`
-                                    });
-                                    return {
-                                      label: 'Computer Number',
-                                      type: InputBox,
-                                      callback: function(computerNumber) {
-                                        this.setState({
-                                          ComputerName: `${campus.Acronym || 'null'}${building.Acronym || 'null'}${room.ID || 'null'}P${computerNumber.substring(0, 2) || '##'}`,
-                                          done: true
-                                        });
-                                      }.bind(this)
-                                    };
-                                  }.bind(this, room)
+                                  value: i,
+                                  callback: function(env) {
+                                    if (env == 'Office/Room') {
+                                      this.setState({
+                                        ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}[OFFICE/ROOM]K[##]`
+                                      });
+                                      return {
+                                        type: InputBox,
+                                        label: 'Office/Room',
+                                        callback: function(num) {
+                                          this.setState({
+                                            ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}${num.substring(0, 5) || '00000'}K[##]`
+                                          });
+                                          return {
+                                            type: InputBox,
+                                            label: 'Computer Number',
+                                            callback: function(computerNumber) {
+                                              this.setState({
+                                                ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}${num.substring(0, 5) || '00000'}K${computerNumber.substring(0, 2) || '##'}`,
+                                                done: true
+                                              });
+                                            }.bind(this)
+                                          };
+                                        }.bind(this)
+                                      };
+                                    } else {
+                                      this.setState({
+                                        ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}[FLOOR][LOCATION]K[##]`
+                                      });
+                                      return {
+                                        type: InputBox,
+                                        label: 'Floor',
+                                        callback: function(floor) {
+                                          this.setState({
+                                            ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}${floor.substring(0, 2) || '00'}[LOCATION]K[##]`
+                                          });
+                                          return {
+                                            type: InputBox,
+                                            label: 'Location',
+                                            callback: function(location) {
+                                              this.setState({
+                                                ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}${floor.substring(0, 2) || '00'}${location.substring(0, 3) || 'null'}K[##]`
+                                              });
+                                              return {
+                                                type: InputBox,
+                                                label: 'Computer Number',
+                                                callback: function(computerNumber) {
+                                                  this.setState({
+                                                    ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}${floor.substring(0, 2) || '00'}${location.substring(0, 3) || 'null'}K${computerNumber.substring(0, 2) || '##'}`,
+                                                    done: true
+                                                  });
+                                                }.bind(this)
+                                              };
+                                            }.bind(this)
+                                          };
+                                        }.bind(this)
+                                      };
+                                    }
+                                  }.bind(this, i)
+                                };
+                              })
+                            };
+                          }.bind(this, building)
+                        };
+                      })
+                    };
+                  }.bind(this, campus)
+                }
+              }) : []
+            };
+          }.bind(that)
+        }, {
+          value: 'Channel Player',
+          callback: function() {
+            this.setState({
+              ComputerName: `[CAMPUS][BUILDING]...C[##]`
+            });
+            return {
+              label: 'Campus',
+              options: this.props.universities.length > 0 ? this.props.universities[0].Campuses.map(campus => {
+                return {
+                  value: campus.Name,
+                  callback: function(campus) {
+                    this.setState({
+                      ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}[BUILDING]...C[##]`
+                    });
+                    return {
+                      label: 'Building',
+                      options: campus.Buildings.map(building => {
+                        return {
+                          value: building.Name,
+                          callback: function(building) {
+                            this.setState({
+                              ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}...C[##]`
+                            });
+                            return {
+                              label: 'Environment',
+                              options: ['Office/Room', 'Other'].map(i => {
+                                return {
+                                  value: i,
+                                  callback: function(env) {
+                                    if (env == 'Office/Room') {
+                                      this.setState({
+                                        ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}[OFFICE/ROOM]C[##]`
+                                      });
+                                      return {
+                                        type: InputBox,
+                                        label: 'Office/Room',
+                                        callback: function(num) {
+                                          this.setState({
+                                            ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}${num.substring(0, 5) || '00000'}C[##]`
+                                          });
+                                          return {
+                                            type: InputBox,
+                                            label: 'Computer Number',
+                                            callback: function(computerNumber) {
+                                              this.setState({
+                                                ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}${num.substring(0, 5) || '00000'}C${computerNumber.substring(0, 2) || '##'}`,
+                                                done: true
+                                              });
+                                            }.bind(this)
+                                          };
+                                        }.bind(this)
+                                      };
+                                    } else {
+                                      this.setState({
+                                        ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}[FLOOR][LOCATION]C[##]`
+                                      });
+                                      return {
+                                        type: InputBox,
+                                        label: 'Floor',
+                                        callback: function(floor) {
+                                          this.setState({
+                                            ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}${floor.substring(0, 2) || '00'}[LOCATION]C[##]`
+                                          });
+                                          return {
+                                            type: InputBox,
+                                            label: 'Location',
+                                            callback: function(location) {
+                                              this.setState({
+                                                ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}${floor.substring(0, 2) || '00'}${location.substring(0, 3) || 'null'}C[##]`
+                                              });
+                                              return {
+                                                type: InputBox,
+                                                label: 'Computer Number',
+                                                callback: function(computerNumber) {
+                                                  this.setState({
+                                                    ComputerName: `${campus.Acronym.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}${floor.substring(0, 2) || '00'}${location.substring(0, 3) || 'null'}C${computerNumber.substring(0, 2) || '##'}`,
+                                                    done: true
+                                                  });
+                                                }.bind(this)
+                                              };
+                                            }.bind(this)
+                                          };
+                                        }.bind(this)
+                                      };
+                                    }
+                                  }.bind(this, i)
                                 };
                               })
                             };
@@ -278,7 +361,7 @@ class ComputerNameGenerator extends React.Component {
               label: 'Top level OU',
               callback: function(topLevelOU) {
                 this.setState({
-                  ComputerName: `${topLevelOU || 'null'}[BUILDING][INITIALS][TYPE][#]`
+                  ComputerName: `${topLevelOU.substring(0, 3) || 'null'}[BUILDING][INITIALS][TYPE][#]`
                 });
                 return {
                   label: 'Building',
@@ -288,14 +371,14 @@ class ComputerNameGenerator extends React.Component {
                         value: building.Name,
                         callback: function(building) {
                           this.setState({
-                            ComputerName: `${topLevelOU || 'null'}${building.Acronym || 'null'}[INITIALS][TYPE][#]`
+                            ComputerName: `${topLevelOU.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}[INITIALS][TYPE][#]`
                           });
                           return {
                             label: 'Initials',
                             type: InputBox,
                             callback: function(initials) {
                               this.setState({
-                                ComputerName: `${topLevelOU || 'null'}${building.Acronym || 'null'}${initials || 'null'}[TYPE][#]`
+                                ComputerName: `${topLevelOU.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}${initials.substring(0, 3) || 'null'}[TYPE][#]`
                               });
                               return {
                                 label: 'Device Form Factor',
@@ -304,14 +387,14 @@ class ComputerNameGenerator extends React.Component {
                                     value: formFactor,
                                     callback: function(formFactor) {
                                       this.setState({
-                                        ComputerName: `${topLevelOU || 'null'}${building.Acronym || 'null'}${initials || 'null'}${formFactor[0] || 'null'}[#]`
+                                        ComputerName: `${topLevelOU.substring(0, 3) || 'null'}${building.Acronym.substring(0, 3) || 'null'}${initials.substring(0, 3) || 'null'}${formFactor[0] || 'null'}[#]`
                                       });
                                       return {
                                         label: 'Computer Number',
                                         type: InputBox,
                                         callback: function(computerNumber) {
                                           this.setState({
-                                            ComputerName: `${topLevelOU || 'null'}${building.Acronym || 'null'}${initials || 'null'}${formFactor[0] || 'null'}${computerNumber[0] || '#'}`,
+                                            ComputerName: `${topLevelOU || 'null'}${building.Acronym.substring(0, 3) || 'null'}${initials.substring(0, 3) || 'null'}${formFactor[0] || 'null'}${computerNumber[0] || '#'}`,
                                             done: true
                                           });
                                         }.bind(this)
@@ -333,43 +416,33 @@ class ComputerNameGenerator extends React.Component {
           value: 'Server',
           callback: function() {
             this.setState({
-              ComputerName: `[DEPARTMENT][FUNCTION][###]`
+              ComputerName: `[DEPARTMENT/FUNCTION][###]`
             });
             return {
               type: InputBox,
-              label: 'Department',
-              callback: function(department) {
+              label: 'Department/Function',
+              callback: function(departmentFunc) {
                 this.setState({
-                  ComputerName: `${department || 'null'}[FUNCTION][###]`
+                  ComputerName: `${departmentFunc.substring(0, 12) || 'null'}[###]`
                 });
                 return {
+                  label: 'Computer Number',
                   type: InputBox,
-                  label: 'Function',
-                  callback: function(funct) {
+                  callback: function(computerNumber) {
                     this.setState({
-                      ComputerName: `${department || 'null'}${funct || 'null'}[###]`
+                      ComputerName: `${departmentFunc.substring(0, 12) || 'null'}${computerNumber.substring(0, 3) || '###'}`,
+                      done: true
                     });
-                    return {
-                      label: 'Computer Number',
-                      type: InputBox,
-                      callback: function(computerNumber) {
-                        this.setState({
-                          ComputerName: `${department || 'null'}${funct || 'null'}${computerNumber.substring(0, 3) || '###'}`,
-                          done: true
-                        });
-                      }.bind(this)
-                    }
-                  }.bind(that)
-                };
+                  }.bind(this)
+                }
               }.bind(that)
             };
           }.bind(that)
         }]
     };
     this.state = {
-      ComputerName: '',
+      ComputerName: 'undefined',
       done: false,
-      loading: false,
       fields: []
     }
     setTimeout(this._processFields.bind(this, [this.options]), 0);
@@ -405,104 +478,31 @@ class ComputerNameGenerator extends React.Component {
     this.setState({ fields });
   }
 
-  async changeComputerName(newName) {
-    let windowsCommmand = `WMIC computersystem where caption="${os.hostname()}" rename "${newName}"`;
-    console.warn('executing command', windowsCommmand);
-    try {
-      let output = await sudo(windowsCommmand);
-      console.log(output);
-      if (output.includes('ReturnValue = 0')) {
-        return {
-          name: os.hostname(),
-          message: 'Computer Name successfully modified.',
-          detail: output
-        };
-      } else if (output.includes('ReturnValue = 5')) {
-        throw {
-          name: os.hostname(),
-          message: 'Failed to change Computer Name. This is likely due to the lack of privileges.',
-          detail: output
-        };
-      } else {
-        throw {
-          name: os.hostname(),
-          message: 'Failed to change Computer Name.',
-          detail: output
-        };
-      }
-    } catch (err) {
-      throw {
-        name: os.hostname(),
-        message: 'There was an error executing WMIC. Failed to change Computer Name.',
-        detail: err.message
-      };
-    }
-  }
-
 	render() {
     return (
       <FieldSet>
         { this.state.fields }
-        <div
-          style={[styles.base]}
+        <ComputerName
+          userOverride={true}
+          userSubmit={this.state.done}
+          minLength={1}
+          maxLength={15}
+          resolve={name => {
+            this.props.finish(name);
+          }}
         >
-          <div
-            style={[styles.label]}
-          >
-            Computer Name:
-          </div>
-          <div
-            style={[styles.secondaryWrapper]}
-          >
-            <div
-              style={[styles.computerNamePreview]}
-              contentEditable=""
-            >
-              {this.state.ComputerName}
-            </div>
-            <div
-              style={[styles.horizontalMargin]}
-            >
-            {
-              this.state.loading && (<ProgressCircle />)
-            }
-            </div>
-            {
-              this.state.done &&
-                (<Button push
-                  placeholder="Computer ID"
-                  onClick={async () => {
-                    this.setState({
-                      loading: true
-                    });
-                    try {
-                      let result = await this.changeComputerName(this.state.ComputerName);
-                      this.props.finish(result.name);
-                    } catch(err) {
-                      console.error(err);
-                    }
-                    this.setState({
-                      loading: false
-                    });
-                  }}
-                >
-                Apply
-                </Button>)
-            }
-          </div>
-        </div>
+          {this.state.ComputerName}
+        </ComputerName>
       </FieldSet>
     );
 	}
 }
 
 ComputerNameGenerator.defaultProps = {
-  template: '',
   ComputerTypes: []
 };
 
 ComputerNameGenerator.propTypes = {
-  template: PropTypes.string,
   ComputerTypes: PropTypes.array
 };
 
