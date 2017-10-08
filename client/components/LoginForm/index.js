@@ -30,6 +30,7 @@ import {
 
 class API {
     constructor() {
+        this.currentSession = null;
     }
     authenticate(_credentials) {
         return new Promise((resolve, reject) => {
@@ -39,7 +40,7 @@ class API {
                 username: 'RAMS\\' + _credentials.username,
                 password: _credentials.password
             });
-            currentSession.findUser(_credentials.username, function parseResponse(err, auth) {
+            currentSession.findUser(_credentials.username, (err, auth) => {
                 if (auth) {
                     resolve({
                         details: auth,
@@ -53,7 +54,7 @@ class API {
                         session: currentSession
                     });
                 }
-            }.bind(this));
+            });
         });
     }
 }
@@ -85,11 +86,11 @@ module.exports = class ActiveDirectoryLoginForm extends React.Component {
                 loading: false,
                 success: true,
                 error: false,
-                transitionEnd: function() {
+                transitionEnd: () => {
                     this.props.finish({
                         ...details
                     });
-                }.bind(this)
+                }
             });
         }).catch((details) => {
             this.setState({
@@ -219,29 +220,37 @@ module.exports = class ActiveDirectoryLoginForm extends React.Component {
                         </Label>
                     </div>
                     <div
-                        style={{
-                            maxHeight: '40px',
-                            padding: '5px 5px 0 5px' // These are workarounds, so that Radium doesn't complain
+                        onKeyDown={e => {
+                          if (e.key == 'Enter') {
+                            this.submit();
+                          }
                         }}
                     >
-                        <TextInput
-                            placeholder="Username"
-                            width={256}
-                            onChange={e => void(this.username = e.target.value)}
-                        />
+                        <div
+                            style={{
+                                maxHeight: '40px',
+                                padding: '5px 5px 0 5px' // These are workarounds, so that Radium doesn't complain
+                            }}
+                        >
+                            <TextInput
+                                placeholder="Username"
+                                width={256}
+                                onChange={e => void(this.username = e.target.value)}
+                            />
+                        </div>
+                        <div
+                            style={{
+                                maxHeight: '40px',
+                                padding: '5px 5px 0 5px' // These are workarounds, so that Radium doesn't complain
+                            }}
+                        >
+                            <TextInput
+                                password={true}
+                                placeholder="Password"
+                                width={256}
+                                onChange={e => void(this.password = e.target.value)}
+                            />
                     </div>
-                    <div
-                        style={{
-                            maxHeight: '40px',
-                            padding: '5px 5px 0 5px' // These are workarounds, so that Radium doesn't complain
-                        }}
-                    >
-                        <TextInput
-                            password={true}
-                            placeholder="Password"
-                            width={256}
-                            onChange={e => void(this.password = e.target.value)}
-                        />
                     </div>
                     <div
                         style={{
