@@ -31,33 +31,30 @@ import {
 class API {
     constructor() {
     }
-    authenticate(_credentials, _callback) {
-        let calledBack = false;
-        const currentSession = new ActiveDirectory({
-            url: 'ldap://rams.adp.vcu.edu',
-            baseDN: 'dc=rams,dc=ADP,dc=vcu,dc=edu',
-            username: 'RAMS\\' + _credentials.username,
-            password: _credentials.password
+    authenticate(_credentials) {
+        return new Promise((resolve, reject) => {
+            const currentSession = new ActiveDirectory({
+                url: 'ldap://rams.adp.vcu.edu',
+                baseDN: 'dc=rams,dc=ADP,dc=vcu,dc=edu',
+                username: 'RAMS\\' + _credentials.username,
+                password: _credentials.password
+            });
+            currentSession.findUser(_credentials.username, function parseResponse(err, auth) {
+                if (auth) {
+                    resolve({
+                        details: auth,
+                        credentials: _credentials,
+                        session: currentSession
+                    });
+                } else {
+                    reject({
+                        details: err,
+                        credentials: _credentials,
+                        session: currentSession
+                    });
+                }
+            }.bind(this));
         });
-        currentSession.findUser(_credentials.username, function parseResponse(err, auth) {
-            if (calledBack) {
-                throw new Error('Prevented duplicate callback.');
-            }
-            calledBack = true;
-            if (auth) {
-                _callback(true, {
-                    details: auth,
-                    credentials: _credentials,
-                    session: currentSession
-                });
-            } else {
-                _callback(false, {
-                    details: err,
-                    credentials: _credentials,
-                    session: currentSession
-                });
-            }
-        }.bind(this));
     }
 }
 
@@ -83,30 +80,30 @@ module.exports = class ActiveDirectoryLoginForm extends React.Component {
         this.api.authenticate({
             username: this.username,
             password: this.password
-        }, function(success, details) {
-            if (success) {
+        }).then((details) => {
+            this.setState({
+                loading: false,
+                success: true,
+                error: false,
+                transitionEnd: function() {
+                    this.props.finish({
+                        ...details
+                    });
+                }.bind(this)
+            });
+        }).catch((details) => {
+            this.setState({
+                errorBackground: false
+            });
+            setTimeout(() => {
                 this.setState({
                     loading: false,
-                    success: true,
-                    error: false,
-                    transitionEnd: function() {
-                        this.props.finish(details);
-                    }.bind(this)
+                    error: true,
+                    errorBackground: true
                 });
-            } else {
-                this.setState({
-                    errorBackground: false
-                });
-                setTimeout(function() {
-                    this.setState({
-                        loading: false,
-                        error: true,
-                        errorBackground: true
-                    });
-                }.bind(this), 0);
-                this.props.postMessage(details);
-            }
-        }.bind(this));
+            }, 0);
+            this.props.postMessage(details);
+        });
         this.username = '';
         this.password = '';
     }

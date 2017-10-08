@@ -93,8 +93,7 @@ class NomadArrayAdapter extends Carousel.ArrayAdapter {
 	getNext(previousCallbackProps) {
 		switch(++this.stage) {
 			case 0:
-				this.stage++;
-				//return <ActiveDirectoryLoginForm />;
+				return <ActiveDirectoryLoginForm />;
 			case 1: {
 				this.configStore.set('credentials', previousCallbackProps.credentials);
 				this.configStore.loadRemoteConfig(
