@@ -1,4 +1,23 @@
+/*
+  Copyright (C) 2017 Darren Chan
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+const DEBUG = process.argv.includes('--dev');
+const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer');
 const electron = require('electron');
+
 // Module to control application life.
 const app = electron.app;
 // Module to create native browser window.
@@ -15,14 +34,17 @@ function createWindow () {
   mainWindow.setMenu(null);
 
   // and load the index.html of the app.
-  if (process.argv.includes('--release')) {
-    mainWindow.loadURL(`file://${__dirname}/build/index.html`);
-  } else {
+  if (DEBUG) {
     mainWindow.loadURL(`http://localhost:8080/index.html`);
+    // Install React Developer tools
+    installExtension(REACT_DEVELOPER_TOOLS)
+      .then(name => console.log(`Sucessfully Added Extension: ${name}.`))
+      .catch(err => console.error('An error occurred while install Electron extensions: ', err));
+    // Open the DevTools.
+    mainWindow.webContents.openDevTools();
+  } else {
+    mainWindow.loadURL(`file://${__dirname}/build/index.html`);
   }
-
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
