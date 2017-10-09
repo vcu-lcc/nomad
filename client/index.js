@@ -16,137 +16,30 @@
 */
 import React from 'react';
 import ReactDOM from 'react-dom';
-import _ from 'lodash';
-import {
-    ProgressCircle,
-    Text
-} from 'react-desktop/windows';
-// The main wrapper function for encapsulating different 'fragments'
-import Carousel from './components/Shared/Carousel';
 
-import ActiveDirectoryLoginForm from './components/LoginForm';
-import ComputerNameGenerator from './components/ComputerNameGenerator';
-import PackageInstaller from './components/PackageInstaller'
+// Nomad view component
+import NomadApp from './components/NomadApp';
 
-class ConfigStore {
-	constructor(callback) {
-		this.config = {
-			'Template': '',
-			'ComputerTypes': [
-				'Classroom Podium Workstation',
-				'Lab Workstation',
-				'Kiosk',
-				'Channel Player',
-				'Faculty/Staff Computer',
-				'Servers'
-			],
-			'Universities': [],
-			'Chainload': []
-		};
-	}
-	set(key, value) {
-		this.config[key] = value;
-	}
-	get(key) {
-		return this.config[key];
-	}
-	apply(newConfig) {
-		newConfig = _.merge(this.config, newConfig);
-	}
-	async loadRemoteConfig(/*...urls*/) {
-		for (let url of arguments) {
-			try {
-				this.apply(await this._fetchConfig(url));
-			} catch (err) {
-				console.error('Error while obtaining JSON config from ' + url, err);
-			}
-		}
-		let chainload = this.config.Chainload;
-		if (chainload.length > 0) {
-			this.config.Chainload = [];
-			await loadRemoteConfig(...chainload);
-		}
-	}
-	async _fetchConfig(url) {
-		return new Promise((resolve, reject) => {
-			var request = require('request');
-			request({
-				url,
-				json: true
-			}, (error, response, body) => {
-				if (error || response.statusCode != 200) {
-					reject(new Error(error || 'Unexpected status code: ' + response.statusCode));
-				} else {
-					resolve(body);
-				}
-			});
-		});
-	}
-}
+// The global config object we're using
+import ConfigStore from './components/Shared/ConfigStore';
 
-class NomadArrayAdapter extends Carousel.ArrayAdapter {
-	constructor() {
-		super();
-		this.stage = -1;
-		this.configStore = new ConfigStore();
-	}
-	getNext(previousCallbackProps) {
-		switch(++this.stage) {
-			case 0:
-				return <ActiveDirectoryLoginForm />;
-			case 1: {
-				this.configStore.set('credentials', previousCallbackProps.credentials);
-				this.configStore.loadRemoteConfig(
-					//'https://files.nuget.ts.vcu.edu/EMS/vcu.json',
-					'http://localhost/vcu.json'
-				).then(() => this.parent.next());
-				return (
-					<div
-						style={{
-							display: 'flex',
-							alignItems: 'center'
-						}}
-					>
-						<ProgressCircle
-							size={80}
-						/>
-						<Text
-							padding="0px 24px 0px 24px"
-							height={60}
-							verticalAlignment="center"
-						>
-							<span
-								style={{
-									fontSize: 'x-large'
-								}}
-							>
-								Fetching configuration files...
-							</span>
-						</Text>
-					</div>
-				);
-			}
-			case 2: {
-				return <ComputerNameGenerator
-					universities={this.configStore.get('Universities')}
-					template={this.configStore.get('Template')}
-					ComputerTypes={this.configStore.get('ComputerTypes')}
-				/>;
-			}
-			case 3: {
-				return <PackageInstaller />;
-			}
-			default:
-				return null;
-		}
-	}
-	onMessage(details) {
-	}
-}
+const config = ConfigStore.globalConfig;
+
+config.apply({
+	Template: '',
+	ComputerTypes: [
+		'Classroom Podium Workstation',
+		'Lab Workstation',
+		'Kiosk',
+		'Channel Player',
+		'Faculty/Staff Computer',
+		'Servers'
+	],
+	Universities: [],
+	Chainload: [],
+	credentials: {}
+});
 
 ReactDOM.render((
-	<Carousel
-		adapter={new NomadArrayAdapter()}
-	>
-	</Carousel>
-), document.querySelector('#react-root'));
+	<NomadApp config={config} />
+), document.getElementById('react-root'));
