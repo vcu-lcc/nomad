@@ -23,7 +23,7 @@ import Carousel from '../Shared/Carousel';
 import ActiveDirectoryLoginForm from '../LoginForm';
 import ComputerNameGenerator from '../ComputerNameGenerator';
 import PackageInstaller from '../PackageInstaller';
-import LoadingScreen from '../shared/LoadingScreen';
+import LoadingScreen from '../Shared/LoadingScreen';
 // Config objects
 import ConfigStore from '../Shared/ConfigStore';
 
