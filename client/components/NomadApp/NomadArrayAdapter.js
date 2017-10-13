@@ -40,6 +40,7 @@ class NomadArrayAdapter extends Carousel.ArrayAdapter {
       return <ActiveDirectoryLoginForm />;
     case 1: {
       this.configStore.set('credentials', previousCallbackProps.credentials);
+      console.log(previousCallbackProps);
       this.configStore.loadRemoteConfig(
         // 'https://files.nuget.ts.vcu.edu/EMS/vcu.json',
         'http://localhost/vcu.json'

@@ -30,8 +30,11 @@ let mainWindow;
 function createWindow () {
   const {width, height} = electron.screen.getPrimaryDisplay().workAreaSize;
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: width * .8, height: height, x: 0, y: 0});
+  mainWindow = new BrowserWindow({
+    title: 'NOMAD'
+  });
   mainWindow.setMenu(null);
+  mainWindow.maximize();
 
   // and load the index.html of the app.
   if (DEBUG) {
