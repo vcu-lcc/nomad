@@ -15,13 +15,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { combineReducers } from 'redux';
-import { SET_STAGE, NEXT_STAGE, SET_CREDENTIALS, SET_UNIVERSITY, MERGE_CONFIGS } from '../actions';
+import { SET_STAGE, NEXT_STAGE, SET_CREDENTIALS, SET_UNIVERSITY, MERGE_CONFIGS, SET_IDENTITY } from '../actions';
 
 const defaultState = {
 	stage: 0,
 	credentials: {
 		authenticated: false
 	},
+	identity: {},
 	Universities: [],
 	remote: [
 		// 'https://files.nuget.ts.vcu.edu/EMS/vcu.json',
@@ -60,6 +61,12 @@ const nomadConfig = (state=defaultState, action) => {
 		}
 		case MERGE_CONFIGS: {
 			return Object.assign({}, state, ...action.configs);
+		}
+		case SET_IDENTITY: {
+			return {
+				...state,
+				identity: action.identity
+			};
 		}
 		default:
 			return state;

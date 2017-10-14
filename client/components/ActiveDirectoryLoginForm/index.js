@@ -17,7 +17,7 @@
 // Import ReactJS
 import ActiveDirectory from 'activedirectory';
 import LoginForm from './LoginForm';
-import { setCredentials, nextStage } from '../../actions';
+import { setCredentials, nextStage, setIdentity } from '../../actions';
 import { connect } from 'react-redux';
 
 let state = {};
@@ -38,6 +38,7 @@ const mapDispatchToProps = function(dispatch, ownProps) {
                 });
                 currentSession.findUser(username, (err, auth) => {
                     if (auth) {
+                        dispatch(setIdentity(auth));
                         dispatch(setCredentials(username, password));
                         resolve(() => {
                             dispatch(nextStage());

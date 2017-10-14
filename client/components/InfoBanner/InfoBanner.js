@@ -66,7 +66,7 @@ class InfoBanner extends React.Component {
 InfoBanner.defaultProps = {
   background: '#ffc40d',
   name: 'Unknown User',
-  topOU: 'Unknown OU',
+  topOU: 'Unknown',
   visible: false
 };
 

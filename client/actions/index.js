@@ -19,6 +19,7 @@ export const NEXT_STAGE = 'NEXT_STAGE';
 export const SET_CREDENTIALS = 'SET_CREDENTIALS';
 export const SET_UNIVERSITY = 'SET_UNIVERSITY';
 export const MERGE_CONFIGS = 'MERGE_CONFIGS';
+export const SET_IDENTITY = 'SET_IDENTITY';
 
 export function setStage(stage) {
     return {
@@ -54,5 +55,12 @@ export function mergeConfigs(configs) {
     return {
         type: MERGE_CONFIGS,
         configs
+    };
+};
+
+export function setIdentity(identity) {
+    return {
+        type: SET_IDENTITY,
+        identity
     };
 };

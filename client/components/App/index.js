@@ -28,6 +28,7 @@ import LoadingScreen from '../Shared/LoadingScreen';
 
 const App = () => (
   <div>
+    <InfoBanner />
     <Carousel>
       <ActiveDirectoryLoginForm />
       <ConfigFetcher />

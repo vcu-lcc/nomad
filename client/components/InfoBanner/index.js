@@ -20,7 +20,12 @@ import { connect } from 'react-redux';
 
 const mapStateToProps = function(state) {
     return {
-        visible: state.credentials.authenticated
+        visible: state.credentials.authenticated,
+        name: state.identity.displayName,
+        topOU: typeof state.identity.dn == 'string' ? state.identity.dn.split(',')
+            .filter(i => i.startsWith('OU='))
+            .map(i => i.split('=')[1])
+            .pop() : null
     };
 };
 
