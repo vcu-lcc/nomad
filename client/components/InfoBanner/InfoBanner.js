@@ -20,12 +20,21 @@ import Radium from 'radium';
 
 const styles = {
   base: {
-    userSelect: 'none',
     cursor: 'default',
+    boxShadow: '0 5px 12px 0px rgba(0,0,0,0)',
+    display: 'flex',
+    flexDirection: 'column',
     fontFamily: '"Segoe UI"',
     position: 'absolute',
-    transition: 'transform 1000ms ease-out',
-    transform: 'translateY(-100%)'
+    transition: 'transform 1000ms ease-out, box-shadow 1000ms ease-out',
+    transform: 'translateY(-100%)',
+    userSelect: 'none',
+    width: '100vw'
+  },
+  row: {
+    display: 'flex',
+    flexDirection: 'row',
+    padding: '8px 16px 12px 16px'
   }
 };
 
@@ -38,22 +47,33 @@ class InfoBanner extends React.Component {
       <div
         style={[styles.base, {
           transform: this.props.visible ? 'translateY(0)' : 'translateY(-100%)',
+          boxShadow: this.props.visible ? '0 5px 12px 0px rgba(0,0,0,0.15)' : '0 5px 12px 0px rgba(0,0,0,0)',
           backgroundColor: this.props.background
         }]}
       >
-        {this.props.children}
+        <div
+          style={[styles.row]}
+        >
+          <div>{this.props.name}</div>
+          <div style={{ flexGrow: '1' }}></div>
+          <div>Organizational Unit: {this.props.topOU}</div>
+        </div>
       </div>
     );
   }
 }
 
 InfoBanner.defaultProps = {
-  background: '#2d89ef',
+  background: '#ffc40d',
+  name: 'Unknown User',
+  topOU: 'Unknown OU',
   visible: false
 };
 
 InfoBanner.propTypes = {
   background: PropTypes.string,
+  name: PropTypes.string,
+  topOU: PropTypes.string,
   visible: PropTypes.bool
 };
 

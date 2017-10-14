@@ -16,30 +16,19 @@
 */
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
+import nomadConfig from './reducers';
 
-// Nomad view component
-import NomadApp from './components/NomadApp';
+import App from './components/App';
 
-// The global config object we're using
-import ConfigStore from './components/Shared/ConfigStore';
-
-const config = ConfigStore.globalConfig;
-
-config.apply({
-	Template: '',
-	ComputerTypes: [
-		'Classroom Podium Workstation',
-		'Lab Workstation',
-		'Kiosk',
-		'Channel Player',
-		'Faculty/Staff Computer',
-		'Servers'
-	],
-	Universities: [],
-	Chainload: [],
-	credentials: {}
-});
+const store = createStore(
+    nomadConfig,
+    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+);
 
 ReactDOM.render((
-	<NomadApp config={config} />
+	<Provider store={store}>
+		<App />
+	</Provider>
 ), document.getElementById('react-root'));

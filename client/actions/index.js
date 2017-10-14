@@ -14,25 +14,45 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import ComputerNameGenerator from './ComputerNameGenerator';
-import { nextStage } from '../../actions';
-import { connect } from 'react-redux';
+export const SET_STAGE = 'SET_STAGE';
+export const NEXT_STAGE = 'NEXT_STAGE';
+export const SET_CREDENTIALS = 'SET_CREDENTIALS';
+export const SET_UNIVERSITY = 'SET_UNIVERSITY';
+export const MERGE_CONFIGS = 'MERGE_CONFIGS';
 
-const mapStateToProps = function(state) {
+export function setStage(stage) {
     return {
-        universities: state.Universities
+        type: SET_STAGE,
+        stage
     };
 };
 
-const mapDispatchToProps = function(dispatch) {
+export function nextStage() {
     return {
-        resolve: dispatch.bind(this, nextStage())
+        type: NEXT_STAGE
     };
 };
 
-const ComputerNameController = connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(ComputerNameGenerator);
+export function setCredentials(username, password) {
+    return {
+        type: SET_CREDENTIALS,
+        credentials: {
+            username,
+            password
+        }
+    };
+};
 
-export default ComputerNameController;
+export function setUniversity(universities) {
+    return {
+        type: SET_UNIVERSITY,
+        universities
+    };
+};
+
+export function mergeConfigs(configs) {
+    return {
+        type: MERGE_CONFIGS,
+        configs
+    };
+};

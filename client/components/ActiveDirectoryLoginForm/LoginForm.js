@@ -14,10 +14,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-// Import ReactJS and React-DOM
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import ActiveDirectory from 'activedirectory';
+import React from 'react';
 // Import react-desktop elements
 import {
     Button,
@@ -28,40 +25,9 @@ import {
     View
 } from 'react-desktop/windows';
 
-class API {
-    constructor() {
-        this.currentSession = null;
-    }
-    authenticate(_credentials) {
-        return new Promise((resolve, reject) => {
-            const currentSession = new ActiveDirectory({
-                url: 'ldap://rams.adp.vcu.edu',
-                baseDN: 'dc=rams,dc=ADP,dc=vcu,dc=edu',
-                username: 'RAMS\\' + _credentials.username,
-                password: _credentials.password
-            });
-            currentSession.findUser(_credentials.username, (err, auth) => {
-                if (auth) {
-                    resolve({
-                        details: auth,
-                        credentials: _credentials,
-                        session: currentSession
-                    });
-                } else {
-                    reject({
-                        details: err,
-                        credentials: _credentials,
-                        session: currentSession
-                    });
-                }
-            });
-        });
-    }
-}
-
-module.exports = class ActiveDirectoryLoginForm extends React.Component {
+class LoginForm extends React.Component {
     constructor(props) {
-        super();
+        super(props);
         this.state = {
             loading: false,
             error: false,
@@ -71,26 +37,20 @@ module.exports = class ActiveDirectoryLoginForm extends React.Component {
         };
         this.username = '';
         this.password = '';
-        this.api = new API();
     }
 
     submit() {
         this.setState({
             loading: true
         });
-        this.api.authenticate({
-            username: this.username,
-            password: this.password
-        }).then((details) => {
+        this.props.onSubmit(this.username, this.password).then(resolve => {
             this.setState({
                 loading: false,
                 success: true,
                 error: false,
-                transitionEnd: () => {
-                    this.props.finish(details);
-                }
+                transitionEnd: resolve
             });
-        }).catch((details) => {
+        }).catch(details => {
             this.setState({
                 errorBackground: false
             });
@@ -101,7 +61,6 @@ module.exports = class ActiveDirectoryLoginForm extends React.Component {
                     errorBackground: true
                 });
             }, 0);
-            this.props.postMessage(details);
         });
         this.username = '';
         this.password = '';
@@ -189,7 +148,6 @@ module.exports = class ActiveDirectoryLoginForm extends React.Component {
                     height="130px"
                     width="130px"
                     draggable={false}
-                    onClick={() => location.reload()}
                     style={{
                         padding: '10px',
                         borderRight: 'solid #EEEEEE 1px',
@@ -203,7 +161,7 @@ module.exports = class ActiveDirectoryLoginForm extends React.Component {
                 >
                     <div
                         style={{
-                            padding: '5px' // These are workarounds, so that Radium doesn't complain
+                            padding: '5px'
                         }}
                     >
                         <Label>
@@ -227,7 +185,7 @@ module.exports = class ActiveDirectoryLoginForm extends React.Component {
                         <div
                             style={{
                                 maxHeight: '40px',
-                                padding: '5px 5px 0 5px' // These are workarounds, so that Radium doesn't complain
+                                padding: '5px 5px 0 5px'
                             }}
                         >
                             <TextInput
@@ -239,7 +197,7 @@ module.exports = class ActiveDirectoryLoginForm extends React.Component {
                         <div
                             style={{
                                 maxHeight: '40px',
-                                padding: '5px 5px 0 5px' // These are workarounds, so that Radium doesn't complain
+                                padding: '5px 5px 0 5px'
                             }}
                         >
                             <TextInput
@@ -314,3 +272,5 @@ module.exports = class ActiveDirectoryLoginForm extends React.Component {
         );
     }
 };
+
+export default LoginForm;

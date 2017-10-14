@@ -14,23 +14,16 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import Carousel from './Carousel';
-import { SET_STAGE } from '../../../actions';
-import { connect } from 'react-redux';
+import React from 'react';
+import Radium from 'radium';
 
-const mapStateToProps = function(state) {
-    return {
-        index: state.stage
-    };
-};
+class PackageInstaller extends React.Component {
+  constructor() {
+    super();
+  }
+  render() {
+    return (<h1>This section is under construction!!!</h1>);
+  }
+}
 
-const mapDispatchToProps = function(dispatch) {
-    return {};
-};
-
-const CarouselController = connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(Carousel);
-
-export default CarouselController;
+export default Radium(PackageInstaller);

@@ -14,13 +14,13 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import Carousel from './Carousel';
-import { SET_STAGE } from '../../../actions';
+import InfoBanner from './InfoBanner';
+import { nextStage } from '../../actions';
 import { connect } from 'react-redux';
 
 const mapStateToProps = function(state) {
     return {
-        index: state.stage
+        visible: state.credentials.authenticated
     };
 };
 
@@ -28,9 +28,9 @@ const mapDispatchToProps = function(dispatch) {
     return {};
 };
 
-const CarouselController = connect(
+const InfoController = connect(
     mapStateToProps,
     mapDispatchToProps
-)(Carousel);
+)(InfoBanner);
 
-export default CarouselController;
+export default InfoController;

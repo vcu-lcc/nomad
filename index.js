@@ -15,7 +15,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 const DEBUG = process.argv.includes('--dev');
-const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer');
+const { default: installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } = require('electron-devtools-installer');
 const electron = require('electron');
 
 // Module to control application life.
@@ -42,7 +42,11 @@ function createWindow () {
     // Install React Developer tools
     installExtension(REACT_DEVELOPER_TOOLS)
       .then(name => console.log(`Sucessfully Added Extension: ${name}.`))
-      .catch(err => console.error('An error occurred while install Electron extensions: ', err));
+      .catch(err => console.error('An error occurred while installing Electron extension: ', err));
+    // Install Redux devtools
+    installExtension(REDUX_DEVTOOLS)
+      .then(name => console.log(`Sucessfully Added Extension: ${name}.`))
+      .catch(err => console.error('An error occurred while installing Electron extension: ', err));
     // Open the DevTools.
     mainWindow.webContents.openDevTools();
   } else {
