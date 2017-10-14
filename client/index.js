@@ -22,10 +22,19 @@ import nomadConfig from './reducers';
 
 import App from './components/App';
 
-const store = createStore(
-    nomadConfig,
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-);
+let store;
+
+if (typeof window.__REDUX_DEVTOOLS_EXTENSION__ == 'undefined') {
+    store = createStore(
+        nomadConfig
+    );
+} else {
+    store = createStore(
+        nomadConfig,
+        window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+    );
+}
+
 
 ReactDOM.render((
 	<Provider store={store}>

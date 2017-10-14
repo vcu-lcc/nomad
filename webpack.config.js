@@ -23,7 +23,9 @@ module.exports = {
 		sourceMapFilename: 'index_bundle.map'
 	},
 	devServer: {
-		filename: 'index_bundle.js'
+		filename: 'index_bundle.js',
+		hot: true,
+		inline: true
 	},
 	devtool: 'cheap-module-eval-source-map',
 	module: {

@@ -32,11 +32,10 @@
     "html-webpack-plugin": "^2.29.0",
     "url-loader": "^0.5.9",
     "webpack": "^3.3.0",
-    "webpack-dev-server": "^2.5.1",
-    "yarn": "^0.27.5"
+    "webpack-dev-server": "^2.5.1"
   },
   "scripts": {
-    "start": "start electron . --dev && webpack-dev-server --hot --inline",
-    "production": "webpack && electron ."
+    "start": "electron . --dev",
+    "production": "electron ."
   }
 }
