@@ -38,8 +38,8 @@ const mapDispatchToProps = function(dispatch, ownProps) {
                 });
                 currentSession.findUser(username, (err, auth) => {
                     if (auth) {
-                        dispatch(setIdentity(auth));
                         dispatch(setCredentials(username, password));
+                        dispatch(setIdentity(auth));
                         resolve(() => {
                             dispatch(nextStage());
                         });

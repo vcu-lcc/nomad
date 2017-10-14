@@ -20,6 +20,7 @@ export const SET_CREDENTIALS = 'SET_CREDENTIALS';
 export const SET_UNIVERSITY = 'SET_UNIVERSITY';
 export const MERGE_CONFIGS = 'MERGE_CONFIGS';
 export const SET_IDENTITY = 'SET_IDENTITY';
+export const SET_MACHINE_PROPS = 'SET_MACHINE_PROPS';
 
 export function setStage(stage) {
     return {
@@ -62,5 +63,12 @@ export function setIdentity(identity) {
     return {
         type: SET_IDENTITY,
         identity
+    };
+};
+
+export function setMachineProps(props) {
+    return {
+        type: SET_MACHINE_PROPS,
+        props
     };
 };

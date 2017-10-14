@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { combineReducers } from 'redux';
-import { SET_STAGE, NEXT_STAGE, SET_CREDENTIALS, SET_UNIVERSITY, MERGE_CONFIGS, SET_IDENTITY } from '../actions';
+import { SET_STAGE, NEXT_STAGE, SET_CREDENTIALS, SET_UNIVERSITY, MERGE_CONFIGS, SET_IDENTITY, SET_MACHINE_PROPS } from '../actions';
 
 const defaultState = {
 	stage: 0,
@@ -23,6 +23,7 @@ const defaultState = {
 		authenticated: false
 	},
 	identity: {},
+	machine: {},
 	Universities: [],
 	remote: [
 		// 'https://files.nuget.ts.vcu.edu/EMS/vcu.json',
@@ -66,6 +67,15 @@ const nomadConfig = (state=defaultState, action) => {
 			return {
 				...state,
 				identity: action.identity
+			};
+		}
+		case SET_MACHINE_PROPS: {
+			return {
+				...state,
+				machine: {
+					...state.machine,
+					...action.props
+				}
 			};
 		}
 		default:

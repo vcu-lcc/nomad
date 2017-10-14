@@ -29,7 +29,8 @@ const styles = {
     transition: 'transform 1000ms ease-out, box-shadow 1000ms ease-out',
     transform: 'translateY(-100%)',
     userSelect: 'none',
-    width: '100vw'
+    width: '100vw',
+    zIndex: 1
   },
   row: {
     display: 'flex',

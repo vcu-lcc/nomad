@@ -25,6 +25,8 @@ import ConfigFetcher from '../ConfigFetcher';
 import ComputerNameGenerator from '../ComputerNameGenerator';
 import PackageInstaller from '../PackageInstaller';
 import LoadingScreen from '../Shared/LoadingScreen';
+// Dialog for more information
+import InfoDialogue from '../InfoDialogue';
 
 const App = () => (
   <div>
@@ -35,6 +37,7 @@ const App = () => (
       <ComputerNameGenerator />
       <PackageInstaller />
     </Carousel>
+    <InfoDialogue />
   </div>
 );
 

@@ -14,27 +14,42 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import InfoBanner from './InfoBanner';
+import wmic from 'wmic';
+import InfoDialogue from './InfoDialogue';
 import { connect } from 'react-redux';
+import { setMachineProps } from '../../actions';
+import { exec } from 'child_process';
+import systemInformation from 'systeminformation';
 
 const mapStateToProps = function(state) {
-    return {
-        visible: state.credentials.authenticated,
-        name: state.identity.displayName,
-        topOU: typeof state.identity.dn == 'string' ? state.identity.dn.split(',')
-            .filter(i => i.startsWith('OU='))
-            .map(i => i.split('=')[1])
-            .pop() : null
-    };
+    return state.machine;
 };
 
 const mapDispatchToProps = function(dispatch) {
+    systemInformation.system().then(system => {
+        dispatch(setMachineProps({
+            manufacturer: system.manufacturer,
+            modelNumber: system.model,
+            serialNumber: system.serial
+        }));
+    });
+    systemInformation.osInfo().then(os => {
+        dispatch(setMachineProps({
+            architecture: os.arch
+        }));
+    });
+    systemInformation.networkInterfaces().then(nic => {
+        dispatch(setMachineProps({
+            macAddress: nic[0].mac,
+            currentIP: nic[0].ip4
+        }));
+    });
     return {};
 };
 
-const InfoController = connect(
+const DialogueController = connect(
     mapStateToProps,
     mapDispatchToProps
-)(InfoBanner);
+)(InfoDialogue);
 
-export default InfoController;
+export default DialogueController;
