@@ -27,11 +27,11 @@ let mainWindow;
 
 function loadWebpack() {
   if (DEBUG) {
-    let server = new WebpackDevServer(Webpack(webpackConfig), {
-      stats:{
-        colors: true
-      }
-    });
+    webpackConfig.entry.unshift(
+      'webpack-dev-server/client?http://localhost:' + (webpackConfig.devServer.port || 8080),
+      'webpack/hot/dev-server')
+    webpackConfig.plugins.unshift(new Webpack.HotModuleReplacementPlugin());
+    let server = new WebpackDevServer(Webpack(webpackConfig));
     server.listen(8080, '127.0.0.1', () => {
       console.log('Starting webpack development server on http://localhost:8080.');
       createWindow();
