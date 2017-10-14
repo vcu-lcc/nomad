@@ -20,7 +20,8 @@ import { connect } from 'react-redux';
 
 const mapStateToProps = function(state) {
     return {
-        universities: state.Universities
+        universities: state.Universities,
+        defaultComputerName: state.machine.computerName
     };
 };
 

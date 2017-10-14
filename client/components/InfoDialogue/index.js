@@ -35,6 +35,7 @@ const mapDispatchToProps = function(dispatch) {
     });
     systemInformation.osInfo().then(os => {
         dispatch(setMachineProps({
+            computerName: os.hostname,
             architecture: os.arch
         }));
     });

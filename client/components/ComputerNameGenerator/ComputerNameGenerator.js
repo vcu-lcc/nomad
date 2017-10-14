@@ -441,7 +441,7 @@ class ComputerNameGenerator extends React.Component {
         }]
     };
     this.state = {
-      ComputerName: 'undefined',
+      ComputerName: this.props.defaultComputerName,
       done: false,
       fields: []
     }

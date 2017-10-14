@@ -36,6 +36,7 @@ const styles = {
     fontWeight: 'bolder',
     height: '24px',
     margin: '2px 8px 8px 8px',
+    pointerEvents: 'auto',
     textAlign: 'center',
     width: '24px'
   },
@@ -61,6 +62,13 @@ const styles = {
     display: 'flex',
     flexDirection: 'row',
     padding: '4px'
+  },
+  spacer: {
+    flexGrow: '1',
+    minWidth: '16px'
+  },
+  selectable: {
+    userSelect: 'all'
   }
 };
 
@@ -74,7 +82,9 @@ class InfoDialogue extends React.Component {
   render() {
     return (
       <div
-        style={[styles.base]}
+        style={[styles.base, {
+          pointerEvents: this.state.visible ? 'auto' : 'none'
+        }]}
         onMouseLeave={() => this.setState({ visible: false })}
       >
         <div
@@ -83,34 +93,39 @@ class InfoDialogue extends React.Component {
           }]}
         >
           <div style={[styles.infoRow]}>
+            <span>Computer Name: </span>
+            <span style={[styles.spacer]}></span>
+            <span style={[styles.selectable]}>{ this.props.computerName }</span>
+          </div>
+          <div style={[styles.infoRow]}>
             <span>Manufacturer: </span>
-            <span style={{ flexGrow: '1', minWidth: '16px' }}></span>
-            <span>{ this.props.manufacturer }</span>
+            <span style={[styles.spacer]}></span>
+            <span style={[styles.selectable]}>{ this.props.manufacturer }</span>
           </div>
           <div style={[styles.infoRow]}>
             <span>Model Number: </span>
-            <span style={{ flexGrow: '1', minWidth: '16px' }}></span>
-            <span>{ this.props.modelNumber }</span>
+            <span style={[styles.spacer]}></span>
+            <span style={[styles.selectable]}>{ this.props.modelNumber }</span>
           </div>
           <div style={[styles.infoRow]}>
             <span>Serial Number: </span>
-            <span style={{ flexGrow: '1', minWidth: '16px' }}></span>
-            <span>{ this.props.serialNumber }</span>
+            <span style={[styles.spacer]}></span>
+            <span style={[styles.selectable]}>{ this.props.serialNumber }</span>
           </div>
           <div style={[styles.infoRow]}>
             <span>Architecture: </span>
-            <span style={{ flexGrow: '1', minWidth: '16px' }}></span>
-            <span>{ this.props.architecture }</span>
+            <span style={[styles.spacer]}></span>
+            <span style={[styles.selectable]}>{ this.props.architecture }</span>
           </div>
           <div style={[styles.infoRow]}>
             <span>MAC Address: </span>
-            <span style={{ flexGrow: '1', minWidth: '16px' }}></span>
-            <span>{ this.props.macAddress }</span>
+            <span style={[styles.spacer]}></span>
+            <span style={[styles.selectable]}>{ this.props.macAddress }</span>
           </div>
           <div style={[styles.infoRow]}>
             <span>IP Address: </span>
-            <span style={{ flexGrow: '1', minWidth: '16px' }}></span>
-            <span>{ this.props.currentIP }</span>
+            <span style={[styles.spacer]}></span>
+            <span style={[styles.selectable]}>{ this.props.currentIP }</span>
           </div>
         </div>
         <div
@@ -135,15 +150,17 @@ class InfoDialogue extends React.Component {
 }
 
 InfoDialogue.defaultProps = {
-  manufacturer: 'unavaliable',
-  modelNumber: 'unavaliable',
-  serialNumber: 'unavaliable',
-  architecture: 'unavaliable',
-  macAddress: 'unavaliable',
-  currentIP: 'unavaliable'
+  computerName: 'unknown',
+  manufacturer: 'unknown',
+  modelNumber: 'unknown',
+  serialNumber: 'unknown',
+  architecture: 'unknown',
+  macAddress: 'unknown',
+  currentIP: 'unknown'
 };
 
 InfoDialogue.propTypes = {
+  computerName: PropTypes.string,
   manufacturer: PropTypes.string,
   modelNumber: PropTypes.string,
   serialNumber: PropTypes.string,
