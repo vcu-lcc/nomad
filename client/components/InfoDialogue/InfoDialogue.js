@@ -79,13 +79,16 @@ class InfoDialogue extends React.Component {
       visible: false
     };
   }
+
   render() {
     return (
       <div
         style={[styles.base, {
           pointerEvents: this.state.visible ? 'auto' : 'none'
         }]}
-        onMouseLeave={() => this.setState({ visible: false })}
+        onMouseLeave={e => this.setState({ visible: false }) ||
+          (window.getSelection().focusNode && e.target.contains(window.getSelection().focusNode.parentElement) ?
+            window.getSelection().removeAllRanges() : null)}
       >
         <div
           style={[styles.dialogue, {
