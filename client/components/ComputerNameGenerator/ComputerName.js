@@ -80,10 +80,8 @@ class ComputerName extends React.Component {
 
   async changeComputerName(newName) {
     let windowsCommmand = `WMIC computersystem where caption="${os.hostname()}" rename "${newName}"`;
-    console.warn('executing command', windowsCommmand);
     try {
       let output = await sudo(windowsCommmand);
-      console.log(output);
       if (output.includes('ReturnValue = 0')) {
         return {
           name: os.hostname(),

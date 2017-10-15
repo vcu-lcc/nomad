@@ -15,12 +15,27 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { combineReducers } from 'redux';
-import { SET_STAGE, NEXT_STAGE, SET_CREDENTIALS, SET_UNIVERSITY, MERGE_CONFIGS, SET_IDENTITY, SET_MACHINE_PROPS } from '../actions';
+import {
+	SET_STAGE,
+	NEXT_STAGE,
+	SET_CREDENTIALS,
+	SET_UNIVERSITY,
+	MERGE_CONFIGS,
+	SET_IDENTITY,
+	SET_MACHINE_PROPS,
+	SET_LOADING,
+	SET_ACTIVE_DIRECTORY_PATH,
+	SET_ACTIVE_DIRECTORY_CONTENTS
+} from '../actions';
 
 const defaultState = {
 	stage: 0,
+	loading: false,
 	credentials: {
 		authenticated: false
+	},
+	activeDirectory: {
+		path: 'DC=RAMS,DC=adp,DC=vcu,DC=edu'
 	},
 	identity: {},
 	machine: {},
@@ -75,6 +90,30 @@ const nomadConfig = (state=defaultState, action) => {
 				machine: {
 					...state.machine,
 					...action.props
+				}
+			};
+		}
+		case SET_LOADING: {
+			return {
+				...state,
+				loading: action.loading
+			};
+		}
+		case SET_ACTIVE_DIRECTORY_PATH: {
+			return {
+				...state,
+				activeDirectory: {
+					...state.activeDirectory,
+					path: action.path
+				}
+			};
+		}
+		case SET_ACTIVE_DIRECTORY_CONTENTS: {
+			return {
+				...state,
+				activeDirectory: {
+					...state.activeDirectory,
+					contents: action.contents
 				}
 			};
 		}

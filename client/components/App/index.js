@@ -23,8 +23,8 @@ import Carousel from '../Shared/Carousel';
 import ActiveDirectoryLoginForm from '../ActiveDirectoryLoginForm';
 import ConfigFetcher from '../ConfigFetcher';
 import ComputerNameGenerator from '../ComputerNameGenerator';
+import ActiveDirectorySelector from '../ActiveDirectorySelector';
 import PackageInstaller from '../PackageInstaller';
-import LoadingScreen from '../Shared/LoadingScreen';
 // Dialog for more information
 import InfoDialogue from '../InfoDialogue';
 
@@ -35,6 +35,7 @@ const App = () => (
       <ActiveDirectoryLoginForm />
       <ConfigFetcher />
       <ComputerNameGenerator />
+      <ActiveDirectorySelector />
       <PackageInstaller />
     </Carousel>
     <InfoDialogue />

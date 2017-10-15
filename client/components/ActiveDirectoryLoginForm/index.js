@@ -31,8 +31,8 @@ const mapDispatchToProps = function(dispatch, ownProps) {
         onSubmit: function(username, password) {
             return new Promise((resolve, reject) => {
                 const currentSession = new ActiveDirectory({
-                    url: 'ldap://rams.adp.vcu.edu',
-                    baseDN: 'dc=rams,dc=ADP,dc=vcu,dc=edu',
+                    url: 'ldap://RAMS.adp.vcu.edu',
+                    baseDN: 'DC=RAMS,DC=ADP,DC=vcu,DC=edu',
                     username: 'RAMS\\' + username,
                     password: password
                 });

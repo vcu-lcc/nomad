@@ -33,15 +33,41 @@ const fetchConfig = function(url) {
 			}
 		});
 	});
-}
+};
 
 class ConfigFetcher extends React.Component {
-	componentWillMount() {
-		Promise.all(this.props.urls.map(url => fetchConfig(url)))
-			.then(configs => this.props.resolve(configs))
+    constructor(props) {
+        super(props);
+        this.state = {
+            message: 'Loading...'
+        };
+    }
+    applyConfig(urls) {
+        this.setState({
+            message: 'Fetching Configuration Files...'
+        });
+        return new Promise((resolve, reject) => {
+    		Promise.all(urls.map(url => fetchConfig(url)))
+    			.then(configs => {
+                    resolve(configs);
+                })
+                .catch(error => {
+                    this.setState({
+                        message: error
+                    });
+                    reject(error);
+                });
+        });
+    }
+    componentWillMount() {
+        this.applyConfig(this.props.urls)
+            .then(configs => this.props.resolve(configs))
+            .catch(error => this.props.reject(error));
 	}
 	render() {
-		return <LoadingScreen> Fetching configuration files... </LoadingScreen>;
+		return (
+            <LoadingScreen>{this.state.message}</LoadingScreen>
+        );
 	}
 }
 
@@ -53,6 +79,9 @@ const mapStateToProps = function(state) {
 
 const mapDispatchToProps = function(dispatch) {
     return {
+        reject: error => {
+            // @TODO: Report bug
+        },
     	resolve: configs => {
     		dispatch(mergeConfigs(configs));
     		dispatch(nextStage());
