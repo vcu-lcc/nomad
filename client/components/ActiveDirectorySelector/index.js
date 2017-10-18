@@ -17,7 +17,14 @@
 // Import ReactJS
 import ActiveDirectory from 'activedirectory';
 import ActiveDirectorySelector from './ActiveDirectorySelector';
-import { setLoading, nextStage, setActiveDirectoryPath, setActiveDirectoryContents } from '../../actions';
+import {
+  setLoading,
+  nextStage,
+  setActiveDirectoryContents,
+  updateActiveDirectoryPath,
+  requestActiveDirectoryPath,
+  rejectActiveDirectoryPath
+} from '../../actions';
 import { connect } from 'react-redux';
 
 let globalSession = null;
@@ -30,7 +37,8 @@ const mapStateToProps = function(state, ownProps) {
       password: state.credentials.password
     });
   }
-  let splitPath = state.activeDirectory.path.split(',').map(s => [s.split('=')[0].toUpperCase(), s.split('=').slice(1).join('=')]);
+  let target = state.activeDirectory.requestedPath || state.activeDirectory.path;
+  let splitPath = target.split(',').map(s => [s.split('=')[0].toUpperCase(), s.split('=').slice(1).join('=')]);
   let displayPath = [];
   let dc = false;
   for (let i = 0; i != splitPath.length; i++) {
@@ -52,9 +60,12 @@ const mapStateToProps = function(state, ownProps) {
       actualPath: splitPath.slice(i).map(i => i.join('=')).join(',')
     };
   }).reverse();
+  if (state.activeDirectory.requestedPath) {
+    path.pop();
+  }
   return {
     contents: state.activeDirectory.contents,
-    loading: state.loading,
+    loading: !!state.activeDirectory.requestedPath,
     path
   };
 };
@@ -65,14 +76,14 @@ const mapDispatchToProps = function(dispatch, ownProps) {
       if (typeof path != 'string') {
         throw new Error('Invalid path type ' + typeof path);
       }
-      dispatch(setLoading(true));
+      dispatch(requestActiveDirectoryPath(path));
       globalSession.find({
         baseDN: path,
         filter: '(objectClass=*)',
         scope: 'one'
       }, (err, results) => {
         if (results) {
-          dispatch(setActiveDirectoryPath(path));
+          dispatch(updateActiveDirectoryPath(path));
           let sanitized = [];
           Object.keys(results).forEach(category => results[category].forEach(obj => {
             sanitized.push({
@@ -83,6 +94,7 @@ const mapDispatchToProps = function(dispatch, ownProps) {
           }));
           dispatch(setActiveDirectoryContents(sanitized));
         } else {
+          dispatch(rejectActiveDirectoryPath(err ? `Error ${err.code}: ${err.name}` : 'An unknown error occured while changing directories.'))
           // @TODO: dispatch a warning
         }
         dispatch(setLoading(false));

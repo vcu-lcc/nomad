@@ -101,7 +101,7 @@ class ActiveDirectorySelector extends React.Component {
                 idx < arr.length - 1 ? <div key={idx + arr.length} style={[styles.pathDivider]}></div> : null
               ]), [])
           }
-          { this.props.loading && <div style={[styles.pathDivider]}></div> }
+          { this.props.loading && this.props.path.length > 0 && <div style={[styles.pathDivider]}></div> }
           { this.props.loading && <ProgressCircle size={25} /> }
         </div>
         <div style={[styles.header]}>
@@ -133,10 +133,9 @@ class ActiveDirectorySelector extends React.Component {
 };
 
 ActiveDirectorySelector.defaultProps = {
-  actualPath: '',
   contents: [],
-  displayPath: '',
-  loading: true
+  loading: true,
+  path: []
 };
 
 ActiveDirectorySelector.propTypes = {

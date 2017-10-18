@@ -24,8 +24,10 @@ import {
 	SET_IDENTITY,
 	SET_MACHINE_PROPS,
 	SET_LOADING,
-	SET_ACTIVE_DIRECTORY_PATH,
-	SET_ACTIVE_DIRECTORY_CONTENTS
+	SET_ACTIVE_DIRECTORY_CONTENTS,
+	UPDATE_ACTIVE_DIRECTORY_PATH,
+	REQUEST_ACTIVE_DIRECTORY_PATH,
+	REJECT_ACTIVE_DIRECTORY_PATH
 } from '../actions';
 
 const defaultState = {
@@ -35,7 +37,8 @@ const defaultState = {
 		authenticated: false
 	},
 	activeDirectory: {
-		path: 'DC=RAMS,DC=adp,DC=vcu,DC=edu'
+		path: 'DC=RAMS,DC=adp,DC=vcu,DC=edu',
+		loading: false
 	},
 	identity: {},
 	machine: {},
@@ -99,15 +102,6 @@ const nomadConfig = (state=defaultState, action) => {
 				loading: action.loading
 			};
 		}
-		case SET_ACTIVE_DIRECTORY_PATH: {
-			return {
-				...state,
-				activeDirectory: {
-					...state.activeDirectory,
-					path: action.path
-				}
-			};
-		}
 		case SET_ACTIVE_DIRECTORY_CONTENTS: {
 			return {
 				...state,
@@ -116,6 +110,34 @@ const nomadConfig = (state=defaultState, action) => {
 					contents: action.contents
 				}
 			};
+		}
+		case UPDATE_ACTIVE_DIRECTORY_PATH: {
+			return {
+				...state,
+				activeDirectory: {
+					...state.activeDirectory,
+					path: action.path,
+					requestedPath: false
+				}
+			};
+		}
+		case REQUEST_ACTIVE_DIRECTORY_PATH: {
+			return {
+				...state,
+				activeDirectory: {
+					...state.activeDirectory,
+					requestedPath: action.requestedPath
+				}
+			};
+		}
+		case REJECT_ACTIVE_DIRECTORY_PATH: {
+			return {
+				...state,
+				activeDirectory: {
+					...state.activeDirectory,
+					requestedPath: false
+				}
+			}
 		}
 		default:
 			return state;

@@ -22,8 +22,10 @@ export const MERGE_CONFIGS = 'MERGE_CONFIGS';
 export const SET_IDENTITY = 'SET_IDENTITY';
 export const SET_MACHINE_PROPS = 'SET_MACHINE_PROPS';
 export const SET_LOADING = 'SET_LOADING';
-export const SET_ACTIVE_DIRECTORY_PATH = 'SET_ACTIVE_DIRECTORY_PATH';
 export const SET_ACTIVE_DIRECTORY_CONTENTS = 'SET_ACTIVE_DIRECTORY_CONTENTS';
+export const REQUEST_ACTIVE_DIRECTORY_PATH = 'REQUEST_ACTIVE_DIRECTORY_PATH';
+export const UPDATE_ACTIVE_DIRECTORY_PATH = 'UPDATE_ACTIVE_DIRECTORY_PATH';
+export const REJECT_ACTIVE_DIRECTORY_PATH = 'REJECT_ACTIVE_DIRECTORY_PATH';
 
 export function setStage(stage) {
     return {
@@ -83,16 +85,30 @@ export function setLoading(loading) {
     };
 };
 
-export function setActiveDirectoryPath(path) {
-    return {
-        type: SET_ACTIVE_DIRECTORY_PATH,
-        path
-    };
-};
-
 export function setActiveDirectoryContents(contents) {
     return {
         type: SET_ACTIVE_DIRECTORY_CONTENTS,
         contents
+    };
+};
+
+export function updateActiveDirectoryPath(path) {
+    return {
+        type: UPDATE_ACTIVE_DIRECTORY_PATH,
+        path
+    };
+};
+
+export function requestActiveDirectoryPath(requestedPath) {
+    return {
+        type: REQUEST_ACTIVE_DIRECTORY_PATH,
+        requestedPath
+    };
+};
+
+export function rejectActiveDirectoryPath(reason) {
+    return {
+        type: REJECT_ACTIVE_DIRECTORY_PATH,
+        error: reason
     };
 };
