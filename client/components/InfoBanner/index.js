@@ -16,6 +16,7 @@
 */
 import InfoBanner from './InfoBanner';
 import { connect } from 'react-redux';
+import { setTopOu } from '../../actions';
 
 const mapStateToProps = function(state) {
     return {
@@ -29,7 +30,11 @@ const mapStateToProps = function(state) {
 };
 
 const mapDispatchToProps = function(dispatch) {
-    return {};
+    return {
+        updateOU: (ou) => {
+            dispatch(setTopOu(ou));
+        }
+    };
 };
 
 const InfoController = connect(

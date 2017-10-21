@@ -43,6 +43,13 @@ class InfoBanner extends React.Component {
   constructor(props) {
     super(props);
   }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.topOU != nextProps.topOU) {
+      this.props.updateOU(nextProps.topOU);
+    }
+  }
+
   render() {
     return (
       <div

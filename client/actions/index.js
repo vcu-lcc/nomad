@@ -20,6 +20,7 @@ export const SET_CREDENTIALS = 'SET_CREDENTIALS';
 export const SET_UNIVERSITY = 'SET_UNIVERSITY';
 export const MERGE_CONFIGS = 'MERGE_CONFIGS';
 export const SET_IDENTITY = 'SET_IDENTITY';
+export const SET_TOP_OU = 'SET_TOP_OU';
 export const SET_MACHINE_PROPS = 'SET_MACHINE_PROPS';
 export const SET_LOADING = 'SET_LOADING';
 export const SET_ACTIVE_DIRECTORY_CONTENTS = 'SET_ACTIVE_DIRECTORY_CONTENTS';
@@ -70,6 +71,13 @@ export function setIdentity(identity) {
         identity
     };
 };
+
+export function setTopOu(ou) {
+    return {
+        type: SET_TOP_OU,
+        ou
+    };
+}
 
 export function setMachineProps(props) {
     return {

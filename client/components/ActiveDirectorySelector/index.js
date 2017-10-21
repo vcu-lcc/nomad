@@ -34,7 +34,12 @@ const mapStateToProps = function(state, ownProps) {
     globalSession = new ActiveDirectory({
       url: 'ldap://RAMS.adp.vcu.edu',
       username: 'RAMS\\' + state.credentials.username,
-      password: state.credentials.password
+      password: state.credentials.password,
+      attributes: {
+        user: [],
+        group: [],
+        other: []
+      }
     });
   }
   let target = state.activeDirectory.requestedPath || state.activeDirectory.path;
@@ -70,6 +75,29 @@ const mapStateToProps = function(state, ownProps) {
   };
 };
 
+const getType = function(adObj, defaultCategory) {
+  if (defaultCategory == 'users') {
+    return 'User';
+  } else if (defaultCategory == 'groups') {
+    return 'Group';
+  } else if (adObj.dn.startsWith('DC=')) {
+    return 'Domain Component';
+  } else if (adObj.objectClass && adObj.objectClass.length > 0) {
+    let cls = adObj.objectClass[adObj.objectClass.length - 1];
+    if (cls == 'container') {
+      return 'Container';
+    } else if (cls == 'organizationalUnit') {
+      return 'Organizational Unit';
+    } else if (cls == 'computer') {
+      return 'Computer';
+    } else {
+      return cls;
+    }
+  } else {
+    return 'Unknown';
+  }
+};
+
 const mapDispatchToProps = function(dispatch, ownProps) {
   return {
     updatePath: (path) => {
@@ -87,15 +115,14 @@ const mapDispatchToProps = function(dispatch, ownProps) {
           let sanitized = [];
           Object.keys(results).forEach(category => results[category].forEach(obj => {
             sanitized.push({
-              type: category,
+              type: getType(obj, category),
               name: obj.dn.split(',')[0].split('=').slice(1).join('='),
               path: obj.dn
             });
           }));
           dispatch(setActiveDirectoryContents(sanitized));
         } else {
-          dispatch(rejectActiveDirectoryPath(err ? `Error ${err.code}: ${err.name}` : 'An unknown error occured while changing directories.'))
-          // @TODO: dispatch a warning
+          dispatch(rejectActiveDirectoryPath(err ? `Error ${err.code}: ${err.name}` : 'An unknown error occured while changing directories.'));
         }
         dispatch(setLoading(false));
       });

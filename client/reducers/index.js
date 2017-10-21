@@ -22,6 +22,7 @@ import {
 	SET_UNIVERSITY,
 	MERGE_CONFIGS,
 	SET_IDENTITY,
+	SET_TOP_OU,
 	SET_MACHINE_PROPS,
 	SET_LOADING,
 	SET_ACTIVE_DIRECTORY_CONTENTS,
@@ -85,6 +86,15 @@ const nomadConfig = (state=defaultState, action) => {
 			return {
 				...state,
 				identity: action.identity
+			};
+		}
+		case SET_TOP_OU: {
+			return {
+				...state,
+				activeDirectory: {
+					...state.activeDirectory,
+					path: `OU=${ action.ou },DC=${ state.activeDirectory.path.split('DC=').slice(1).join('DC=') }`
+				}
 			};
 		}
 		case SET_MACHINE_PROPS: {
