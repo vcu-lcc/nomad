@@ -37,7 +37,9 @@
     "webpack-dev-server": "^2.5.1"
   },
   "scripts": {
-    "start": "electron . --dev",
-    "production": "electron ."
+    "build": "electron . --build",
+    "development": "electron . --dev",
+    "production": "electron . --production",
+    "start": "electron . --dev"
   }
 }

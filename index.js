@@ -15,7 +15,9 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const DEBUG = process.argv.includes('--dev');
+const BUILD = process.argv.includes('--build');
+const DEVELOPMENT = process.argv.includes('--dev');
+const PRODUCTION = process.argv.includes('--production');
 
 const { default: installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } = require('electron-devtools-installer');
 const { app, BrowserWindow } = require('electron');
@@ -26,17 +28,7 @@ const webpackConfig = require('./webpack.config.js');
 let mainWindow;
 
 function loadWebpack() {
-  if (DEBUG) {
-    webpackConfig.entry.unshift(
-      'webpack-dev-server/client?http://localhost:' + (webpackConfig.devServer.port || 8080),
-      'webpack/hot/dev-server')
-    webpackConfig.plugins.unshift(new Webpack.HotModuleReplacementPlugin());
-    let server = new WebpackDevServer(Webpack(webpackConfig));
-    server.listen(8080, '127.0.0.1', () => {
-      console.log('Starting webpack development server on http://localhost:8080.');
-      createWindow();
-    });
-  } else {
+  if (BUILD || PRODUCTION) {
     Webpack(webpackConfig).run((err, stats) => {
       if (err || stats.hasErrors()) {
         console.log('There were some errors while building webpack.');
@@ -47,6 +39,24 @@ function loadWebpack() {
       } else {
         console.log('Webpack build successful!');
       }
+    });
+    console.info(`NOMAD written to ${ webpackConfig.output.path }`);
+    if (PRODUCTION) {
+      createWindow();
+    } else if (BUILD) {
+      if (process.platform !== 'darwin') {
+        app.quit();
+      }
+    }
+  }
+  if (DEVELOPMENT && !PRODUCTION) {
+    webpackConfig.entry.unshift(
+      'webpack-dev-server/client?http://localhost:' + (webpackConfig.devServer.port || 8080),
+      'webpack/hot/dev-server')
+    webpackConfig.plugins.unshift(new Webpack.HotModuleReplacementPlugin());
+    let server = new WebpackDevServer(Webpack(webpackConfig));
+    server.listen(8080, '127.0.0.1', () => {
+      console.log('Starting webpack development server on http://localhost:8080.');
       createWindow();
     });
   }
@@ -58,7 +68,9 @@ function createWindow() {
   });
   mainWindow.setMenu(null);
   mainWindow.maximize();
-  if (DEBUG) {
+  if (PRODUCTION) {
+    mainWindow.loadURL(`file://${__dirname}/build/index.html`);
+  } else if (DEVELOPMENT) {
     mainWindow.loadURL(`http://localhost:8080/index.html`);
     installExtension(REACT_DEVELOPER_TOOLS)
       .then(name => console.log(`Sucessfully Added Extension: ${name}.`))
@@ -67,8 +79,6 @@ function createWindow() {
       .then(name => console.log(`Sucessfully Added Extension: ${name}.`))
       .catch(err => console.error('An error occurred while installing Electron extension: ', err));
     mainWindow.webContents.openDevTools();
-  } else {
-    mainWindow.loadURL(`file://${__dirname}/build/index.html`);
   }
   mainWindow.on('closed', function() {
     mainWindow = null;
