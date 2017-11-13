@@ -24,6 +24,7 @@ import {
     TextInput,
     View
 } from 'react-desktop/windows';
+import PropTypes from 'prop-types';
 
 class LoginForm extends React.Component {
     constructor(props) {
@@ -33,17 +34,17 @@ class LoginForm extends React.Component {
             error: false,
             errorBackground: false,
             success: false,
-            transitionEnd: null
+            transitionEnd: null,
+            username: this.props.username,
+            password: this.props.password
         };
-        this.username = '';
-        this.password = '';
+        if (this.props.submit) {
+            setTimeout(() => this.submit());
+        }
     }
 
     submit() {
-        this.setState({
-            loading: true
-        });
-        this.props.onSubmit(this.username, this.password).then(resolve => {
+        this.props.onSubmit(this.state.username, this.state.password).then(resolve => {
             this.setState({
                 loading: false,
                 success: true,
@@ -62,8 +63,9 @@ class LoginForm extends React.Component {
                 });
             }, 0);
         });
-        this.username = '';
-        this.password = '';
+        this.setState({
+            loading: true
+        });
     }
 
     render() {
@@ -191,7 +193,8 @@ class LoginForm extends React.Component {
                             <TextInput
                                 placeholder="Username"
                                 width={256}
-                                onChange={e => void(this.username = e.target.value)}
+                                onChange={e => void(this.state.username = e.target.value)}
+                                defaultValue={this.state.username}
                             />
                         </div>
                         <div
@@ -204,7 +207,8 @@ class LoginForm extends React.Component {
                                 password={true}
                                 placeholder="Password"
                                 width={256}
-                                onChange={e => void(this.password = e.target.value)}
+                                onChange={e => void(this.state.password = e.target.value)}
+                                defaultValue={this.state.password}
                             />
                     </div>
                     </div>
@@ -271,6 +275,17 @@ class LoginForm extends React.Component {
             </View>
         );
     }
+};
+
+LoginForm.defaultProps = {
+    username: '',
+    password: '',
+    submit: false
+};
+LoginForm.propTypes = {
+    username: PropTypes.string,
+    password: PropTypes.string,
+    submit: PropTypes.bool
 };
 
 export default LoginForm;

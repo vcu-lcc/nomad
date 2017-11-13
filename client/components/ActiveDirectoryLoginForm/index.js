@@ -20,10 +20,12 @@ import LoginForm from './LoginForm';
 import { setCredentials, nextStage, setIdentity } from '../../actions';
 import { connect } from 'react-redux';
 
-let state = {};
-
-const mapStateToProps = function(_state, ownProps) {
-    return {};
+const mapStateToProps = function(state, ownProps) {
+    return {
+        username: state.credentials.username || '',
+        password: state.credentials.password || '',
+        submit: state.credentials.submit
+    };
 };
 
 const mapDispatchToProps = function(dispatch, ownProps) {

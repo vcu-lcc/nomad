@@ -45,8 +45,11 @@ const defaultState = {
 	machine: {},
 	Universities: [],
 	remote: [
-		// 'https://files.nuget.ts.vcu.edu/EMS/vcu.json',
-		'http://localhost/vcu.json'
+		// 'https://files.nuget.ts.vcu.edu/EMS/vcu.json'
+	],
+	local: [
+		'config.json',
+		'vcu-cache.json'
 	]
 };
 

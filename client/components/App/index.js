@@ -32,8 +32,8 @@ const App = () => (
   <div>
     <InfoBanner />
     <Carousel>
-      <ActiveDirectoryLoginForm />
       <ConfigFetcher />
+      <ActiveDirectoryLoginForm />
       <ComputerNameGenerator />
       <ActiveDirectorySelector />
       <PackageInstaller />

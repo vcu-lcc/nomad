@@ -19,6 +19,7 @@ import LoadingScreen from '../Shared/LoadingScreen';
 import { mergeConfigs, nextStage } from '../../actions';
 import { connect } from 'react-redux';
 import request from 'request';
+import fs from 'fs';
 
 const fetchConfig = function(url) {
 	return new Promise((resolve, reject) => {
@@ -34,46 +35,87 @@ const fetchConfig = function(url) {
 		});
 	});
 };
+const getLocalConfig = function(path) {
+    return new Promise((resolve, reject) => {
+        fs.readFile(path, 'utf8', (err, data) => {
+            try {
+                err ? reject(err) : resolve(JSON.parse(data));
+            } catch (err) {
+                reject(err);
+            }
+        });
+    });
+};
+const reflectAll = function(promises) {
+    return new Promise((resolve, reject) => {
+        Promise.all(promises.map(p => new Promise(
+            (resolve, reject) => {
+                p.then(result => resolve({
+                    status: 'resolved',
+                    result
+                }))
+                .catch(result => resolve({
+                    status: 'rejected',
+                    result
+                }));
+            }
+        )))
+        .then(results => {
+            resolve({
+                resolved: results.filter(p => p.status == 'resolved').map(p => p.result),
+                rejected: results.filter(p => p.status == 'rejected').map(p => p.result)
+            });
+        });
+    });
+};
 
 class ConfigFetcher extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            message: 'Loading...'
+            messages: ['Loading...']
         };
     }
-    applyConfig(urls) {
+    applyConfig(urls, localPaths) {
         this.setState({
-            message: 'Fetching Configuration Files...'
+            messages: ['Fetching Configuration Files...']
         });
         return new Promise((resolve, reject) => {
-    		Promise.all(urls.map(url => fetchConfig(url)))
-    			.then(configs => {
-                    resolve(configs);
-                })
-                .catch(error => {
-                    this.setState({
-                        message: error
-                    });
-                    reject(error);
+            reflectAll([...urls.map(url => fetchConfig(url)), ...localPaths.map(path => getLocalConfig(path))])
+                .then(results => {
+                    let delay = false;
+                    if (results.rejected.length > 0) {
+                        let errors = results.rejected.map(e => e.toString().trim());
+                        delay = true;
+                        this.setState({
+                            messages: ['Some errors occured while fetching config files:', ...errors, 'Continuing in 5 seconds...']
+                        });
+                    }
+                    setTimeout(() => resolve(results.resolved), delay ? 5000 : 0);
                 });
         });
     }
     componentWillMount() {
-        this.applyConfig(this.props.urls)
+        this.applyConfig(this.props.remote, this.props.local)
             .then(configs => this.props.resolve(configs))
             .catch(error => this.props.reject(error));
 	}
 	render() {
 		return (
-            <LoadingScreen>{this.state.message}</LoadingScreen>
+            <LoadingScreen>
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column'
+                }}>{ this.state.messages.map((s, i) => <span key={i} style={{padding: '12px'}}>{s}</span>) }</div>
+            </LoadingScreen>
         );
 	}
 }
 
 const mapStateToProps = function(state) {
     return {
-        urls: state.remote
+        remote: state.remote,
+        local: state.local
     };
 };
 
