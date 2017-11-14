@@ -15,7 +15,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Rx from 'rxjs/Rx';
 import React from 'react';
 import Radium from 'radium';
 import PropTypes from 'prop-types';
