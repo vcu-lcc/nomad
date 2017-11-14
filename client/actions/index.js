@@ -22,6 +22,8 @@ export const MERGE_CONFIGS = 'MERGE_CONFIGS';
 export const SET_IDENTITY = 'SET_IDENTITY';
 export const SET_TOP_OU = 'SET_TOP_OU';
 export const SET_MACHINE_PROPS = 'SET_MACHINE_PROPS';
+export const UPDATE_COMPUTER_NAME = 'UPDATE_COMPUTER_NAME';
+export const UPDATE_COMPUTER_NAME_SELECTIONS = 'UPDATE_COMPUTER_NAME_SELECTIONS';
 export const SET_LOADING = 'SET_LOADING';
 export const SET_ACTIVE_DIRECTORY_CONTENTS = 'SET_ACTIVE_DIRECTORY_CONTENTS';
 export const REQUEST_ACTIVE_DIRECTORY_PATH = 'REQUEST_ACTIVE_DIRECTORY_PATH';
@@ -83,6 +85,20 @@ export function setMachineProps(props) {
     return {
         type: SET_MACHINE_PROPS,
         props
+    };
+};
+
+export function updateComputerName(computerName) {
+    return {
+        type: UPDATE_COMPUTER_NAME,
+        computerName
+    };
+};
+
+export function updateComputerNameSelections(selections) {
+    return {
+        type: UPDATE_COMPUTER_NAME_SELECTIONS,
+        selections
     };
 };
 

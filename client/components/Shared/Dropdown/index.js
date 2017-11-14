@@ -14,6 +14,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import PropTypes from 'prop-types';
 import React from 'react';
 import _ from 'lodash';
 import Radium from 'radium';
@@ -35,20 +36,11 @@ class Dropdown extends React.Component {
 		this.root = null;
 		this.dropdownBox = null;
 		this.state = {
-			activeIndex: React.Children.toArray(this.props.children).length == 1 ? 0 : -1,
+			activeIndex: typeof this.props.index === 'number' ? this.props.index : (this.props.options.length == 1 ? 0 : -1),
 			isExpanded: false,
 			offset: 0,
-			maxHeight: 'auto',
-			onChange: typeof this.props.onChange == 'function' ? this.props.onChange : function() {}
+			maxHeight: 'auto'
 		};
-		switch(React.Children.toArray(this.props.children).length) {
-			case 0:
-				setTimeout(this.state.onChange.bind(window, null), 0);
-				break;
-			case 1:
-				setTimeout(this.state.onChange.bind(window, 0), 0);
-				break;
-		}
 	}
 	componentDidMount() {
 		let offsetTop = this.root.getBoundingClientRect().top - this.state.offset;
@@ -56,21 +48,13 @@ class Dropdown extends React.Component {
 		this.setState({
 			maxHeight: Math.min(offsetTop, offsetBottom) * 0.8 + 'px'
 		});
-	}
-	componentWillReceiveProps(nextProps) {
-		if (!_.isEqual(React.Children.toArray(this.props.children), nextProps.children)) {
-			this.setState({
-				activeIndex: React.Children.toArray(this.props.children).length == 1 ? 0 : -1,
-				isExpanded: false
-			});
-			switch(React.Children.toArray(this.props.children).length) {
-				case 0:
-					setTimeout(this.state.onChange.bind(window, null), 0);
-					break;
-				case 1:
-					setTimeout(this.state.onChange.bind(window, 0), 0);
-					break;
-			}
+		switch(this.props.options.length) {
+			case 0:
+				setTimeout(() => this.props.onSelect(null));
+				break;
+			case 1:
+				setTimeout(() => this.props.onSelect(0));
+				break;
 		}
 	}
 	render() {
@@ -93,7 +77,7 @@ class Dropdown extends React.Component {
 				</div>
 				<div
 					style={{
-						width: this.props.width || '600px',
+						width: '600px',
 						minHeight: '38px'
 					}}
 				>
@@ -101,7 +85,7 @@ class Dropdown extends React.Component {
 						style={{
 							background: 'white',
 							position: this.state.isExpanded ? 'absolute' : null,
-							width: this.props.width || '600px',
+							width: '600px',
 							transform: this.state.isExpanded ? 'translateY(-' + this.state.offset + 'px)' : null,
 							zIndex: 1
 						}}
@@ -166,7 +150,7 @@ class Dropdown extends React.Component {
 										}}
 										className={this.state.isExpanded ? 'option' : 'active option'}
 									>
-										{this.state.activeIndex == -1 ? '' : React.Children.toArray(this.props.children)[this.state.activeIndex]}
+										{this.state.activeIndex == -1 ? '' : this.props.options[this.state.activeIndex]}
 									</div>
 								</div>
 								<img
@@ -183,7 +167,7 @@ class Dropdown extends React.Component {
 									overflowY: 'auto'
 								}}
 							>
-								{React.Children.toArray(this.props.children).map((e, i, unused, entry) => (
+								{this.props.options.map((e, i, unused, entry) => (
 									<div
 										key={i}
 										style={{
@@ -205,7 +189,7 @@ class Dropdown extends React.Component {
 													activeIndex: i
 												});
 												if (this.state.activeIndex != i) {
-													this.state.onChange(i);
+													this.props.onSelect(i);
 												}
 											}
 										}.bind(this)}
@@ -220,6 +204,22 @@ class Dropdown extends React.Component {
 			</div>
 		);
 	}
+}
+
+Dropdown.defaultProps = {
+	children: [],
+	label: '',
+	width: '600px',
+	onSelect: function() {},
+	index: -1
+};
+
+Dropdown.propTypes = {
+	children: PropTypes.array,
+	label: PropTypes.string,
+	width: PropTypes.string,
+	onSelect: PropTypes.func,
+	index: PropTypes.number
 }
 
 export default Radium(Dropdown);

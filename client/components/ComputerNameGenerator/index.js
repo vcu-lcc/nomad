@@ -15,19 +15,26 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import ComputerNameGenerator from './ComputerNameGenerator';
-import { nextStage } from '../../actions';
+import {
+    nextStage,
+    updateComputerName,
+    updateComputerNameSelections
+} from '../../actions';
 import { connect } from 'react-redux';
 
 const mapStateToProps = function(state) {
     return {
+        ...state.computerNameGenerator,
         universities: state.Universities,
-        defaultComputerName: state.machine.computerName
+        computerName: typeof state.computerNameGenerator.computerName == 'string' ? state.computerNameGenerator.computerName : state.machine.computerName
     };
 };
 
 const mapDispatchToProps = function(dispatch) {
     return {
-        resolve: dispatch.bind(this, nextStage())
+        updateSelections: fields => dispatch(updateComputerNameSelections(fields)),
+        setComputerName: name => dispatch(updateComputerName(name)),
+        resolve: () => dispatch(nextStage())
     };
 };
 

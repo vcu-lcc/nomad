@@ -14,6 +14,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import _ from 'lodash';
 import { combineReducers } from 'redux';
 import {
 	SET_STAGE,
@@ -24,6 +25,8 @@ import {
 	SET_IDENTITY,
 	SET_TOP_OU,
 	SET_MACHINE_PROPS,
+	UPDATE_COMPUTER_NAME,
+	UPDATE_COMPUTER_NAME_SELECTIONS,
 	SET_LOADING,
 	SET_ACTIVE_DIRECTORY_CONTENTS,
 	UPDATE_ACTIVE_DIRECTORY_PATH,
@@ -35,7 +38,17 @@ const defaultState = {
 	stage: 0,
 	loading: false,
 	credentials: {
-		authenticated: false
+		authenticated: false,
+		username: '',
+		password: '',
+		submit: false
+	},
+	computerNameGenerator: {
+		allowUserOverride: true,
+		computerName: null,
+		minLength: 1,
+		maxLength: 15,
+		selections: []
 	},
 	activeDirectory: {
 		path: 'DC=RAMS,DC=adp,DC=vcu,DC=edu',
@@ -83,7 +96,7 @@ const nomadConfig = (state=defaultState, action) => {
 			};
 		}
 		case MERGE_CONFIGS: {
-			return Object.assign({}, state, ...action.configs);
+			return _.merge({}, state, ...action.configs);
 		}
 		case SET_IDENTITY: {
 			return {
@@ -108,6 +121,24 @@ const nomadConfig = (state=defaultState, action) => {
 					...action.props
 				}
 			};
+		}
+		case UPDATE_COMPUTER_NAME: {
+			return {
+				...state,
+				computerNameGenerator: {
+					...state.computerNameGenerator,
+					computerName: action.computerName
+				}
+			}
+		}
+		case UPDATE_COMPUTER_NAME_SELECTIONS: {
+			return {
+				...state,
+				computerNameGenerator: {
+					...state.computerNameGenerator,
+					selections: action.selections
+				}
+			}
 		}
 		case SET_LOADING: {
 			return {

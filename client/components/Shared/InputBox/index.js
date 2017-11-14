@@ -76,6 +76,7 @@ class InputBox extends React.Component {
 						onChange={() => this.props.onChange(this.getValue())}
 						style={styles.input}
 						placeholder={this.props.placeholder}
+						value={this.props.defaultValue}
 					></input>
 				</div>
 			</div>
@@ -86,13 +87,15 @@ class InputBox extends React.Component {
 InputBox.defaultProps = {
 	onChange: function() {
 	},
+	defaultValue: '',
 	placeholder: null,
 	width: '600px'
 };
 
 InputBox.propTypes = {
 	onChange: PropTypes.func,
-	placeholder: PropTypes.string,
+	defaultValue: PropTypes.string,
+	placeholder: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 	width: PropTypes.string
 };
 

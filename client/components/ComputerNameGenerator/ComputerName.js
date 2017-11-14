@@ -76,10 +76,12 @@ class ComputerName extends React.Component {
       error: false
     };
     this.computerNameElem = null;
+    this.intialized = false;
   }
 
   async changeComputerName(newName) {
     let windowsCommmand = `WMIC computersystem where caption="${os.hostname()}" rename "${newName}"`;
+    console.log(windowsCommmand);
     try {
       let output = await sudo(windowsCommmand);
       if (output.includes('ReturnValue = 0')) {
@@ -129,12 +131,34 @@ class ComputerName extends React.Component {
     this.validate();
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (!this.intialized && this.props.submitOnMount) {
+      setTimeout(() => this.submit());
+    }
+    this.intialized = true;
+  }
+
   componentWillReceiveProps(nextProps) {
     if (this.props.children != nextProps.children ||
       this.props.minLength != nextProps.minLength ||
       this.props.maxLength != nextProps.maxLength) {
       this.validate();
     }
+  }
+
+  submit() {
+    this.setState({
+      loading: true
+    });
+    this.changeComputerName(this.computerNameElem.innerText)
+      .then(result => {
+        this.props.resolve(result.name);
+        this.setState({ loading: false });
+      })
+      .catch(err => {
+        this.props.reject(err);
+        this.setState({ loading: false });
+      });
   }
 
   render() {
@@ -151,10 +175,12 @@ class ComputerName extends React.Component {
           style={[styles.secondaryWrapper]}
         >
           <span
-            style={[styles.computerNamePreview, this.state.error ? styles.error : {}]}
+            style={[styles.computerNamePreview, this.state.error ? styles.error : {}, {
+              cursor: this.props.allowUserOverride ? 'text' : 'default'
+            }]}
             ref={input => this.computerNameElem = input}
             onClick={() => {
-              if (this.props.userOverride) {
+              if (this.props.allowUserOverride) {
                 this.computerNameElem.setAttribute('contenteditable', '');
                 this.setState({
                   forceEnable: true
@@ -187,21 +213,10 @@ class ComputerName extends React.Component {
           </div>
           <Button push
             placeholder="Computer ID"
-            hidden={!this.state.forceEnable && !this.props.userSubmit}
-            onClick={async () => {
-              this.setState({
-                loading: true
-              });
-              try {
-                let result = await this.changeComputerName(this.computerNameElem.innerText);
-                this.props.resolve(result.name);
-              } catch(err) {
-                this.props.reject(err);
-              }
-              this.setState({
-                loading: false
-              });
+            style={{
+              visibility: this.state.forceEnable || !this.state.error && this.props.userSubmit ? 'visible' : 'hidden'
             }}
+            onClick={this.submit}
           > Apply </Button>
         </div>
       </div>
@@ -210,7 +225,7 @@ class ComputerName extends React.Component {
 }
 
 ComputerName.defaultProps = {
-  userOverride: false,
+  allowUserOverride: false,
   userSubmit: false,
   children: 'undefined',
   minLength: 0,
@@ -221,18 +236,20 @@ ComputerName.defaultProps = {
   },
   reject: function() {
     console.error(...arguments);
-  }
+  },
+  submitOnMount: false
 };
 
 ComputerName.propTypes = {
-  userOverride: PropTypes.bool,
+  allowUserOverride: PropTypes.bool,
   userSubmit: PropTypes.bool,
   children: PropTypes.string,
   minLength: PropTypes.number,
   maxLength: PropTypes.number,
   error: PropTypes.bool,
   resolve: PropTypes.func,
-  reject: PropTypes.func
+  reject: PropTypes.func,
+  submitOnMount: PropTypes.bool
 };
 
 export default Radium(ComputerName);
