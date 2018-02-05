@@ -9,6 +9,7 @@
     "activedirectory": "^0.7.2",
     "electron": "^1.7.8",
     "lodash": "^4.17.4",
+    "node-powershell": "^3.3.1",
     "prop-types": "^15.5.10",
     "radium": "^0.19.4",
     "react": "^15.6.1",
@@ -16,6 +17,7 @@
     "react-dom": "^15.6.1",
     "react-redux": "^5.0.6",
     "redux": "^3.7.2",
+    "redux-thunk": "^2.2.0",
     "sudo-prompt": "^7.1.1",
     "systeminformation": "^3.30.6",
     "wmic": "^0.3.0"
@@ -40,6 +42,6 @@
     "build": "electron . --build",
     "development": "electron . --dev",
     "production": "electron . --production",
-    "start": "electron . --dev"
+    "start": "electron ."
   }
 }

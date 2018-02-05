@@ -29,6 +29,7 @@ export const SET_ACTIVE_DIRECTORY_CONTENTS = 'SET_ACTIVE_DIRECTORY_CONTENTS';
 export const REQUEST_ACTIVE_DIRECTORY_PATH = 'REQUEST_ACTIVE_DIRECTORY_PATH';
 export const UPDATE_ACTIVE_DIRECTORY_PATH = 'UPDATE_ACTIVE_DIRECTORY_PATH';
 export const REJECT_ACTIVE_DIRECTORY_PATH = 'REJECT_ACTIVE_DIRECTORY_PATH';
+export const PLACE_COMPUTER_OBJECT = 'PLACE_COMPUTER_OBJECT';
 
 export function setStage(stage) {
     return {
@@ -134,5 +135,11 @@ export function rejectActiveDirectoryPath(reason) {
     return {
         type: REJECT_ACTIVE_DIRECTORY_PATH,
         error: reason
+    };
+};
+
+export function placeComputerObject() {
+    return {
+        type: PLACE_COMPUTER_OBJECT
     };
 };

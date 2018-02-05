@@ -16,8 +16,8 @@
 */
 
 const BUILD = process.argv.includes('--build');
-const DEVELOPMENT = process.argv.includes('--dev');
 const PRODUCTION = process.argv.includes('--production');
+const DEVELOPMENT = process.argv.includes('--dev') || !BUILD && !PRODUCTION;
 
 const { default: installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } = require('electron-devtools-installer');
 const { app, BrowserWindow } = require('electron');

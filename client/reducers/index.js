@@ -31,7 +31,8 @@ import {
 	SET_ACTIVE_DIRECTORY_CONTENTS,
 	UPDATE_ACTIVE_DIRECTORY_PATH,
 	REQUEST_ACTIVE_DIRECTORY_PATH,
-	REJECT_ACTIVE_DIRECTORY_PATH
+	REJECT_ACTIVE_DIRECTORY_PATH,
+	PLACE_COMPUTER_OBJECT
 } from '../actions';
 
 const defaultState = {
@@ -51,7 +52,9 @@ const defaultState = {
 		selections: []
 	},
 	activeDirectory: {
+		apply: false,
 		path: 'DC=RAMS,DC=adp,DC=vcu,DC=edu',
+		requestedPath: false,
 		loading: false
 	},
 	identity: {},
@@ -105,13 +108,18 @@ const nomadConfig = (state=defaultState, action) => {
 			};
 		}
 		case SET_TOP_OU: {
-			return {
-				...state,
-				activeDirectory: {
-					...state.activeDirectory,
-					path: `OU=${ action.ou },DC=${ state.activeDirectory.path.split('DC=').slice(1).join('DC=') }`
-				}
-			};
+			if (state.activeDirectory.path.includes('OU=')) {
+				// If the OU is already defined, it is probably being overriden by some local or remote config.
+				return {...state};
+			} else {
+				return {
+					...state,
+					activeDirectory: {
+						...state.activeDirectory,
+						path: `OU=${ action.ou },DC=${ state.activeDirectory.path.split('DC=').slice(1).join('DC=') }`
+					}
+				};
+			}
 		}
 		case SET_MACHINE_PROPS: {
 			return {
@@ -180,6 +188,15 @@ const nomadConfig = (state=defaultState, action) => {
 				activeDirectory: {
 					...state.activeDirectory,
 					requestedPath: false
+				}
+			}
+		}
+		case PLACE_COMPUTER_OBJECT: {
+			return {
+				...state,
+				activeDirectory: {
+					...state.activeDirectory,
+					apply: true
 				}
 			}
 		}

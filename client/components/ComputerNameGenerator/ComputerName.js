@@ -81,7 +81,6 @@ class ComputerName extends React.Component {
 
   async changeComputerName(newName) {
     let windowsCommmand = `WMIC computersystem where caption="${os.hostname()}" rename "${newName}"`;
-    console.log(windowsCommmand);
     try {
       let output = await sudo(windowsCommmand);
       if (output.includes('ReturnValue = 0')) {
@@ -106,7 +105,7 @@ class ComputerName extends React.Component {
     } catch (err) {
       throw {
         name: os.hostname(),
-        message: 'There was an error executing WMIC. Failed to change Computer Name.',
+        message: 'There was an error with the Rename-Computer PowerShell module. Failed to change Computer Name.',
         detail: err.message
       };
     }
@@ -214,9 +213,9 @@ class ComputerName extends React.Component {
           <Button push
             placeholder="Computer ID"
             style={{
-              visibility: this.state.forceEnable || !this.state.error && this.props.userSubmit ? 'visible' : 'hidden'
+              display: this.state.forceEnable || !this.state.error && this.props.userSubmit ? 'block' : 'none'
             }}
-            onClick={this.submit}
+            onClick={() => this.submit()}
           > Apply </Button>
         </div>
       </div>

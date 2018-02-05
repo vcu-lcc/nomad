@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 import Radium from 'radium';
 // Import react-desktop elements
 import {
+  Button,
   ProgressCircle
 } from 'react-desktop/windows';
 
@@ -33,14 +34,17 @@ const styles = {
   breadcrumb: {
     alignItems: 'center',
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     fontWeight: '100',
-    padding: '8px 0'
+    padding: '8px 0 0 0',
+    overflow: 'auto',
+    maxWidth: 'max-content'
   },
   path: {
     color: '#1d1d1d',
     cursor: 'pointer',
-    padding: '8px'
+    padding: '8px',
+    whiteSpace: 'nowrap'
   },
   pathDivider: {
     borderBottom: '3px solid transparent',
@@ -64,7 +68,8 @@ const styles = {
   },
   content: {
     borderTop: 'solid 1px rgba(0,0,0,.2)',
-    height: '70vh',
+    height: '60vh',
+    margin: '0 0 32px 0',
     overflow: 'auto',
     width: '100%'
   },
@@ -78,6 +83,11 @@ const styles = {
   },
   contentItemLabel: {
     width: '50%'
+  },
+  bottomBar: {
+    alignItems: 'center',
+    display: 'flex',
+    width: '100%'
   }
 };
 
@@ -93,21 +103,6 @@ class ActiveDirectorySelector extends React.Component {
   render() {
     return (
       <div style={[styles.base]}>
-        <div style={[styles.breadcrumb]}>
-          {
-            this.props.path.map((p, idx) => <div key={idx} style={[styles.path]} onClick={() => this.props.updatePath(p.actualPath)}>{p.name}</div>)
-              .reduce((accum, curr, idx, arr) => accum.concat([
-                curr,
-                idx < arr.length - 1 ? <div key={idx + arr.length} style={[styles.pathDivider]}></div> : null
-              ]), [])
-          }
-          { this.props.loading && this.props.path.length > 0 && <div style={[styles.pathDivider]}></div> }
-          { this.props.loading && <ProgressCircle size={25} /> }
-        </div>
-        <div style={[styles.header]}>
-          <div style={[styles.headerLabel]}>Name</div>
-          <div style={[styles.headerLabel]}>Type</div>
-        </div>
         <style>{`
           div.minimalScrollbar::-webkit-scrollbar {
             width: 8px;
@@ -117,6 +112,21 @@ class ActiveDirectorySelector extends React.Component {
             background-color: rgba(0,0,0,.3);
           }
         `}</style>
+        <div style={[styles.breadcrumb]} className="minimalScrollbar">
+          { this.props.loading && <ProgressCircle size={25} /> }
+          { this.props.loading && this.props.path.length > 0 && <div style={[styles.pathDivider]}></div> }
+          {
+            this.props.path.reverse().map((p, idx, arr) => <div key={idx} style={[styles.path]} onClick={() => this.props.updatePath(p.actualPath)}>{p.name}</div>)
+              .reduce((accum, curr, idx, arr) => accum.concat([
+                curr,
+                idx < arr.length - 1 ? <div key={idx + arr.length} style={[styles.pathDivider]}></div> : null,
+              ]), [])
+          }
+        </div>
+        <div style={[styles.header]}>
+          <div style={[styles.headerLabel]}>Name</div>
+          <div style={[styles.headerLabel]}>Type</div>
+        </div>
         <div className="minimalScrollbar" style={[styles.content]}>
           {
             this.props.contents.map((e, i, arr) => (
@@ -127,18 +137,29 @@ class ActiveDirectorySelector extends React.Component {
             ))
           }
         </div>
+        <div style={[styles.bottomBar]}>
+          <div style={{flexGrow: '1'}}></div>
+          <div style={{
+            padding: '0 16px'
+          }}>
+            { this.props.applying && <ProgressCircle /> }
+          </div>
+          <Button onClick={() => this.props.placeComputerObject()}>Submit</Button>
+        </div>
       </div>
     );
   }
 };
 
 ActiveDirectorySelector.defaultProps = {
+  applying: false,
   contents: [],
   loading: true,
   path: []
 };
 
 ActiveDirectorySelector.propTypes = {
+  applying: PropTypes.bool,
   contents: PropTypes.arrayOf(PropTypes.shape({
     type: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
@@ -148,7 +169,9 @@ ActiveDirectorySelector.propTypes = {
   path: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string.isRequired,
     actualPath: PropTypes.string.isRequired
-  }))
+  })),
+  placeComputerObject: PropTypes.func.isRequired,
+  updatePath: PropTypes.func.isRequired
 };
 
 export default Radium(ActiveDirectorySelector);

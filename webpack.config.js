@@ -24,6 +24,8 @@ const HtmlWebpackPluginConfig = new HtmlWebpackPlugin({
 	filename: 'index.html',
 	inject: 'body'
 });
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+
 let nodeModules = fs.readdirSync('./node_modules')
 	.filter(module => module !== '.bin')
 	.reduce((prev, module) => {
@@ -73,7 +75,8 @@ module.exports = {
 		sourceMapFilename: 'index_bundle.map'
 	},
 	plugins: [
-		HtmlWebpackPluginConfig
+		HtmlWebpackPluginConfig,
+		new UglifyJsPlugin()
 	],
 	resolve: {
 		extensions: ['.js', '.jsx', '.json', '.css']

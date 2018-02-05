@@ -17,21 +17,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
 import nomadConfig from './reducers';
 
 import App from './components/App';
 
 let store;
 
-if (typeof window.__REDUX_DEVTOOLS_EXTENSION__ == 'undefined') {
+if (window.__REDUX_DEVTOOLS_EXTENSION__) {
     store = createStore(
-        nomadConfig
+        nomadConfig,
+        window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
+        applyMiddleware(thunk)
     );
 } else {
     store = createStore(
         nomadConfig,
-        window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+        applyMiddleware(thunk)
     );
 }
 

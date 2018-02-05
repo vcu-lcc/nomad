@@ -23,7 +23,8 @@ import {
   setActiveDirectoryContents,
   updateActiveDirectoryPath,
   requestActiveDirectoryPath,
-  rejectActiveDirectoryPath
+  rejectActiveDirectoryPath,
+  placeComputerObject
 } from '../../actions';
 import { connect } from 'react-redux';
 
@@ -69,6 +70,7 @@ const mapStateToProps = function(state, ownProps) {
     path.pop();
   }
   return {
+    applying: state.activeDirectory.apply,
     contents: state.activeDirectory.contents,
     loading: !!state.activeDirectory.requestedPath,
     path
@@ -100,6 +102,9 @@ const getType = function(adObj, defaultCategory) {
 
 const mapDispatchToProps = function(dispatch, ownProps) {
   return {
+    placeComputerObject: () => {
+      dispatch(placeComputerObject())
+    },
     updatePath: (path) => {
       if (typeof path != 'string') {
         throw new Error('Invalid path type ' + typeof path);
