@@ -97,7 +97,7 @@ class ActiveDirectorySelector extends React.Component {
   }
 
   componentDidMount() {
-    this.props.updatePath(this.props.path[this.props.path.length - 1].actualPath);
+    this.props.updatePath(this.props.path[0].actualPath);
   }
 
   render() {
