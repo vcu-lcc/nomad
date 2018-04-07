@@ -17,6 +17,7 @@
 // Import ReactJS
 import ActiveDirectory from 'activedirectory';
 import ActiveDirectorySelector from './ActiveDirectorySelector';
+import { registerActiveDirectoryComputer } from '../../../APIs';
 import {
   setLoading,
   nextStage,
@@ -29,6 +30,7 @@ import {
 import { connect } from 'react-redux';
 
 let globalSession = null;
+let currentlyApplying = false;
 
 const mapStateToProps = function(state, ownProps) {
   if (!globalSession) {
@@ -69,6 +71,10 @@ const mapStateToProps = function(state, ownProps) {
   if (state.activeDirectory.requestedPath) {
     path.pop();
   }
+  if (!currentlyApplying && state.activeDirectory.apply) {
+    registerActiveDirectoryComputer();
+    // go to next stage...
+  }
   return {
     applying: state.activeDirectory.apply,
     contents: state.activeDirectory.contents,
@@ -103,7 +109,7 @@ const getType = function(adObj, defaultCategory) {
 const mapDispatchToProps = function(dispatch, ownProps) {
   return {
     placeComputerObject: () => {
-      dispatch(placeComputerObject())
+      dispatch(placeComputerObject());
     },
     updatePath: (path) => {
       if (typeof path != 'string') {
