@@ -99,6 +99,9 @@ class ActiveDirectorySelector extends React.Component {
 
   componentDidMount() {
     this.props.updatePath(this.props.path[0].actualPath);
+    if (this.props.apply) {
+      this.placeComputerObject(this.props.apply);
+    }
   }
   
   placeComputerObject(options) {

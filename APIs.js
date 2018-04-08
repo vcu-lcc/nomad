@@ -3,7 +3,6 @@ import Sudoer from 'sudo-prompt';
 import os from 'os';
 
 const encodePowershell = function(...commands) {
-    console.info(commands);
     let bytes = Array.from(new TextEncoder().encode(commands.join('\n')));
     let byteString = bytes.map(b => String.fromCharCode(b) + String.fromCharCode(0)).join('');
     return btoa(byteString);
