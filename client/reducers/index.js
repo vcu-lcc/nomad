@@ -32,7 +32,8 @@ import {
 	UPDATE_ACTIVE_DIRECTORY_PATH,
 	REQUEST_ACTIVE_DIRECTORY_PATH,
 	REJECT_ACTIVE_DIRECTORY_PATH,
-	PLACE_COMPUTER_OBJECT
+	PLACE_COMPUTER_OBJECT,
+	FINISHED_PLACING_COMPUTER_OBJECT
 } from '../actions';
 
 const defaultState = {
@@ -197,6 +198,15 @@ const nomadConfig = (state=defaultState, action) => {
 				activeDirectory: {
 					...state.activeDirectory,
 					apply: true
+				}
+			}
+		}
+		case FINISHED_PLACING_COMPUTER_OBJECT: {
+			return {
+				...state,
+				activeDirectory: {
+					...state.activeDirectory,
+					apply: false
 				}
 			}
 		}

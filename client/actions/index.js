@@ -30,6 +30,7 @@ export const REQUEST_ACTIVE_DIRECTORY_PATH = 'REQUEST_ACTIVE_DIRECTORY_PATH';
 export const UPDATE_ACTIVE_DIRECTORY_PATH = 'UPDATE_ACTIVE_DIRECTORY_PATH';
 export const REJECT_ACTIVE_DIRECTORY_PATH = 'REJECT_ACTIVE_DIRECTORY_PATH';
 export const PLACE_COMPUTER_OBJECT = 'PLACE_COMPUTER_OBJECT';
+export const FINISHED_PLACING_COMPUTER_OBJECT = 'FINISHED_PLACING_COMPUTER_OBJECT';
 
 export function setStage(stage) {
     return {
@@ -143,3 +144,9 @@ export function placeComputerObject() {
         type: PLACE_COMPUTER_OBJECT
     };
 };
+
+export function finishedPlacingComputerObject() {
+    return {
+        type: FINISHED_PLACING_COMPUTER_OBJECT
+    }
+}

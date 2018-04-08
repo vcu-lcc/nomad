@@ -17,6 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Radium from 'radium';
+import { registerActiveDirectoryComputer } from '../../../APIs';
 // Import react-desktop elements
 import {
   Button,
@@ -99,6 +100,20 @@ class ActiveDirectorySelector extends React.Component {
   componentDidMount() {
     this.props.updatePath(this.props.path[0].actualPath);
   }
+  
+  placeComputerObject(options) {
+    registerActiveDirectoryComputer(options.username, options.password, options.path, options.computerName).then(res => {
+      this.props.resolve(res);
+    }).catch(err => {
+      this.props.reject(err);
+    })
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (!prevProps.apply && this.props.apply) {
+      this.placeComputerObject(this.props.apply);
+    }
+  }
 
   render() {
     return (
@@ -142,9 +157,9 @@ class ActiveDirectorySelector extends React.Component {
           <div style={{
             padding: '0 16px'
           }}>
-            { this.props.applying && <ProgressCircle /> }
+            { this.props.apply && <ProgressCircle /> }
           </div>
-          <Button onClick={() => this.props.placeComputerObject()}>Submit</Button>
+          <Button onClick={ () => this.props.placeComputerObject() }>Submit</Button>
         </div>
       </div>
     );
@@ -152,14 +167,19 @@ class ActiveDirectorySelector extends React.Component {
 };
 
 ActiveDirectorySelector.defaultProps = {
-  applying: false,
+  apply: null,
   contents: [],
   loading: true,
   path: []
 };
 
 ActiveDirectorySelector.propTypes = {
-  applying: PropTypes.bool,
+  apply: PropTypes.shape({
+    username: PropTypes.string.isRequired,
+    password: PropTypes.string.isRequired,
+    path: PropTypes.string.isRequired,
+    computerName: PropTypes.string.isRequired
+  }),
   contents: PropTypes.arrayOf(PropTypes.shape({
     type: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
@@ -171,7 +191,9 @@ ActiveDirectorySelector.propTypes = {
     actualPath: PropTypes.string.isRequired
   })),
   placeComputerObject: PropTypes.func.isRequired,
-  updatePath: PropTypes.func.isRequired
+  updatePath: PropTypes.func.isRequired,
+  resolve: PropTypes.func.isRequired,
+  reject: PropTypes.func.isRequired
 };
 
 export default Radium(ActiveDirectorySelector);

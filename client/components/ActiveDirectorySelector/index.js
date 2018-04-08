@@ -17,7 +17,6 @@
 // Import ReactJS
 import ActiveDirectory from 'activedirectory';
 import ActiveDirectorySelector from './ActiveDirectorySelector';
-import { registerActiveDirectoryComputer } from '../../../APIs';
 import {
   setLoading,
   nextStage,
@@ -25,12 +24,12 @@ import {
   updateActiveDirectoryPath,
   requestActiveDirectoryPath,
   rejectActiveDirectoryPath,
-  placeComputerObject
+  placeComputerObject,
+  finishedPlacingComputerObject
 } from '../../actions';
 import { connect } from 'react-redux';
 
 let globalSession = null;
-let currentlyApplying = false;
 
 const mapStateToProps = function(state, ownProps) {
   if (!globalSession) {
@@ -71,12 +70,13 @@ const mapStateToProps = function(state, ownProps) {
   if (state.activeDirectory.requestedPath) {
     path.pop();
   }
-  if (!currentlyApplying && state.activeDirectory.apply) {
-    registerActiveDirectoryComputer();
-    // go to next stage...
-  }
   return {
-    applying: state.activeDirectory.apply,
+    apply: state.activeDirectory.apply ? {
+      username: state.credentials.username,
+      password: state.credentials.password,
+      path: state.activeDirectory.path,
+      computerName: state.computerNameGenerator.computerName
+    } : null,
     contents: state.activeDirectory.contents,
     loading: !!state.activeDirectory.requestedPath,
     path
@@ -137,6 +137,15 @@ const mapDispatchToProps = function(dispatch, ownProps) {
         }
         dispatch(setLoading(false));
       });
+    },
+    resolve: msg => {
+      console.log(msg);
+      dispatch(finishedPlacingComputerObject());
+      dispatch(nextStage());
+    },
+    reject: err => {
+      dispatch(finishedPlacingComputerObject());
+      console.error(err);
     }
   };
 };

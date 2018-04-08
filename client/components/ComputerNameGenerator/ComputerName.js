@@ -28,14 +28,6 @@ import {
   ProgressCircle
 } from 'react-desktop/windows';
 
-const sudo = function(cmd) {
-  return new Promise((resolve, reject) => {
-    Sudoer.exec(cmd, { name: 'Elevate privileges' }, function(error, stdout, stderr) {
-      error ? reject(error) : resolve(stdout || stderr);
-    });
-  });
-};
-
 const styles = {
   base: {
     display: 'flex',
@@ -79,38 +71,6 @@ class ComputerName extends React.Component {
     this.intialized = false;
   }
 
-  async changeComputerName(newName) {
-    let windowsCommmand = `WMIC computersystem where caption="${os.hostname()}" rename "${newName}"`;
-    try {
-      let output = await sudo(windowsCommmand);
-      if (output.includes('ReturnValue = 0')) {
-        return {
-          name: os.hostname(),
-          message: 'Computer Name successfully modified.',
-          detail: output
-        };
-      } else if (output.includes('ReturnValue = 5')) {
-        throw {
-          name: os.hostname(),
-          message: 'Failed to change Computer Name. This is likely due to the lack of privileges.',
-          detail: output
-        };
-      } else {
-        throw {
-          name: os.hostname(),
-          message: 'Failed to change Computer Name.',
-          detail: output
-        };
-      }
-    } catch (err) {
-      throw {
-        name: os.hostname(),
-        message: 'There was an error with the Rename-Computer PowerShell module. Failed to change Computer Name.',
-        detail: err.message
-      };
-    }
-  }
-
   validate() {
     if (this.props.error ||
       this.computerNameElem.innerText.length < this.props.minLength ||
@@ -149,15 +109,7 @@ class ComputerName extends React.Component {
     this.setState({
       loading: true
     });
-    this.changeComputerName(this.computerNameElem.innerText)
-      .then(result => {
-        this.props.resolve(result.name);
-        this.setState({ loading: false });
-      })
-      .catch(err => {
-        this.props.reject(err);
-        this.setState({ loading: false });
-      });
+    this.props.resolve(this.computerNameElem.innerText);
   }
 
   render() {
