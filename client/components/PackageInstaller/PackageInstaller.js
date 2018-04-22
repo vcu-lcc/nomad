@@ -22,7 +22,13 @@ class PackageInstaller extends React.Component {
     super();
   }
   render() {
-    return (<h1>This section is under construction!!!</h1>);
+    return (
+      <div style={{
+        height: '100%'
+      }}>
+        ViewBox
+      </div>
+    );
   }
 }
 

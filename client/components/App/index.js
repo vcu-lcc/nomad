@@ -15,6 +15,7 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 import React from 'react';
+import Radium from 'radium';
 // Banner for information
 import InfoBanner from '../InfoBanner';
 // The main wrapper class for encapsulating different 'fragments'
@@ -29,7 +30,15 @@ import PackageInstaller from '../PackageInstaller';
 import InfoDialogue from '../InfoDialogue';
 
 const App = () => (
-  <div>
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      position: 'absolute',
+      height: '100%'
+    }}
+  >
     <InfoBanner />
     <Carousel>
       <ConfigFetcher />
@@ -42,4 +51,4 @@ const App = () => (
   </div>
 );
 
-export default App;
+export default Radium(App);

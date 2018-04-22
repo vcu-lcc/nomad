@@ -24,8 +24,8 @@ import {
   updateActiveDirectoryPath,
   requestActiveDirectoryPath,
   rejectActiveDirectoryPath,
-  placeComputerObject,
-  finishedPlacingComputerObject
+  applyActiveDirectory,
+  placeComputerObject
 } from '../../actions';
 import { connect } from 'react-redux';
 
@@ -108,8 +108,12 @@ const getType = function(adObj, defaultCategory) {
 
 const mapDispatchToProps = function(dispatch, ownProps) {
   return {
-    placeComputerObject: () => {
-      dispatch(placeComputerObject());
+    applyActiveDirectory: () => {
+      dispatch(applyActiveDirectory());
+    },
+    placeComputerObject: (options) => {
+      dispatch(placeComputerObject(options));
+      dispatch(nextStage());
     },
     updatePath: (path) => {
       if (typeof path != 'string') {
@@ -137,15 +141,6 @@ const mapDispatchToProps = function(dispatch, ownProps) {
         }
         dispatch(setLoading(false));
       });
-    },
-    resolve: msg => {
-      console.log(msg);
-      dispatch(finishedPlacingComputerObject());
-      dispatch(nextStage());
-    },
-    reject: err => {
-      dispatch(finishedPlacingComputerObject());
-      console.error(err);
     }
   };
 };

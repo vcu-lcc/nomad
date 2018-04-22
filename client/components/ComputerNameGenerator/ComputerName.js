@@ -24,8 +24,7 @@ import Radium from 'radium';
 import PropTypes from 'prop-types';
 
 import {
-  Button,
-  ProgressCircle
+  Button
 } from 'react-desktop/windows';
 
 const styles = {
@@ -63,7 +62,6 @@ class ComputerName extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false,
       forceEnable: false,
       error: false
     };
@@ -106,9 +104,6 @@ class ComputerName extends React.Component {
   }
 
   submit() {
-    this.setState({
-      loading: true
-    });
     this.props.resolve(this.computerNameElem.innerText);
   }
 
@@ -158,9 +153,6 @@ class ComputerName extends React.Component {
           <div
             style={[styles.horizontalMargin]}
           >
-          {
-            this.state.loading && (<ProgressCircle />)
-          }
           </div>
           <Button push
             placeholder="Computer ID"

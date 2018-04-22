@@ -17,7 +17,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Radium from 'radium';
-import { registerActiveDirectoryComputer } from '../../../APIs';
 // Import react-desktop elements
 import {
   Button,
@@ -105,11 +104,7 @@ class ActiveDirectorySelector extends React.Component {
   }
   
   placeComputerObject(options) {
-    registerActiveDirectoryComputer(options.username, options.password, options.path, options.computerName).then(res => {
-      this.props.resolve(res);
-    }).catch(err => {
-      this.props.reject(err);
-    })
+    this.props.placeComputerObject(options);
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -162,7 +157,7 @@ class ActiveDirectorySelector extends React.Component {
           }}>
             { this.props.apply && <ProgressCircle /> }
           </div>
-          <Button onClick={ () => this.props.placeComputerObject() }>Submit</Button>
+          <Button onClick={ () => this.props.applyActiveDirectory() }>Submit</Button>
         </div>
       </div>
     );
@@ -193,10 +188,9 @@ ActiveDirectorySelector.propTypes = {
     name: PropTypes.string.isRequired,
     actualPath: PropTypes.string.isRequired
   })),
+  applyActiveDirectory: PropTypes.func.isRequired,
   placeComputerObject: PropTypes.func.isRequired,
   updatePath: PropTypes.func.isRequired,
-  resolve: PropTypes.func.isRequired,
-  reject: PropTypes.func.isRequired
 };
 
 export default Radium(ActiveDirectorySelector);

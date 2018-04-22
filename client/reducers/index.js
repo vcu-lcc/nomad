@@ -32,8 +32,9 @@ import {
 	UPDATE_ACTIVE_DIRECTORY_PATH,
 	REQUEST_ACTIVE_DIRECTORY_PATH,
 	REJECT_ACTIVE_DIRECTORY_PATH,
+	APPLY_ACTIVE_DIRECTORY,
 	PLACE_COMPUTER_OBJECT,
-	FINISHED_PLACING_COMPUTER_OBJECT
+	ENQUEUE_OPERATION
 } from '../actions';
 
 const defaultState = {
@@ -61,13 +62,17 @@ const defaultState = {
 	identity: {},
 	machine: {},
 	Universities: [],
+	packageSelector: {
+		sources: []
+	},
 	remote: [
 		// 'https://files.nuget.ts.vcu.edu/EMS/vcu.json'
 	],
 	local: [
 		'config.json',
 		'vcu-cache.json'
-	]
+	],
+	operations: []
 };
 
 const nomadConfig = (state=defaultState, action) => {
@@ -190,25 +195,31 @@ const nomadConfig = (state=defaultState, action) => {
 					...state.activeDirectory,
 					requestedPath: false
 				}
-			}
+			};
 		}
 		case PLACE_COMPUTER_OBJECT: {
 			return {
 				...state,
 				activeDirectory: {
 					...state.activeDirectory,
-					apply: true
+					apply: false
 				}
-			}
+			};
 		}
-		case FINISHED_PLACING_COMPUTER_OBJECT: {
+		case APPLY_ACTIVE_DIRECTORY: {
 			return {
 				...state,
 				activeDirectory: {
 					...state.activeDirectory,
-					apply: false
+					apply: true
 				}
-			}
+			};
+		}
+		case ENQUEUE_OPERATION: {
+			return {
+				...state,
+				operations: [...state.operations, action.operation]
+			};
 		}
 		default:
 			return state;

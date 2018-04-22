@@ -14,6 +14,8 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import os from 'os';
+
 export const SET_STAGE = 'SET_STAGE';
 export const NEXT_STAGE = 'NEXT_STAGE';
 export const SET_CREDENTIALS = 'SET_CREDENTIALS';
@@ -31,6 +33,8 @@ export const UPDATE_ACTIVE_DIRECTORY_PATH = 'UPDATE_ACTIVE_DIRECTORY_PATH';
 export const REJECT_ACTIVE_DIRECTORY_PATH = 'REJECT_ACTIVE_DIRECTORY_PATH';
 export const PLACE_COMPUTER_OBJECT = 'PLACE_COMPUTER_OBJECT';
 export const FINISHED_PLACING_COMPUTER_OBJECT = 'FINISHED_PLACING_COMPUTER_OBJECT';
+export const ENQUEUE_OPERATION = 'ENQUEUE_OPERATION';
+export const APPLY_ACTIVE_DIRECTORY = 'APPLY_ACTIVE_DIRECTORY';
 
 export function setStage(stage) {
     return {
@@ -139,14 +143,32 @@ export function rejectActiveDirectoryPath(reason) {
     };
 };
 
-export function placeComputerObject() {
+export function enqueueOperation(operation) {
     return {
-        type: PLACE_COMPUTER_OBJECT
-    };
+        type: ENQUEUE_OPERATION,
+        operation
+    }
 };
 
-export function finishedPlacingComputerObject() {
+export function applyActiveDirectory() {
     return {
-        type: FINISHED_PLACING_COMPUTER_OBJECT
-    }
+        type: APPLY_ACTIVE_DIRECTORY
+    };
 }
+
+export function placeComputerObject({
+    username,
+    password,
+    path,
+    computerName
+}={}) {
+    return enqueueOperation({
+        name: 'Rename Computer and add to Active Directory',
+        description: `Rename computer from ${os.hostname().toUpperCase()} to ${computerName}, and place in path: "${path}"`,
+        commands: [
+            `$password = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${btoa(password)}")) | ConvertTo-SecureString -asPlainText -Force`,
+            `$credentials = New-Object System.Management.Automation.PSCredential ("${username}", $password)`,
+            `Add-Computer -DomainName RAMS.adp.vcu.edu -OUPath "${path}" ${os.hostname().toUpperCase() == computerName ? '' : `-NewName "${computerName}" `}-Credential $credentials -Force`
+        ]
+    });
+};

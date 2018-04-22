@@ -17,9 +17,12 @@
 import PackageInstaller from './PackageInstaller';
 import { nextStage } from '../../actions';
 import { connect } from 'react-redux';
+import { getFeeds } from './API';
 
 const mapStateToProps = function(state) {
-    return {};
+    return {
+        sources: state.packageSelector.sources
+    };
 };
 
 const mapDispatchToProps = function(dispatch) {

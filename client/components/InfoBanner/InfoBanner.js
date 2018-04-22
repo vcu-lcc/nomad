@@ -25,7 +25,6 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     fontFamily: '"Segoe UI"',
-    position: 'absolute',
     transition: 'transform 1000ms ease-out, box-shadow 1000ms ease-out',
     transform: 'translateY(-100%)',
     userSelect: 'none',

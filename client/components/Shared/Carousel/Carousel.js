@@ -91,7 +91,6 @@ class Carousel extends React.Component {
                     display: 'flex',
                     height: '100%',
                     justifyContent: 'center',
-                    position: 'fixed',
                     transition: this.state.slide ? 'transform 500ms ease-in-out' : null,
                     transform: this.state.slide ? 'translateX(-100vw)' : null,
                     minWidth: '100%'
