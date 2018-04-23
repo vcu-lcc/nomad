@@ -43,10 +43,11 @@ class Carousel extends React.Component {
                     alignItems: 'center',
                     display: 'flex',
                     flexDirection: 'column',
-                    height: '100%',
+                    flexGrow: '1',
                     justifyContent: 'center',
-                    width: '100vw'
+                    width: '100%'
                 }}
+                className='carousel-child'
                 onTransitionEnd={e => e.stopPropagation()}
                 key={String(this.counter++)}
             > { nextView } </div>
@@ -92,8 +93,8 @@ class Carousel extends React.Component {
                     height: '100%',
                     justifyContent: 'center',
                     transition: this.state.slide ? 'transform 500ms ease-in-out' : null,
-                    transform: this.state.slide ? 'translateX(-100vw)' : null,
-                    minWidth: '100%'
+                    transform: this.state.slide ? 'translateX(-50%)' : null,
+                    width: this.state.slide ? '200%' : '100%'
                 }}
             >
                 <style>

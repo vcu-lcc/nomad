@@ -36,7 +36,8 @@ const App = () => (
       flexDirection: 'column',
       justifyContent: 'center',
       position: 'absolute',
-      height: '100%'
+      height: '100%',
+      width: '100%'
     }}
   >
     <InfoBanner />

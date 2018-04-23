@@ -17,16 +17,24 @@
 import React from 'react';
 import Radium from 'radium';
 
+const styles = {
+  base: {
+    height: '100%',
+    width: '100%',
+    fontFamily: 'sans-serif'
+  }
+};
+
 class PackageInstaller extends React.Component {
   constructor() {
     super();
   }
   render() {
     return (
-      <div style={{
-        height: '100%'
-      }}>
-        ViewBox
+      <div style={styles.base}>
+        <div>
+          <span>Packages</span>
+        </div>
       </div>
     );
   }
