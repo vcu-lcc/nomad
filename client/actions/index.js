@@ -35,6 +35,7 @@ export const PLACE_COMPUTER_OBJECT = 'PLACE_COMPUTER_OBJECT';
 export const FINISHED_PLACING_COMPUTER_OBJECT = 'FINISHED_PLACING_COMPUTER_OBJECT';
 export const ENQUEUE_OPERATION = 'ENQUEUE_OPERATION';
 export const APPLY_ACTIVE_DIRECTORY = 'APPLY_ACTIVE_DIRECTORY';
+export const SET_PACKAGES = 'SET_PACKAGES';
 
 export function setStage(stage) {
     return {
@@ -171,4 +172,12 @@ export function placeComputerObject({
             `Add-Computer -DomainName RAMS.adp.vcu.edu -OUPath "${path}" ${os.hostname().toUpperCase() == computerName ? '' : `-NewName "${computerName}" `}-Credential $credentials -Force`
         ]
     });
+};
+
+export function setPackages(source, packages) {
+    return {
+        type: SET_PACKAGES,
+        source,
+        packages
+    };
 };

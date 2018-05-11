@@ -15,19 +15,34 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import PackageInstaller from './PackageInstaller';
-import { nextStage } from '../../actions';
+import { nextStage, setPackages } from '../../actions';
 import { connect } from 'react-redux';
-import { getFeeds } from './API';
+import { getPackages } from './API';
 
 const mapStateToProps = function(state) {
     return {
-        sources: state.packageSelector.sources
+        sources: state.packageSelector.sources,
+        packages: Object.entries(state.packageSelector.packages).reduce((accum, keyValue) => accum.concat(keyValue[1].map(_package => ({
+            ..._package,
+            source: console.log(_package) || keyValue[0]
+        }))), [])
     };
 };
 
 const mapDispatchToProps = function(dispatch) {
     return {
-        resolve: dispatch.bind(this, nextStage())
+        resolve: dispatch.bind(this, nextStage()),
+        refreshPackages: async sources => {
+            for (let source of sources.filter(source => source.enabled)) {
+                let knownPackageIds = {};
+                dispatch(setPackages(source.origin, (await getPackages(source.origin)).map(_package => ({
+                    feedName: _package.Feed_Name,
+                    feedId: _package.Feed_Id,
+                    packageId: _package.Package_Id,
+                    enabled: false
+                })).filter(_package => _package.packageId in knownPackageIds ? false : (knownPackageIds[_package.packageId] = true))));
+            }
+        }
     };
 };
 

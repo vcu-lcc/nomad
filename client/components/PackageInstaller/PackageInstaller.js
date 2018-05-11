@@ -16,12 +16,22 @@
 */
 import React from 'react';
 import Radium from 'radium';
+import PropTypes from 'prop-types';
 
 const styles = {
   base: {
-    height: '100%',
-    width: '100%',
-    fontFamily: 'sans-serif'
+    height: '90vh',
+    width: '95vw',
+    fontFamily: 'sans-serif',
+    padding: '16px'
+  },
+  header: {
+    paddingBottom: '32px'
+  },
+  label: {
+    fontSize: 'xx-large',
+    cursor: 'default',
+    userSelect: 'none'
   }
 };
 
@@ -29,15 +39,45 @@ class PackageInstaller extends React.Component {
   constructor() {
     super();
   }
+
+  componentDidMount() {
+    require('./API').getAllPackages("nuget.ts.vcu.edu");
+    // this.props.refreshPackages(this.props.sources);
+  }
+
   render() {
     return (
       <div style={styles.base}>
+        <div style={styles.header}>
+          <span style={styles.label}>Packages</span>
+        </div>
         <div>
-          <span>Packages</span>
+          { false && this.props.packages.map((_package, i) => <div key={i}>{_package.packageId}</div>) }
         </div>
       </div>
     );
   }
 }
+
+PackageInstaller.defaultProps = {
+  refreshPackages: () => {},
+  sources: [],
+  packages: []
+};
+
+PackageInstaller.propTypes = {
+  refreshPackages: PropTypes.func.isRequired,
+  sources: PropTypes.arrayOf(PropTypes.shape({
+    enabled: PropTypes.bool.isRequired,
+    origin: PropTypes.string.isRequired
+  })).isRequired,
+  packages: PropTypes.arrayOf(PropTypes.shape({
+    source: PropTypes.string.isRequired,
+    feedId: PropTypes.number.isRequired,
+    feedName: PropTypes.string.isRequired,
+    packageId: PropTypes.string.isRequired,
+    enabled: PropTypes.bool.isRequired
+  })).isRequired
+};
 
 export default Radium(PackageInstaller);

@@ -34,7 +34,8 @@ import {
 	REJECT_ACTIVE_DIRECTORY_PATH,
 	APPLY_ACTIVE_DIRECTORY,
 	PLACE_COMPUTER_OBJECT,
-	ENQUEUE_OPERATION
+	ENQUEUE_OPERATION,
+	SET_PACKAGES
 } from '../actions';
 
 const defaultState = {
@@ -63,7 +64,8 @@ const defaultState = {
 	machine: {},
 	Universities: [],
 	packageSelector: {
-		sources: []
+		sources: [],
+		packages: {}
 	},
 	remote: [
 		// 'https://files.nuget.ts.vcu.edu/EMS/vcu.json'
@@ -219,6 +221,18 @@ const nomadConfig = (state=defaultState, action) => {
 			return {
 				...state,
 				operations: [...state.operations, action.operation]
+			};
+		}
+		case SET_PACKAGES: {
+			return {
+				...state,
+				packageSelector: {
+					...state.packageSelector,
+					packages: {
+						...state.packageSelector.packages,
+						[action.source]: action.packages
+					}
+				}
 			};
 		}
 		default:
