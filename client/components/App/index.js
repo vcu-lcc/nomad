@@ -24,7 +24,7 @@ import ActiveDirectoryLoginForm from '../ActiveDirectoryLoginForm';
 import ConfigFetcher from '../ConfigFetcher';
 import ComputerNameGenerator from '../ComputerNameGenerator';
 import ActiveDirectorySelector from '../ActiveDirectorySelector';
-import PackageInstaller from '../PackageInstaller';
+import ConfirmationPage from '../ConfirmationPage/ConfirmationPage';
 // Dialog for more information
 import InfoDialogue from '../InfoDialogue';
 
@@ -36,7 +36,7 @@ const App = () => (
       <ActiveDirectoryLoginForm />
       <ComputerNameGenerator />
       <ActiveDirectorySelector />
-      <PackageInstaller />
+      <ConfirmationPage />
     </Carousel>
     <InfoDialogue />
   </div>

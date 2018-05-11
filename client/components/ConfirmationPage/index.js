@@ -14,16 +14,23 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import React from 'react';
-import Radium from 'radium';
+import ConfirmationPage from './ConfirmationPage';
+import { nextStage } from '../../actions';
+import { connect } from 'react-redux';
 
-class PackageInstaller extends React.Component {
-  constructor() {
-    super();
-  }
-  render() {
-    return (<h1>This section is under construction!!!</h1>);
-  }
-}
+const mapStateToProps = function(state) {
+    return {};
+};
 
-export default Radium(PackageInstaller);
+const mapDispatchToProps = function(dispatch) {
+    return {
+        resolve: dispatch.bind(this, nextStage())
+    };
+};
+
+const ConfirmationSection = connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(ConfirmationPage);
+
+export default ConfirmationSection;

@@ -27,3 +27,7 @@ export function registerActiveDirectoryComputer(username, password, path, comput
         `Add-Computer -DomainName RAMS.adp.vcu.edu -OUPath "${path}" ${os.hostname().toUpperCase() == computerName ? '' : `-NewName "${computerName}" `}-Credential $credentials -Force`
     ));
 };
+
+export function restartPC() {
+    return sudo(powerShell('Restart-Computer -Force'));
+}
