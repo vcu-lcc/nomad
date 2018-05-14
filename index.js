@@ -77,8 +77,6 @@ function createWindow() {
   mainWindow.maximize();
   if (PRODUCTION) {
     mainWindow.loadURL(`file://${__dirname}/build/index.html`);
-    console.log({ BUILD, PRODUCTION, DEVELOPMENT });
-    mainWindow.webContents.openDevTools();
   } else if (DEVELOPMENT) {
     mainWindow.loadURL(`http://localhost:8080/index.html`);
     installExtension(REACT_DEVELOPER_TOOLS)
