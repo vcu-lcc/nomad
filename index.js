@@ -16,40 +16,47 @@
 */
 
 const BUILD = process.argv.includes('--build');
-const PRODUCTION = process.argv.includes('--production');
-const DEVELOPMENT = process.argv.includes('--dev') || !BUILD && !PRODUCTION;
+const DEVELOPMENT = process.argv.includes('--dev');
+const PRODUCTION = process.argv.includes('--production') || !BUILD && !DEVELOPMENT;
 
-const { default: installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } = require('electron-devtools-installer');
 const { app, BrowserWindow } = require('electron');
-const Webpack = require('webpack');
-const WebpackDevServer = require('webpack-dev-server');
-const webpackConfig = require('./webpack.config.js');
+
+let installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS, Webpack, WebpackDevServer, webpackConfig, rimraf;
+
+if (BUILD || DEVELOPMENT) {
+	Webpack = require('webpack');
+  webpackConfig = require('./webpack.config.js');
+  rimraf = require('rimraf');
+	if (DEVELOPMENT) {
+		WebpackDevServer = require('webpack-dev-server');
+		installExtension = require('electron-devtools-installer').installExtension;
+		REACT_DEVELOPER_TOOLS = require('electron-devtools-installer').REACT_DEVELOPER_TOOLS;
+		REDUX_DEVTOOLS = require('electron-devtools-installer').REDUX_DEVTOOLS;
+	}
+}
 
 let mainWindow;
 
 function loadWebpack() {
-  if (BUILD || PRODUCTION) {
-    Webpack(webpackConfig).run((err, stats) => {
-      if (err || stats.hasErrors()) {
-        console.log('There were some errors while building webpack.');
-        if (err) {
-          console.error(err);
+  if (BUILD) {
+    rimraf(webpackConfig.output.path, function() {
+      Webpack(webpackConfig).run((err, stats) => {
+        if (err || stats.hasErrors()) {
+          console.log('There were some errors while building webpack.');
+          if (err) {
+            console.error(err);
+          }
+          console.warn(stats.toJson('minimal'))
+        } else {
+          console.log('Webpack build successful!');
         }
-        console.warn(stats.toJson('minimal'))
-      } else {
-        console.log('Webpack build successful!');
-      }
-    });
-    console.info(`NOMAD written to ${ webpackConfig.output.path }`);
-    if (PRODUCTION) {
-      createWindow();
-    } else if (BUILD) {
-      if (process.platform !== 'darwin') {
         app.quit();
-      }
-    }
-  }
-  if (DEVELOPMENT && !PRODUCTION) {
+      });
+    });
+    console.info(`Writing NOMAD to ${ webpackConfig.output.path } ...`);
+  } else if (PRODUCTION) {
+    createWindow();
+  } else if (DEVELOPMENT) {
     webpackConfig.entry.unshift(
       'webpack-dev-server/client?http://localhost:' + (webpackConfig.devServer.port || 8080),
       'webpack/hot/dev-server')
@@ -70,6 +77,8 @@ function createWindow() {
   mainWindow.maximize();
   if (PRODUCTION) {
     mainWindow.loadURL(`file://${__dirname}/build/index.html`);
+    console.log({ BUILD, PRODUCTION, DEVELOPMENT });
+    mainWindow.webContents.openDevTools();
   } else if (DEVELOPMENT) {
     mainWindow.loadURL(`http://localhost:8080/index.html`);
     installExtension(REACT_DEVELOPER_TOOLS)
