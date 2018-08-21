@@ -28,7 +28,11 @@ const styles = {
     flexDirection: 'column'
   },
   huge: {
-    fontSize: 'x-large'
+    fontSize: 'x-large',
+    textAlign: 'center'
+  },
+  error: {
+    color: 'red'
   },
   buttonGroup: {
     display: 'flex',
@@ -40,12 +44,15 @@ const styles = {
 }
 
 class ConfirmationPage extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
   }
   render() {
     return (<div style={[styles.base]}>
-        <span style={[styles.huge]}>Computer Renaming and Active Directory Join Complete!</span>
+        <span style={[styles.huge]}>
+	    { this.props.errorText ?'Something Went Wrong!':'Computer Renaming and Active Directory Join Complete!' }
+	</span>
+	<code style={[styles.error]}>{ this.props.errorText? this.props.errorText :''}</code>
         <div style={[styles.buttonGroup]}>
           <div style={styles.button}><Button onClick={close}>Quit NOMAD</Button></div>
           <div style={styles.button}><Button onClick={restartPC}>Restart PC</Button></div>
@@ -53,5 +60,4 @@ class ConfirmationPage extends React.Component {
     </div>);
   }
 }
-
 export default Radium(ConfirmationPage);

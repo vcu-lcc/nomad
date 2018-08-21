@@ -79,12 +79,12 @@ function createWindow() {
     mainWindow.loadURL(`file://${__dirname}/build/index.html`);
   } else if (DEVELOPMENT) {
     mainWindow.loadURL(`http://localhost:8080/index.html`);
-    installExtension(REACT_DEVELOPER_TOOLS)
-      .then(name => console.log(`Sucessfully Added Extension: ${name}.`))
-      .catch(err => console.error('An error occurred while installing Electron extension: ', err));
-    installExtension(REDUX_DEVTOOLS)
-      .then(name => console.log(`Sucessfully Added Extension: ${name}.`))
-      .catch(err => console.error('An error occurred while installing Electron extension: ', err));
+    //installExtension(REACT_DEVELOPER_TOOLS)
+     // .then(name => console.log(`Sucessfully Added Extension: ${name}.`))
+      //.catch(err => console.error('An error occurred while installing Electron extension: ', err));
+   // installExtension(REDUX_DEVTOOLS)
+    //  .then(name => console.log(`Sucessfully Added Extension: ${name}.`))
+     // .catch(err => console.error('An error occurred while installing Electron extension: ', err));
     mainWindow.webContents.openDevTools();
   }
   mainWindow.on('closed', function() {

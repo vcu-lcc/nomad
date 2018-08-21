@@ -82,7 +82,7 @@ class ComputerNameGenerator extends React.Component {
           + (building ? building.Acronym.substring(0, 3) || 'null' : '[BUILDING]')
           + (room ? room.RoomNumber.substring(Math.max(0, room.RoomNumber.length - 5), room.RoomNumber.length) || 'null' : '[ROOM]')
           + (selections[0] == 0 ? 'P' : 'L')
-          + (computerNumber ? computerNumber[0] || '#' : '[#]');
+          + (computerNumber ? computerNumber.substring(0, 3)|| '#' : '[#]');
         break;
       }
       case 2:
@@ -154,7 +154,7 @@ class ComputerNameGenerator extends React.Component {
           + (building ? building.Acronym.substring(0, 3) || 'null' : '[BUILDING]')
           + center
           + (selections[0] == 2 ? 'K' : 'C')
-          + (computerNumber ? computerNumber.substring(0, 2) || '##' : '[##]');
+          + (computerNumber ? computerNumber.substring(0, 3)|| '##' : '[##]');
         break;
       }
       case 4: {
@@ -210,7 +210,7 @@ class ComputerNameGenerator extends React.Component {
           + (building ? building.Acronym.substring(0, 3) || 'null' : '[BUILDING]')
           + (initials ? initials.substring(0, 3) || 'null' : '[INITIALS]')
           + (formFactor ? formFactor[0] || '#' : '[#]')
-          + (computerNumber ? computerNumber[0] || '#' : '[#]');
+          + (computerNumber ? computerNumber.substring(0, 3)|| '#' : '[#]');
         break;
       }
       case 5: {
@@ -267,6 +267,7 @@ class ComputerNameGenerator extends React.Component {
           userSubmit={this.state.done}
           minLength={this.props.minLength}
           maxLength={this.props.maxLength}
+	  setComputerName={this.props.setComputerName}
           resolve={name => {
             this.props.resolve(name);
           }}

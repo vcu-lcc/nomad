@@ -28,6 +28,7 @@ export const SET_LOADING = 'SET_LOADING';
 export const SET_ACTIVE_DIRECTORY_CONTENTS = 'SET_ACTIVE_DIRECTORY_CONTENTS';
 export const REQUEST_ACTIVE_DIRECTORY_PATH = 'REQUEST_ACTIVE_DIRECTORY_PATH';
 export const UPDATE_ACTIVE_DIRECTORY_PATH = 'UPDATE_ACTIVE_DIRECTORY_PATH';
+export const SET_ACTIVE_DIRECTORY_ERROR = 'SET_ACTIVE_DIRECTORY_ERROR';
 export const REJECT_ACTIVE_DIRECTORY_PATH = 'REJECT_ACTIVE_DIRECTORY_PATH';
 export const PLACE_COMPUTER_OBJECT = 'PLACE_COMPUTER_OBJECT';
 export const FINISHED_PLACING_COMPUTER_OBJECT = 'FINISHED_PLACING_COMPUTER_OBJECT';
@@ -122,6 +123,13 @@ export function updateActiveDirectoryPath(path) {
     return {
         type: UPDATE_ACTIVE_DIRECTORY_PATH,
         path
+    };
+};
+
+export function setActiveDirectoryError(errorText) {
+    return {
+        type: SET_ACTIVE_DIRECTORY_ERROR,
+        errorText
     };
 };
 

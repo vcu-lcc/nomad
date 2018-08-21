@@ -30,6 +30,7 @@ import {
 	SET_LOADING,
 	SET_ACTIVE_DIRECTORY_CONTENTS,
 	UPDATE_ACTIVE_DIRECTORY_PATH,
+	SET_ACTIVE_DIRECTORY_ERROR,
 	REQUEST_ACTIVE_DIRECTORY_PATH,
 	REJECT_ACTIVE_DIRECTORY_PATH,
 	PLACE_COMPUTER_OBJECT,
@@ -170,6 +171,15 @@ const nomadConfig = (state=defaultState, action) => {
 					...state.activeDirectory,
 					path: action.path,
 					requestedPath: false
+				}
+			};
+		}
+		case SET_ACTIVE_DIRECTORY_ERROR: {
+			return {
+				...state,
+				activeDirectory: {
+					...state.activeDirectory,
+					errorText: action.errorText
 				}
 			};
 		}

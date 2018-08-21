@@ -106,6 +106,7 @@ class ActiveDirectorySelector extends React.Component {
   
   placeComputerObject(options) {
     registerActiveDirectoryComputer(options.username, options.password, options.path, options.computerName).then(res => {
+	console.log(res);
       this.props.resolve(res);
     }).catch(err => {
       this.props.reject(err);

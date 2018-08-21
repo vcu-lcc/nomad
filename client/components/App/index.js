@@ -24,7 +24,7 @@ import ActiveDirectoryLoginForm from '../ActiveDirectoryLoginForm';
 import ConfigFetcher from '../ConfigFetcher';
 import ComputerNameGenerator from '../ComputerNameGenerator';
 import ActiveDirectorySelector from '../ActiveDirectorySelector';
-import ConfirmationPage from '../ConfirmationPage/ConfirmationPage';
+import ConfirmationPage from '../ConfirmationPage';
 // Dialog for more information
 import InfoDialogue from '../InfoDialogue';
 

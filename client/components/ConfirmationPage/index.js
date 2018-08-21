@@ -17,9 +17,10 @@
 import ConfirmationPage from './ConfirmationPage';
 import { nextStage } from '../../actions';
 import { connect } from 'react-redux';
-
 const mapStateToProps = function(state) {
-    return {};
+    return {
+	    errorText: state.activeDirectory.errorText
+    };
 };
 
 const mapDispatchToProps = function(dispatch) {

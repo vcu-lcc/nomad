@@ -22,6 +22,7 @@ import {
   nextStage,
   setActiveDirectoryContents,
   updateActiveDirectoryPath,
+  setActiveDirectoryError,
   requestActiveDirectoryPath,
   rejectActiveDirectoryPath,
   placeComputerObject,
@@ -139,13 +140,16 @@ const mapDispatchToProps = function(dispatch, ownProps) {
       });
     },
     resolve: msg => {
-      console.log(msg);
       dispatch(finishedPlacingComputerObject());
       dispatch(nextStage());
     },
     reject: err => {
       dispatch(finishedPlacingComputerObject());
+      let errString = String(err);
+      errString = (errString.substr(errString.indexOf('#'),errString.length));
+      dispatch(setActiveDirectoryError(errString));
       console.error(err);
+      dispatch(nextStage());
     }
   };
 };
