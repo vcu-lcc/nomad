@@ -50,7 +50,7 @@ class ConfirmationPage extends React.Component {
   render() {
     return (<div style={[styles.base]}>
         <span style={[styles.huge]}>
-	    { this.props.errorText ?'Something Went Wrong!':'Computer Renaming and Active Directory Join Complete!' }
+	    { this.props.errorText ?'Something Went Wrong!':'Computer Renaming Complete!' }
 	</span>
 	<code style={[styles.error]}>{ this.props.errorText? this.props.errorText :''}</code>
         <div style={[styles.buttonGroup]}>

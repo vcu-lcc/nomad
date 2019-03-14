@@ -23,6 +23,8 @@ import React from 'react';
 import Radium from 'radium';
 import PropTypes from 'prop-types';
 
+import {namePC} from '../../../APIs';
+
 import {
   Button,
   ProgressCircle
@@ -110,6 +112,7 @@ class ComputerName extends React.Component {
     this.setState({
       loading: true
     });
+    namePC(this.computerNameElem.innerText);
     this.props.resolve(this.computerNameElem.innerText);
   }
 

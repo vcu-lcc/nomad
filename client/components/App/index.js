@@ -20,25 +20,19 @@ import InfoBanner from '../InfoBanner';
 // The main wrapper class for encapsulating different 'fragments'
 import Carousel from '../Shared/Carousel';
 // The different 'fragments' that we have
-import ActiveDirectoryLoginForm from '../ActiveDirectoryLoginForm';
 import ConfigFetcher from '../ConfigFetcher';
 import ComputerNameGenerator from '../ComputerNameGenerator';
-import ActiveDirectorySelector from '../ActiveDirectorySelector';
 import ConfirmationPage from '../ConfirmationPage';
 // Dialog for more information
-import InfoDialogue from '../InfoDialogue';
 
 const App = () => (
   <div>
     <InfoBanner />
     <Carousel>
       <ConfigFetcher />
-      <ActiveDirectoryLoginForm />
       <ComputerNameGenerator />
-      <ActiveDirectorySelector />
       <ConfirmationPage />
     </Carousel>
-    <InfoDialogue />
   </div>
 );
 
