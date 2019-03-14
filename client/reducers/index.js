@@ -28,6 +28,13 @@ import {
 	UPDATE_COMPUTER_NAME,
 	UPDATE_COMPUTER_NAME_SELECTIONS,
 	SET_LOADING,
+	SET_ACTIVE_DIRECTORY_CONTENTS,
+	UPDATE_ACTIVE_DIRECTORY_PATH,
+	SET_ACTIVE_DIRECTORY_ERROR,
+	REQUEST_ACTIVE_DIRECTORY_PATH,
+	REJECT_ACTIVE_DIRECTORY_PATH,
+	PLACE_COMPUTER_OBJECT,
+	FINISHED_PLACING_COMPUTER_OBJECT
 } from '../actions';
 
 const defaultState = {
@@ -45,6 +52,12 @@ const defaultState = {
 		minLength: 1,
 		maxLength: 15,
 		selections: []
+	},
+	activeDirectory: {
+		apply: false,
+		path: 'DC=RAMS,DC=adp,DC=vcu,DC=edu',
+		requestedPath: false,
+		loading: false
 	},
 	identity: {},
 	machine: {},
@@ -141,6 +154,70 @@ const nomadConfig = (state=defaultState, action) => {
 				...state,
 				loading: action.loading
 			};
+		}
+		case SET_ACTIVE_DIRECTORY_CONTENTS: {
+			return {
+				...state,
+				activeDirectory: {
+					...state.activeDirectory,
+					contents: action.contents
+				}
+			};
+		}
+		case UPDATE_ACTIVE_DIRECTORY_PATH: {
+			return {
+				...state,
+				activeDirectory: {
+					...state.activeDirectory,
+					path: action.path,
+					requestedPath: false
+				}
+			};
+		}
+		case SET_ACTIVE_DIRECTORY_ERROR: {
+			return {
+				...state,
+				activeDirectory: {
+					...state.activeDirectory,
+					errorText: action.errorText
+				}
+			};
+		}
+		case REQUEST_ACTIVE_DIRECTORY_PATH: {
+			return {
+				...state,
+				activeDirectory: {
+					...state.activeDirectory,
+					requestedPath: action.requestedPath
+				}
+			};
+		}
+		case REJECT_ACTIVE_DIRECTORY_PATH: {
+			return {
+				...state,
+				activeDirectory: {
+					...state.activeDirectory,
+					requestedPath: false
+				}
+			}
+		}
+		case PLACE_COMPUTER_OBJECT: {
+			return {
+				...state,
+				activeDirectory: {
+					...state.activeDirectory,
+					apply: true
+				}
+			}
+		}
+		case FINISHED_PLACING_COMPUTER_OBJECT: {
+			return {
+				...state,
+				activeDirectory: {
+					...state.activeDirectory,
+					apply: false
+				}
+			}
 		}
 		default:
 			return state;

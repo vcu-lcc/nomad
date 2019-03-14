@@ -3,16 +3,17 @@ import os from 'os';
 
 
 
-export function sudo(cmd) {
+export function sudo(cmd,cb) {
     return new Promise((resolve, reject) => {
         Sudoer.exec(cmd, { name: 'Elevate privileges' }, function(error, stdout, stderr) {
-            error ? reject(error) : resolve(stdout || stderr);
+		
+            error ? reject(error) : cb();resolve(stdout || stderr);
         });
     });
 };
 
-export function namePC(computerName) {
-    return sudo(`hostname ${computerName}`);
+export function namePC(computerName, cb) {
+    sudo(`hostname ${computerName}`,cb);
 };
 
 export function restartPC() {

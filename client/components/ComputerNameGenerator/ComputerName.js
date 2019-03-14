@@ -109,11 +109,12 @@ class ComputerName extends React.Component {
 
   submit() {
     this.props.setComputerName(this.computerNameElem.innerText);	
-    this.setState({
-      loading: true
+    namePC(this.computerNameElem.innerText,()=>{
+   	 this.setState({
+     	    loading: true
+   	 });
+   	 this.props.resolve(this.computerNameElem.innerText);
     });
-    namePC(this.computerNameElem.innerText);
-    this.props.resolve(this.computerNameElem.innerText);
   }
 
   render() {

@@ -25,6 +25,13 @@ export const SET_MACHINE_PROPS = 'SET_MACHINE_PROPS';
 export const UPDATE_COMPUTER_NAME = 'UPDATE_COMPUTER_NAME';
 export const UPDATE_COMPUTER_NAME_SELECTIONS = 'UPDATE_COMPUTER_NAME_SELECTIONS';
 export const SET_LOADING = 'SET_LOADING';
+export const SET_ACTIVE_DIRECTORY_CONTENTS = 'SET_ACTIVE_DIRECTORY_CONTENTS';
+export const REQUEST_ACTIVE_DIRECTORY_PATH = 'REQUEST_ACTIVE_DIRECTORY_PATH';
+export const UPDATE_ACTIVE_DIRECTORY_PATH = 'UPDATE_ACTIVE_DIRECTORY_PATH';
+export const SET_ACTIVE_DIRECTORY_ERROR = 'SET_ACTIVE_DIRECTORY_ERROR';
+export const REJECT_ACTIVE_DIRECTORY_PATH = 'REJECT_ACTIVE_DIRECTORY_PATH';
+export const PLACE_COMPUTER_OBJECT = 'PLACE_COMPUTER_OBJECT';
+export const FINISHED_PLACING_COMPUTER_OBJECT = 'FINISHED_PLACING_COMPUTER_OBJECT';
 
 export function setStage(stage) {
     return {
@@ -105,3 +112,49 @@ export function setLoading(loading) {
     };
 };
 
+export function setActiveDirectoryContents(contents) {
+    return {
+        type: SET_ACTIVE_DIRECTORY_CONTENTS,
+        contents
+    };
+};
+
+export function updateActiveDirectoryPath(path) {
+    return {
+        type: UPDATE_ACTIVE_DIRECTORY_PATH,
+        path
+    };
+};
+
+export function setActiveDirectoryError(errorText) {
+    return {
+        type: SET_ACTIVE_DIRECTORY_ERROR,
+        errorText
+    };
+};
+
+export function requestActiveDirectoryPath(requestedPath) {
+    return {
+        type: REQUEST_ACTIVE_DIRECTORY_PATH,
+        requestedPath
+    };
+};
+
+export function rejectActiveDirectoryPath(reason) {
+    return {
+        type: REJECT_ACTIVE_DIRECTORY_PATH,
+        error: reason
+    };
+};
+
+export function placeComputerObject() {
+    return {
+        type: PLACE_COMPUTER_OBJECT
+    };
+};
+
+export function finishedPlacingComputerObject() {
+    return {
+        type: FINISHED_PLACING_COMPUTER_OBJECT
+    }
+}
