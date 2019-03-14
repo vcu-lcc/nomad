@@ -13,7 +13,7 @@ export function sudo(cmd,cb) {
 };
 
 export function namePC(computerName, cb) {
-    sudo(`scutil --set LocalHostName ${computerName}`,cb);
+    sudo(`scutil --set LocalHostName ${computerName};scutil --set HostName ${computerName};scutil --set ComputerName ${computerName}`,cb);
 };
 
 export function restartPC() {
