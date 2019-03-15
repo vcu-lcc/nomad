@@ -23,6 +23,7 @@ import Carousel from '../Shared/Carousel';
 import ConfigFetcher from '../ConfigFetcher';
 import ComputerNameGenerator from '../ComputerNameGenerator';
 import ConfirmationPage from '../ConfirmationPage';
+import InstructionsDialogue from '../InstructionsDialogue';
 // Dialog for more information
 
 const App = () => (
@@ -33,6 +34,7 @@ const App = () => (
       <ComputerNameGenerator />
       <ConfirmationPage />
     </Carousel>
+    <InstructionsDialogue/>
   </div>
 );
 
