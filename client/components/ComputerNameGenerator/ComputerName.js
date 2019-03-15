@@ -36,7 +36,7 @@ const styles = {
     alignItems: 'center',
     userSelect: 'none',
     cursor: 'default',
-    fontFamily: '"Segoe UI"'
+    fontFamily: '"sans-serif"'
   },
   computerNamePreview: {
     flexGrow: '1',

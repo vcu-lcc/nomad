@@ -23,7 +23,7 @@ const styles = {
 		display: 'flex',
 		userSelect: 'none',
 		cursor: 'default',
-		fontFamily: '"Segoe UI"',
+		fontFamily: '"sans-serif"',
 		alignItems: 'center'
 	},
 	label: {

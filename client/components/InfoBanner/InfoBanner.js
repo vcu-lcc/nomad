@@ -24,7 +24,7 @@ const styles = {
     boxShadow: '0 5px 12px 0px rgba(0,0,0,0)',
     display: 'flex',
     flexDirection: 'column',
-    fontFamily: '"Segoe UI"',
+    fontFamily: '"sans-serif"',
     position: 'absolute',
     transition: 'transform 1000ms ease-out, box-shadow 1000ms ease-out',
     transform: 'translateY(-100%)',

@@ -23,7 +23,7 @@ const styles = {
 	base: {
 		userSelect: 'none',
 		cursor: 'default',
-		fontFamily: '"Segoe UI"',
+		fontFamily: '"sans-serif"',
 		':focus': {
 			outline: 'none'
 		}
