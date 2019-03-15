@@ -25,6 +25,7 @@ import ConfigFetcher from '../ConfigFetcher';
 import ComputerNameGenerator from '../ComputerNameGenerator';
 import ActiveDirectorySelector from '../ActiveDirectorySelector';
 import ConfirmationPage from '../ConfirmationPage';
+import InstructionsDialogue from '../InstructionsDialogue';
 // Dialog for more information
 import InfoDialogue from '../InfoDialogue';
 
@@ -39,6 +40,7 @@ const App = () => (
       <ConfirmationPage />
     </Carousel>
     <InfoDialogue />
+    <InstructionsDialogue/>
   </div>
 );
 
