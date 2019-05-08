@@ -35,7 +35,7 @@ let globalSession = null;
 const mapStateToProps = function(state, ownProps) {
   if (!globalSession) {
     globalSession = new ActiveDirectory({
-      url: 'ldap://RAMS.adp.vcu.edu',
+      url: `ldaps://${state.activeDirectory.url}`,
       username: 'RAMS\\' + state.credentials.username,
       password: state.credentials.password,
       attributes: {
@@ -76,7 +76,8 @@ const mapStateToProps = function(state, ownProps) {
       username: state.credentials.username,
       password: state.credentials.password,
       path: state.activeDirectory.path,
-      computerName: state.computerNameGenerator.computerName
+      computerName: state.computerNameGenerator.computerName,
+      url: state.activeDirectory.url
     } : null,
     contents: state.activeDirectory.contents,
     loading: !!state.activeDirectory.requestedPath,

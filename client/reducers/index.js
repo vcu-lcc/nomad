@@ -22,6 +22,7 @@ import {
 	SET_CREDENTIALS,
 	SET_UNIVERSITY,
 	MERGE_CONFIGS,
+	SET_URL,
 	SET_IDENTITY,
 	SET_TOP_OU,
 	SET_MACHINE_PROPS,
@@ -57,7 +58,8 @@ const defaultState = {
 		apply: false,
 		path: 'DC=RAMS,DC=adp,DC=vcu,DC=edu',
 		requestedPath: false,
-		loading: false
+		loading: false,
+		url: 'rams.adp.vcu.edu'
 	},
 	identity: {},
 	machine: {},
@@ -101,6 +103,15 @@ const nomadConfig = (state=defaultState, action) => {
 		}
 		case MERGE_CONFIGS: {
 			return _.merge({}, state, ...action.configs);
+		}
+		case SET_URL: {
+			return {
+				...state,
+				activeDirectory: {
+					...state.activeDirectory,
+					url: action.url
+				}
+			};
 		}
 		case SET_IDENTITY: {
 			return {
